@@ -1,26 +1,10 @@
-# SpacetimeDB Documentation
+You can think of SpacetimeDB as a database that's also a server.
 
-## Installation
-
-You can run SpacetimeDB as a standalone database server via the `spacetime` CLI tool.
-
-You can find the instructions to install the CLI tool for your platform [here](/install).
-
-<button to="/install">Click here to install</button>
-
-To get started running your own standalone instance of SpacetimeDB check out our [Getting Started Guide](/docs/getting-started).
-
-<button to="/docs/getting-started">Getting Started</button>
-
-## What is SpacetimeDB?
-
-You can think of SpacetimeDB as a database that is also a server.
-
-It is a relational database system that lets you upload your application logic directly into the database by way of very fancy stored procedures called "modules".
+It's a relational database system that lets you upload your application logic directly into the database with stored procedures called "modules".
 
 Instead of deploying a web or game server that sits in between your clients and your database, your clients connect directly to the database and execute your application logic inside the database itself. You can write all of your permission and authorization logic right inside your module just as you would in a normal server.
 
-This means that you can write your entire application in a single language, Rust, and deploy it as a single binary. No more microservices, no more containers, no more Kubernetes, no more Docker, no more VMs, no more DevOps, no more infrastructure, no more ops, no more servers.
+This means that you can write your entire application in any language that compiles to WebAssembly, like Rust for example, and deploy it as a single binary. This cuts out all of the wrestling with containers, docker, Kubernetes, VMs, DevOps, microservices, and complex cloud provider interfaces.
 
 <figure>
     <img src="/images/basic-architecture-diagram.png" alt="SpacetimeDB Architecture" style="width:100%">
@@ -30,9 +14,9 @@ This means that you can write your entire application in a single language, Rust
     </figcaption>
 </figure>
 
-It's actually similar to the idea of smart contracts, except that SpacetimeDB is a database, has nothing to do with blockchain, and it's a lot faster than any smart contract system.
+In a sense, it's a bit like adding smart-contracts to your in-memory database, a database optimized for high throughput, low latency transactions.
 
-So fast, in fact, that the entire backend our MMORPG [BitCraft Online](https://bitcraftonline.com) is just a SpacetimeDB module. We don't have any other servers or services running, which means that everything in the game, all of the chat messages, items, resources, terrain, and even the locations of the players are stored and processed by the database before being synchronized out to all of the clients in real-time.
+It's so fast, in fact, that the entire backend our MMORPG [BitCraft Online](https://bitcraftonline.com) is just a SpacetimeDB module. We don't have any other servers or services running, which means that everything in the game, all of the chat messages, items, resources, terrain, and even the locations of the players are stored and processed by the database before being synchronized out to all of the clients in real-time.
 
 SpacetimeDB is optimized for maximum speed and minimum latency rather than batch processing or OLAP workloads. It is designed to be used for real-time applications like games, chat, and collaboration tools.
 
