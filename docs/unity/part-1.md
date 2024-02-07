@@ -12,14 +12,19 @@ This tutorial has been tested against UnityEngine version 2022.3.4f1. This tutor
 
 ## Prepare Project Structure
 
-This project is separated into two sub-projects, one for the server (module) code and one for the client code. First we'll create the main directory, this directory name doesn't matter but we'll give you an example:
+This project is separated into two sub-projects;
+
+1. Server (module) code 
+2. Client code.
+
+First, we'll create an arbitrarily-named project root directory:
 
 ```bash
 mkdir SpacetimeDBUnityTutorial
 cd SpacetimeDBUnityTutorial
 ```
 
-In the following sections we'll be adding a client directory and a server directory, which will contain the client files and the module (server) files respectively. We'll start by populating the client directory.
+We'll start by populating the client directory.
 
 ## Setting up the Tutorial Unity Project
 
@@ -31,9 +36,9 @@ Open Unity and create a new project by selecting "New" from the Unity Hub or goi
 
 ![UnityHub-NewProject](/images/unity-tutorial/UnityHub-NewProject.JPG)
 
-For Project Name use `client`. For Project Location make sure that you use your `SpacetimeDBUnityTutorial` directory. This is the directory that we created in a previous step.
+**⚠️ Ensure `3D (URP)` is selected** to properly render the materials in the scene!
 
-**Important: Ensure that you have selected the 3D (URP) template for this project.** If you forget to do this then Unity won't be able to properly render the materials in the scene!
+For Project Name use `client`. For Project Location make sure that you use your `SpacetimeDBUnityTutorial` directory. This is the directory that we created in a previous step.
 
 ![UnityHub-3DURP](/images/unity-tutorial/UnityHub-3DURP.JPG)
 
@@ -77,7 +82,9 @@ Now that we have everything set up, let's run the project and see it in action:
 
 ![Unity-OpenSceneMain](/images/unity-tutorial/Unity-OpenSceneMain.JPG)
 
-NOTE: When you open the scene you may get a message saying you need to import TMP Essentials. When it appears, click the "Import TMP Essentials" button.
+**NOTE:** When you open the scene you may get a message saying you need to import TMP Essentials. When it appears, click the "Import TMP Essentials" button.
+
+🧹 Clear any false-positive TMPro errors that may show.
 
 ![Unity Import TMP Essentials](/images/unity-tutorial/Unity-ImportTMPEssentials.JPG)
 
@@ -104,6 +111,8 @@ At this point you should have the single player game working. In your CLI, your 
 ```bash
 spacetime start
 ```
+
+💡Below examples Rust language, [but you may also use C#](../modules/c-sharp/index.md) at the cost of 1/2 the speed. 
 
 3. Run the following command to initialize the SpacetimeDB server project with Rust as the language:
 
@@ -612,6 +621,7 @@ private void PlayerComponent_OnInsert(PlayerComponent obj, ReducerEvent callInfo
     {
         // Spawn the player object and attach the RemotePlayer component
         var remotePlayer = Instantiate(PlayerPrefab);
+        
         // Lookup and apply the position for this new player
         var entity = EntityComponent.FilterByEntityId(obj.EntityId);
         var position = new Vector3(entity.Position.X, entity.Position.Y, entity.Position.Z);
@@ -639,21 +649,26 @@ using SpacetimeDB;
 private float? lastUpdateTime;
 private void FixedUpdate()
 {
-    if ((lastUpdateTime.HasValue && Time.time - lastUpdateTime.Value > 1.0f / movementUpdateSpeed) || !SpacetimeDBClient.instance.IsConnected())
-    {
-        return;
-    }
+   bool hasUpdatedRecently = lastUpdateTime.HasValue && 
+   Time.time - lastUpdateTime.Value > 1.0f / movementUpdateSpeed;
+   bool isConnected = SpacetimeDBClient.instance.IsConnected();
 
-    lastUpdateTime = Time.time;
-    var p = PlayerMovementController.Local.GetModelPosition();
-    Reducer.UpdatePlayerPosition(new StdbVector3
-        {
-            X = p.x,
-            Y = p.y,
-            Z = p.z,
-        },
-        PlayerMovementController.Local.GetModelRotation(),
-        PlayerMovementController.Local.IsMoving());
+   if (hasUpdatedRecently || !isConnected)
+   {
+      return;
+   }
+
+   lastUpdateTime = Time.time;
+   var p = PlayerMovementController.Local.GetModelPosition();
+   
+   Reducer.UpdatePlayerPosition(new StdbVector3
+   {
+      Y = p.y,
+      Z = p.z,
+      X = p.x,
+   },
+   PlayerMovementController.Local.GetModelRotation(),
+   PlayerMovementController.Local.IsMoving());
 }
 ```
 

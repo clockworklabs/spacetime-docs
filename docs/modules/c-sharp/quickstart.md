@@ -16,7 +16,18 @@ If you haven't already, start by [installing SpacetimeDB](/install). This will i
 
 ## Install .NET 8
 
-Next we need to [install .NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) so that we can build and publish our module. .NET 8.0 is the earliest to have the `wasi-experimental` workload that we rely on.
+Next we need to [install .NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) so that we can build and publish our module.
+
+You may already have .NET 8 and can be checked:
+```bash
+dotnet --list-sdks
+```
+
+.NET 8.0 is the earliest to have the `wasi-experimental` workload that we rely on, but requires manual activation:
+
+```bash
+dotnet workload install wasi-experimental
+```
 
 ## Project structure
 
@@ -35,7 +46,11 @@ spacetime init --lang csharp server
 
 ## Declare imports
 
-`spacetime init` should have pre-populated `server/Lib.cs` with a trivial module. Clear it out, so we can write a module that's still pretty simple: a bare-bones chat server.
+`spacetime init` generated a few files: 
+
+1. Open `server/StdbModule.csproj` to generate a .sln file for intellisense/validation support.
+2. Open `server/Lib.cs`, a trivial module.
+3. Clear it out, so we can write a new module that's still pretty simple: a bare-bones chat server.
 
 To the top of `server/Lib.cs`, add some imports we'll be using:
 
@@ -235,7 +250,7 @@ public static void OnDisconnect(DbEventArgs dbEventArgs)
     else
     {
         // User does not exist, log warning
-        Log($"Warning: No user found for disconnected client.");
+        Log("Warning: No user found for disconnected client.");
     }
 }
 ```
@@ -250,12 +265,16 @@ From the `quickstart-chat` directory, run:
 spacetime publish --project-path server <module-name>
 ```
 
+```bash
+npm i wasm-opt -g
+```
+
 ## Call Reducers
 
 You can use the CLI (command line interface) to run reducers. The arguments to the reducer are passed in JSON format.
 
 ```bash
-spacetime call <module-name> send_message '["Hello, World!"]'
+spacetime call <module-name> send_message "Hello, World!"
 ```
 
 Once we've called our `send_message` reducer, we can check to make sure it ran by running the `logs` command.
@@ -288,4 +307,4 @@ spacetime sql <module-name> "SELECT * FROM Message"
 
 You've just set up your first database in SpacetimeDB! The next step would be to create a client module that interacts with this module. You can use any of SpacetimDB's supported client languages to do this. Take a look at the quick start guide for your client language of choice: [Rust](/docs/languages/rust/rust-sdk-quickstart-guide), [C#](/docs/languages/csharp/csharp-sdk-quickstart-guide), [TypeScript](/docs/languages/typescript/typescript-sdk-quickstart-guide) or [Python](/docs/languages/python/python-sdk-quickstart-guide).
 
-If you are planning to use SpacetimeDB with the Unity3d game engine, you can skip right to the [Unity Comprehensive Tutorial](/docs/unity/part-1) or check out our example game, [BitcraftMini](/docs/unity/part-3).
+If you are planning to use SpacetimeDB with the Unity game engine, you can skip right to the [Unity Comprehensive Tutorial](/docs/unity/part-1) or check out our example game, [BitcraftMini](/docs/unity/part-3).
