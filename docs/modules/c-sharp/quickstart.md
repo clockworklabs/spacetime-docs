@@ -60,8 +60,10 @@ using SpacetimeDB.Module;
 using static SpacetimeDB.Runtime;
 ```
 
-- `System.Runtime.CompilerServices` allows us to use the `ModuleInitializer` attribute, which we'll use to register our `OnConnect` and `OnDisconnect` callbacks.
-- `SpacetimeDB.Module` contains the special attributes we'll use to define our module.
+- `System.Runtime.CompilerServices` 
+- `SpacetimeDB.Module` 
+  - Contains the special attributes we'll use to define our module. 
+  - Allows us to use the `ModuleInitializer` attribute, which we'll use to register our `OnConnect` and `OnDisconnect` callbacks.
 - `SpacetimeDB.Runtime` contains the raw API bindings SpacetimeDB uses to communicate with the database.
 
 We also need to create our static module class which all of the module code will live in. In `server/Lib.cs`, add:
