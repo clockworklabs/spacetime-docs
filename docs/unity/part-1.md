@@ -293,7 +293,6 @@ We use the `connect` and `disconnect` reducers to update the logged in state of 
 // Called when the client connects, we update the logged_in state to true
 #[spacetimedb(connect)]
 pub fn client_connected(ctx: ReducerContext) {
-    // called when the client connects, we update the logged_in state to true
     update_player_login_state(ctx, true);
 }
 
@@ -301,7 +300,6 @@ pub fn client_connected(ctx: ReducerContext) {
 // Called when the client disconnects, we update the logged_in state to false
 #[spacetimedb(disconnect)]
 pub fn client_disconnected(ctx: ReducerContext) {
-    // Called when the client disconnects, we update the logged_in state to false
     update_player_login_state(ctx, false);
 }
 
