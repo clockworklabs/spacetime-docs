@@ -39,7 +39,7 @@ mkdir -p client/module_bindings
 spacetime generate --lang csharp --out-dir client/module_bindings --project-path server
 ```
 
-Take a look inside `client/module_bindings`. The CLI should have generated five files under `module_bindings`:
+Take a look inside `client/module_bindings`. The CLI should have generated five files:
 
 ```
 module_bindings
