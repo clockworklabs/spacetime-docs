@@ -662,13 +662,13 @@ private void FixedUpdate()
    var p = PlayerMovementController.Local.GetModelPosition();
    
    Reducer.UpdatePlayerPosition(new StdbVector3
-   {
-      Y = p.y,
-      Z = p.z,
-      X = p.x,
-   },
-   PlayerMovementController.Local.GetModelRotation(),
-   PlayerMovementController.Local.IsMoving());
+      {
+         X = p.x,
+         Y = p.y,
+         Z = p.z,
+      },
+      PlayerMovementController.Local.GetModelRotation(),
+      PlayerMovementController.Local.IsMoving());
 }
 ```
 
