@@ -3,7 +3,7 @@
 To develop SpacetimeDB applications locally, you will need to run the Standalone version of the server.
 
 1. [Install](/install) the SpacetimeDB CLI (Command Line Interface)
-2. Run the start command
+2. Run the start command:
 
 ```bash
 spacetime start
@@ -11,6 +11,7 @@ spacetime start
 
 The server listens on port `3000` by default, customized via `--listen-addr`.
 
+💡 Standalone mode will run in the foreground.
 ⚠️ SSL is not supported in standalone mode.
 
 ## What's Next?
