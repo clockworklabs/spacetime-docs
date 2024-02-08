@@ -624,9 +624,11 @@ private void PlayerComponent_OnInsert(PlayerComponent obj, ReducerEvent callInfo
         var entity = EntityComponent.FilterByEntityId(obj.EntityId);
         var position = new Vector3(entity.Position.X, entity.Position.Y, entity.Position.Z);
         remotePlayer.transform.position = position;
+        
         var movementController = remotePlayer.GetComponent<PlayerMovementController>();
         movementController.RemoteTargetPosition = position;
         movementController.RemoteTargetRotation = entity.Direction;
+        
         remotePlayer.AddComponent<RemotePlayer>().EntityId = obj.EntityId;
     }
 }
@@ -726,13 +728,16 @@ private void OnPlayerComponentChanged(PlayerComponent obj)
             {
                 // Spawn the player object and attach the RemotePlayer component
                 var remotePlayer = Instantiate(PlayerPrefab);
+                
                 // Lookup and apply the position for this new player
                 var entity = EntityComponent.FilterByEntityId(obj.EntityId);
                 var position = new Vector3(entity.Position.X, entity.Position.Y, entity.Position.Z);
                 remotePlayer.transform.position = position;
+                
                 var movementController = remotePlayer.GetComponent<PlayerMovementController>();
                 movementController.RemoteTargetPosition = position;
                 movementController.RemoteTargetRotation = entity.Direction;
+                
                 remotePlayer.AddComponent<RemotePlayer>().EntityId = obj.EntityId;
             }
         }
