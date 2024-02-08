@@ -15,9 +15,9 @@ This tutorial has been tested against UnityEngine version 2022.3.4f1. This tutor
 This project is separated into two sub-projects;
 
 1. Server (module) code 
-2. Client code.
+2. Client code
 
-First, we'll create an arbitrarily-named project root directory:
+First, we'll create a project root directory (you can choose the name):
 
 ```bash
 mkdir SpacetimeDBUnityTutorial
@@ -36,7 +36,7 @@ Open Unity and create a new project by selecting "New" from the Unity Hub or goi
 
 ![UnityHub-NewProject](/images/unity-tutorial/UnityHub-NewProject.JPG)
 
-**⚠️ Ensure `3D (URP)` is selected** to properly render the materials in the scene!
+**⚠️ Important: Ensure `3D (URP)` is selected** to properly render the materials in the scene!
 
 For Project Name use `client`. For Project Location make sure that you use your `SpacetimeDBUnityTutorial` directory. This is the directory that we created in a previous step.
 
@@ -649,8 +649,8 @@ using SpacetimeDB;
 private float? lastUpdateTime;
 private void FixedUpdate()
 {
-   bool hasUpdatedRecently = lastUpdateTime.HasValue && 
-   Time.time - lastUpdateTime.Value > 1.0f / movementUpdateSpeed;
+   float? deltaTime = Time.time - lastUpdateTime;
+   bool hasUpdatedRecently = deltaTime.HasValue && deltaTime.Value < 1.0f / movementUpdateSpeed;
    bool isConnected = SpacetimeDBClient.instance.IsConnected();
 
    if (hasUpdatedRecently || !isConnected)
