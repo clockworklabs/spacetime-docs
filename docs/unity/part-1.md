@@ -112,7 +112,8 @@ At this point you should have the single player game working. In your CLI, your 
 spacetime start
 ```
 
-💡Below examples Rust language, [but you may also use C#](../modules/c-sharp/index.md) at the cost of 1/2 the speed. 
+💡 Standalone mode will run in the foreground.
+💡 Below examples Rust language, [but you may also use C#](../modules/c-sharp/index.md). 
 
 3. Run the following command to initialize the SpacetimeDB server project with Rust as the language:
 
