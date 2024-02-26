@@ -25,16 +25,24 @@ function section(title: string): NavSection {
 const nav: Nav = {
   items: [
     section("Intro"),
-    page("Overview",        "index",            "index.md"),
-    page("Getting Started", "getting-started",  "getting-started.md"),
+    page("Overview",            "index",                  "index.md"), // TODO(BREAKING): For consistency & clarity, 'index' slug should be renamed 'intro'?
+    page("Getting Started",     "getting-started",        "getting-started.md"),
 
     section("Deploying"),
-    page("Testnet", "deploying/testnet", "deploying/testnet.md"),
+    page("Overview",            "deploying",              "deploying/index.md"),
+    page("Hosted",              "deploying/hosted",       "deploying/hosted.md"),
+    page("Self-Hosted",         "deploying/hosted",       "deploying/self-hosted.md"),
 
-    section("Unity Tutorial"),
-    page("Part 1 - Basic Multiplayer",        "unity/part-1", "unity/part-1.md"),
-    page("Part 2 - Resources And Scheduling", "unity/part-2", "unity/part-2.md"),
-    page("Part 3 - BitCraft Mini",            "unity/part-3", "unity/part-3.md"),
+    section("Unity Tutorial - Basic Multiplayer"),
+    page("Overview",            "unity-tutorial",         "unity/index.md"),
+    page("1 - Setup",           "unity/part-1",           "unity/part-1.md"),
+    page("2a - Server (Rust)",  "unity/part-2a-rust",     "unity/part-2a-rust.md"),
+    page("2b - Server (C#)",    "unity/part-2b-c-sharp",  "unity/part-2a-c-sharp.md"),
+    page("3 - Client",          "unity/part-3",           "unity/part-3.md"),
+
+    section("Unity Tutorial - Advanced"),
+    page("4 - Resources And Scheduling", "unity/part-4",  "unity/part-4.md"),
+    page("5 - BitCraft Mini",            "unity/part-5",  "unity/part-5.md"),
 
     section("Server Module Languages"),
     page("Overview",        "modules",                    "modules/index.md"),
@@ -44,7 +52,7 @@ const nav: Nav = {
     page("C# Reference",    "modules/c-sharp",            "modules/c-sharp/index.md"),
 
     section("Client SDK Languages"),
-    page("Overview",              "sdks", "sdks/index.md"),
+    page("Overview",              "sdks",                         "sdks/index.md"),
     page("Typescript Quickstart", "sdks/typescript/quickstart",   "sdks/typescript/quickstart.md"),
     page("Typescript Reference",  "sdks/typescript",              "sdks/typescript/index.md"),
     page("Rust Quickstart",       "sdks/rust/quickstart",         "sdks/rust/quickstart.md"),
@@ -55,7 +63,7 @@ const nav: Nav = {
     page("C# Reference",          "sdks/c-sharp",                 "sdks/c-sharp/index.md"),
 
     section("WebAssembly ABI"),
-    page("Module ABI Reference", "webassembly-abi", "webassembly-abi/index.md"),
+    page("Module ABI Reference",  "webassembly-abi",              "webassembly-abi/index.md"),
 
     section("HTTP API"),
     page("HTTP",        "http",           "http/index.md"),
@@ -64,14 +72,14 @@ const nav: Nav = {
     page("`/energy`",   "http/energy",    "http/energy.md"),
 
     section("WebSocket API Reference"),
-    page("WebSocket", "ws", "ws/index.md"),
+    page("WebSocket",   "ws",             "ws/index.md"),
 
     section("Data Format"),
-    page("SATN",  "satn",   "satn.md"),
-    page("BSATN", "bsatn",  "bsatn.md"),
+    page("SATN",        "satn",           "satn.md"),
+    page("BSATN",       "bsatn",          "bsatn.md"),
 
     section("SQL"),
-    page("SQL Reference", "sql", "sql/index.md"),
+    page("SQL Reference", "sql",    "sql/index.md"),
   ],
 };
 
