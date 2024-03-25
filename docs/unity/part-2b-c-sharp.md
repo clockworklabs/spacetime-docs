@@ -1,3 +1,17 @@
+# Unity Multiplayer Tutorial
+
+## Part 2 of 3: Inspecting the C# Server Module
+
+In this part of the tutorial, we will create a SpacetimeDB (STDB) server module using C# for the Unity multiplayer game. The server module will handle the game logic and data management for the game.
+
+💡 Need help with the tutorial? [Join our Discord server](https://discord.gg/spacetimedb)!
+
+## The Entity Component Systems (ECS)
+
+Before we continue to creating the server module, it's important to understand the basics of the ECS. This is a game development architecture that separates game objects into components for better flexibility and performance. You can read more about the ECS design pattern [here](https://en.wikipedia.org/wiki/Entity_component_system).
+
+We chose ECS for this example project because it promotes scalability, modularity, and efficient data management, making it ideal for building multiplayer games with SpacetimeDB.
+
 # Unity Tutorial - Basic Multiplayer - Part 2a - Server Module (C#)
 
 Need help with the tutorial? [Join our Discord server](https://discord.gg/spacetimedb)!

@@ -1,122 +1,58 @@
-# Unity Tutorial - Basic Multiplayer - Part 1 - Setup
+# Unity Multiplayer Tutorial
 
-![UnityTutorial-HeroImage](/images/unity-tutorial/UnityTutorial-HeroImage.JPG)
+## Part 1 of 3: Setup
 
-Need help with the tutorial? [Join our Discord server](https://discord.gg/spacetimedb)!
+This tutorial will guide you through setting up a multiplayer game project using Unity and SpacetimeDB. We will start by cloning the project, connecting it to SpacetimeDB and running the project.
 
-## Prepare Project Structure
+💡 Need help with the tutorial? [Join our Discord server](https://discord.gg/spacetimedb)!
 
-This project is separated into two sub-projects;
+> [!IMPORTANT]
+> TODO: This draft may link to WIP repos or docs - be sure to replace with final links after prerequisite PRs are approved (that are not yet approved upon writing this)
 
-1. Server (module) code 
-2. Client code
+## 1. Clone the Project
 
-First, we'll create a project root directory (you can choose the name):
-
+Let's name it `SpacetimeDBUnityTutorial` for reference:
 ```bash
-mkdir SpacetimeDBUnityTutorial
-cd SpacetimeDBUnityTutorial
+git clone https://github.com/clockworklabs/zeke-demo-project/tree/dylan/feat/mini-upgrade SpacetimeDBUnityTutorial
 ```
 
-We'll start by populating the client directory.
+This project repo is separated into two sub-projects:
 
-## Setting up the Tutorial Unity Project
+1. [Server](https://github.com/clockworklabs/zeke-demo-project/tree/dylan/feat/mini-upgrade/Server-Csharp) (STDB Module)
+1. [Client](https://github.com/clockworklabs/zeke-demo-project/tree/dylan/feat/mini-upgrade/Client) (Unity project)
 
-In this section, we will guide you through the process of setting up a Unity Project that will serve as the starting point for our tutorial. By the end of this section, you will have a basic Unity project and be ready to implement the server functionality.
+> [!TIP]
+> You may optionally _update_ the [SpacetimeDB SDK](https://github.com/clockworklabs/com.clockworklabs.spacetimedbsdk) via the Package Manager in Unity
 
-### Step 1: Create a Blank Unity Project
+## 2. Publishing the Project
 
-Open Unity and create a new project by selecting "New" from the Unity Hub or going to **File -> New Project**.
+From Unity, you don't need CLI commands for common functionality:
 
-![UnityHub-NewProject](/images/unity-tutorial/UnityHub-NewProject.JPG)
+1. Open the _Publisher_ editor tool: `ALT+SHIFT+P` (or `Window/SpacetimeDB/Publisher` in the top menu)
+1. Create an identity -> Select `testnet` for the server
+1. Browse to your repo root `Server-Csharp` dir -> **Publish** -> **Generate** Unity files
 
-**⚠️ Important: Ensure `3D (URP)` is selected** to properly render the materials in the scene!
+💡For the next section, we'll use the selected `Server` and publish result `Host`
 
-For Project Name use `client`. For Project Location make sure that you use your `SpacetimeDBUnityTutorial` directory. This is the directory that we created in a previous step.
+![Unity Publisher Tool](https://github.com/clockworklabs/zeke-demo-project/raw/dylan/feat/mini-upgrade/.doc/prev-publisher.jpg)
 
-![UnityHub-3DURP](/images/unity-tutorial/UnityHub-3DURP.JPG)
+## 3. Connecting the Project
 
-Click "Create" to generate the blank project.
+1. Open `Scenes/Main` in Unity -> select the `GameManager` GameObject in the inspector.
+1. Matching the earlier Publish setup:
+   1. For the GameManager `Db Name or Address`, input `testnet`
+   1. For the GameManager `Host`, input `https://testnet.spacetimedb.com
+1. Save your scene
 
-### Step 2: Adding Required Packages
+## 4. Running the Project
 
-To work with SpacetimeDB and ensure compatibility, we need to add some essential packages to our Unity project. Follow these steps:
+With the same `Main` scene open, press play!
 
-1. Open the Unity Package Manager by going to **Window -> Package Manager**.
-2. In the Package Manager window, select the "Unity Registry" tab to view unity packages.
-3. Search for and install the following package:
-   - **Input System**: Enables the use of Unity's new Input system used by this project.
+![Gameplay Screenshot](https://github.com/clockworklabs/zeke-demo-project/raw/dylan/feat/mini-upgrade/.doc/prev-action.jpg)
 
-![PackageManager-InputSystem](/images/unity-tutorial/PackageManager-InputSystem.JPG)
+![UI Screenshot](https://github.com/clockworklabs/zeke-demo-project/raw/dylan/feat/mini-upgrade/.doc/prev-ui.jpg)
 
-4. You may need to restart the Unity Editor to switch to the new Input system.
+You should see your local player as a box in the scene: Notice some hints at the bottom-right for things to do.
 
-![PackageManager-Restart](/images/unity-tutorial/PackageManager-Restart.JPG)
+Congratulations! You have successfully set up your multiplayer game project. In the next section, we will start integrating SpacetimeDB functionality to enable multiplayer features.
 
-### Step 3: Importing the Tutorial Package
-
-In this step, we will import the provided Unity tutorial package that contains the basic single-player game setup. Follow these instructions:
-
-1. Download the tutorial package from the releases page on GitHub: [https://github.com/clockworklabs/com.clockworklabs.spacetimedbsdk/releases/latest](https://github.com/clockworklabs/com.clockworklabs.spacetimedbsdk/releases/latest)
-2. In Unity, go to **Assets -> Import Package -> Custom Package**.
-
-![Unity-ImportCustomPackageB](/images/unity-tutorial/Unity-ImportCustomPackageB.JPG)
-
-3. Browse and select the downloaded tutorial package file.
-4. Unity will prompt you with an import settings dialog. Ensure that all the files are selected and click "Import" to import the package into your project.
-5. At this point in the project, you shouldn't have any errors.
-
-![Unity-ImportCustomPackage2](/images/unity-tutorial/Unity-ImportCustomPackage2.JPG)
-
-### Step 4: Running the Project
-
-Now that we have everything set up, let's run the project and see it in action:
-
-1. Open the scene named "Main" in the Scenes folder provided in the project hierarchy by double-clicking it.
-
-![Unity-OpenSceneMain](/images/unity-tutorial/Unity-OpenSceneMain.JPG)
-
-**NOTE:** When you open the scene you may get a message saying you need to import TMP Essentials. When it appears, click the "Import TMP Essentials" button.
-
-🧹 Clear any false-positive TMPro errors that may show.
-
-![Unity Import TMP Essentials](/images/unity-tutorial/Unity-ImportTMPEssentials.JPG)
-
-2. Press the **Play** button located at the top of the Unity Editor.
-
-![Unity-Play](/images/unity-tutorial/Unity-Play.JPG)
-
-3. Enter any name and click "Continue"
-
-4. You should see a character loaded in the scene, and you can use the keyboard or mouse controls to move the character around.
-
-Congratulations! You have successfully set up the basic single-player game project. In the next section, we will start integrating SpacetimeDB functionality to enable multiplayer features.
-
-## Writing our SpacetimeDB Server Module
-
-At this point you should have the single player game working. In your CLI, your current working directory should be within your `SpacetimeDBUnityTutorial` directory that we created in a previous step.
-
-### Create the Module
-
-1. It is important that you already have the SpacetimeDB CLI tool [installed](/install).
-
-2. Run SpacetimeDB locally using the installed CLI. In a **new** terminal or command window, run the following command:
-
-```bash
-spacetime start
-```
-
-💡 Standalone mode will run in the foreground.
-💡 Below examples Rust language, [but you may also use C#](../modules/c-sharp/index.md). 
-
-### The Entity Component Systems (ECS)
-
-Before we continue to creating the server module, it's important to understand the basics of the ECS. This is a game development architecture that separates game objects into components for better flexibility and performance. You can read more about the ECS design pattern [here](https://en.wikipedia.org/wiki/Entity_component_system).
-
-We chose ECS for this example project because it promotes scalability, modularity, and efficient data management, making it ideal for building multiplayer games with SpacetimeDB.
-
-### Create the Server Module
-
-From here, the tutorial continues with your favorite server module language of choice:
-   - [Rust](part-2a-rust.md)
-   - [C#](part-2b-csharp.md)
