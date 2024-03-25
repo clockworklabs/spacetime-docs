@@ -25,6 +25,8 @@ function section(title: string): NavSection {
 const nav: Nav = {
   items: [
     section("Intro"),
+    page("Overview",        "index",            "index.md"), // TODO(BREAKING): For consistency & clarity, 'index' slug should be renamed 'intro'?
+    page("Getting Started", "getting-started",  "getting-started.md"),
     page("Overview",            "index",                  "index.md"), // TODO(BREAKING): For consistency & clarity, 'index' slug should be renamed 'intro'?
     page("Getting Started",     "getting-started",        "getting-started.md"),
 
