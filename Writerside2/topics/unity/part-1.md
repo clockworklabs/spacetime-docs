@@ -1,11 +1,8 @@
-# Unity Multiplayer Tutorial - Part 1
+# Unity Multiplayer Tutorial
 
-## Project Setup
+## Part 1 of 3: Setup
 
-This progressive tutorial will guide you to: 
-
-1. Quickly setup up a multiplayer game project demo, using Unity and SpacetimeDB. 
-2. Publish your demo SpacetimeDB C# server module to `testnet`.
+This tutorial will guide you through setting up a multiplayer game project using Unity and SpacetimeDB. We will start by cloning the project, connecting it to SpacetimeDB and running the project.
 
 💡 Need help? [Join our Discord server](https://discord.gg/spacetimedb)!
 
@@ -57,8 +54,4 @@ With the same `Main` scene open, press play!
 
 You should see your local player as a box in the scene: Notice some hints at the bottom-right for things to do.
 
-## Conclusion
-
-Congratulations! You have successfully set up your multiplayer game project. 
-
-In the next section, we will break down how Server Modules work and analyze the demo code.
+Congratulations! You have successfully set up your multiplayer game project. In the next section, we will break down how Server Modules work and analyze the demo code.

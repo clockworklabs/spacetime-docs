@@ -19,7 +19,7 @@ const nav = {
         page("Overview", "unity-tutorial", "unity/index.md"),
         page("1 - Setup", "unity/part-1", "unity/part-1.md"),
         page("2a - Server (Rust)", "unity/part-2a-rust", "unity/part-2a-rust.md"),
-        page("2b - Server (C#)", "unity/part-2b-c-sharp", "unity/part-2a-c-sharp.md"),
+        page("2b - Server (C#)", "unity/part-2", "unity/part-2a-c-sharp.md"),
         page("3 - Client", "unity/part-3", "unity/part-3.md"),
         section("Unity Tutorial - Advanced"),
         page("4 - Resources And Scheduling", "unity/part-4", "unity/part-4.md"),

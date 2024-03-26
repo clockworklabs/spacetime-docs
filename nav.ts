@@ -25,8 +25,8 @@ function section(title: string): NavSection {
 const nav: Nav = {
   items: [
     section("Intro"),
-    page("Overview",        "index",            "index.md"), // TODO(BREAKING): For consistency & clarity, 'index' slug should be renamed 'intro'?
-    page("Getting Started", "getting-started",  "getting-started.md"),
+    page("Overview",            "index",                  "index.md"), // TODO(BREAKING): For consistency & clarity, 'index' slug should be renamed 'intro'?
+    page("Getting Started",     "getting-started",        "getting-started.md"),
     page("Overview",            "index",                  "index.md"), // TODO(BREAKING): For consistency & clarity, 'index' slug should be renamed 'intro'?
     page("Getting Started",     "getting-started",        "getting-started.md"),
 
@@ -39,11 +39,11 @@ const nav: Nav = {
     page("Overview",            "unity-tutorial",         "unity/index.md"),
     page("1 - Setup",           "unity/part-1",           "unity/part-1.md"),
     page("2a - Server (Rust)",  "unity/part-2a-rust",     "unity/part-2a-rust.md"),
-    page("2b - Server (C#)",    "unity/part-2b-c-sharp",  "unity/part-2a-c-sharp.md"),
+    page("2b - Server (C#)",    "unity/part-2",           "unity/part-2.md"),
     page("3 - Client",          "unity/part-3",           "unity/part-3.md"),
 
     section("Unity Tutorial - Advanced"),
-    page("4 - Resources And Scheduling", "unity/part-4",  "unity/part-4.md"),
+    page("4 - Resources & Scheduling",   "unity/part-4",  "unity/part-4.md"),
     page("5 - BitCraft Mini",            "unity/part-5",  "unity/part-5.md"),
 
     section("Server Module Languages"),

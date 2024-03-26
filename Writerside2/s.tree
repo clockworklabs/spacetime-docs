@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE instance-profile
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/product-profile.dtd">
+
+<instance-profile id="s"
+                  name="spacetime-docs">
+
+    <toc-element topic="satn.md"/>
+    <toc-element topic="index.md"/>
+    <toc-element topic="getting-started.md"/>
+    <toc-element topic="bsatn.md"/>
+    <toc-element toc-title="deploying">
+        <toc-element topic="self-hosted.md"/>
+        <toc-element topic="deploying_index.md"/>
+        <toc-element topic="hosted.md"/>
+    </toc-element>
+    <toc-element toc-title="http">
+        <toc-element topic="http_index.md"/>
+        <toc-element topic="identity.md"/>
+        <toc-element topic="energy.md"/>
+        <toc-element topic="database.md"/>
+    </toc-element>
+    <toc-element toc-title="modules">
+        <toc-element topic="modules_index.md"/>
+        <toc-element toc-title="c-sharp">
+            <toc-element topic="quickstart.md"/>
+            <toc-element topic="c-sharp_index.md"/>
+        </toc-element>
+        <toc-element toc-title="rust">
+            <toc-element topic="rust_quickstart.md"/>
+            <toc-element topic="rust_index.md"/>
+        </toc-element>
+    </toc-element>
+    <toc-element toc-title="sdks">
+        <toc-element topic="sdks_index.md"/>
+        <toc-element toc-title="c-sharp">
+            <toc-element topic="c-sharp_quickstart.md"/>
+            <toc-element topic="sdks_c-sharp_index.md"/>
+        </toc-element>
+        <toc-element toc-title="python">
+            <toc-element topic="python_quickstart.md"/>
+            <toc-element topic="python_index.md"/>
+        </toc-element>
+        <toc-element toc-title="rust">
+            <toc-element topic="sdks_rust_quickstart.md"/>
+            <toc-element topic="sdks_rust_index.md"/>
+        </toc-element>
+        <toc-element toc-title="typescript">
+            <toc-element topic="typescript_quickstart.md"/>
+            <toc-element topic="typescript_index.md"/>
+        </toc-element>
+    </toc-element>
+    <toc-element toc-title="sql">
+        <toc-element topic="sql_index.md"/>
+    </toc-element>
+    <toc-element toc-title="unity">
+        <toc-element topic="part-5.md"/>
+        <toc-element topic="part-4.md"/>
+        <toc-element topic="part-3.md"/>
+        <toc-element topic="part-2a-rust.md"/>
+        <toc-element topic="part-2.md"/>
+        <toc-element topic="part-1.md"/>
+        <toc-element topic="unity_index.md"/>
+        <toc-element topic="homeless.md"/>
+    </toc-element>
+    <toc-element toc-title="webassembly-abi">
+        <toc-element topic="webassembly-abi_index.md"/>
+    </toc-element>
+    <toc-element toc-title="ws">
+        <toc-element topic="ws_index.md"/>
+    </toc-element>
+</instance-profile>

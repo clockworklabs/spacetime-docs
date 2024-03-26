@@ -1,22 +1,15 @@
-# Unity Multiplayer Tutorial
+### Create the Module
 
-## Part 2 of 3: Inspecting the C# Server Module
+1. It is important that you already have the SpacetimeDB CLI tool [installed](install.).
 
-In this part of the tutorial, we will create a SpacetimeDB (STDB) server module using C# for the Unity multiplayer game. The server module will handle the game logic and data management for the game.
+2. Run SpacetimeDB locally using the installed CLI. In a **new** terminal or command window, run the following command:
 
-💡 Need help with the tutorial? [Join our Discord server](https://discord.gg/spacetimedb)!
+```bash
+spacetime start
+```
 
-## The Entity Component Systems (ECS)
-
-Before we continue to creating the server module, it's important to understand the basics of the ECS. This is a game development architecture that separates game objects into components for better flexibility and performance. You can read more about the ECS design pattern [here](https://en.wikipedia.org/wiki/Entity_component_system).
-
-We chose ECS for this example project because it promotes scalability, modularity, and efficient data management, making it ideal for building multiplayer games with SpacetimeDB.
-
-# Unity Tutorial - Basic Multiplayer - Part 2a - Server Module (C#)
-
-Need help with the tutorial? [Join our Discord server](https://discord.gg/spacetimedb)!
-
-This progressive tutorial is continued from the [Part 1 Tutorial](/docs/unity/part-1.md)
+💡 Standalone mode will run in the foreground.
+💡 Below examples Rust language, [but you may also use C#](c-sharp_index.md).
 
 ## Create a Server Module
 
@@ -44,7 +37,7 @@ using SpacetimeDB.Module;
 using static SpacetimeDB.Runtime;
 ```
 
-Then we are going to start by adding the global `Config` table. Right now it only contains the "message of the day" but it can be extended to store other configuration variables. This also uses a couple of macros, like `#[spacetimedb(table)]` which you can learn more about in our [C# module reference](/docs/modules/c-sharp). Simply put, this just tells SpacetimeDB to create a table which uses this struct as the schema for the table.
+Then we are going to start by adding the global `Config` table. Right now it only contains the "message of the day" but it can be extended to store other configuration variables. This also uses a couple of macros, like `#[spacetimedb(table)]` which you can learn more about in our [C# module reference](c-sharp.). Simply put, this just tells SpacetimeDB to create a table which uses this struct as the schema for the table.
 
 **Append to the bottom of lib.cs:**
 
@@ -296,7 +289,7 @@ cd server
 spacetime publish -c unity-tutorial
 ```
 
-If you get any errors from this command, double check that you correctly entered everything into `lib.cs`. You can also look at the [Client Troubleshooting](/docs/unity/part-3.md#Troubleshooting) section.
+If you get any errors from this command, double check that you correctly entered everything into `lib.cs`. You can also look at the [Client Troubleshooting](part-3.md#Troubleshooting) section.
 
 ### Finally, Add Chat Support
 
@@ -357,6 +350,6 @@ Now that we added chat support, let's publish the latest module version to Space
 spacetime publish -c unity-tutorial
 ```
 
-If you get any errors from this command, double check that you correctly entered everything into `lib.cs`. You can also look at the [Client Troubleshooting](/docs/unity/part-3.md#Troubleshooting) section.
+If you get any errors from this command, double check that you correctly entered everything into `lib.cs`. You can also look at the [Client Troubleshooting](part-3.md#Troubleshooting) section.
 
-From here, the tutorial continues with more-advanced topics. The [next tutorial](/docs/unity/part-4.md) introduces Resources & Scheduling.
+From here, the tutorial continues with more-advanced topics. The [next tutorial](part-41.md) introduces Resources & Scheduling.

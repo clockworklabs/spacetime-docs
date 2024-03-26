@@ -1,41 +1,175 @@
-### Create the Module
+# Unity Multiplayer Tutorial - Part 2
 
-1. It is important that you already have the SpacetimeDB CLI tool [installed](/install).
+## Analyzing the C# Server Module
 
-2. Run SpacetimeDB locally using the installed CLI. In a **new** terminal or command window, run the following command:
+This progressive tutorial is continued from [Part 1](part-11.md).
 
-```bash
-spacetime start
-```
+In this part of the tutorial, we will create a SpacetimeDB (SpacetimeDB) server module using C# for the Unity multiplayer game. The server module will handle the game logic and data management for the game.
 
-💡 Standalone mode will run in the foreground.
-💡 Below examples Rust language, [but you may also use C#](../modules/c-sharp/index.md).
+💡 Need help? [Join our Discord server](https://discord.gg/spacetimedb)!
 
-## Create a Server Module
+## The Entity Component Systems (ECS)
 
-Run the following command to initialize the SpacetimeDB server module project with Rust as the language:
+Before we continue to creating the server module, it's important to understand the basics of the ECS. This is a game development architecture that separates game objects into components for better flexibility and performance. You can read more about the ECS design pattern [here](https://en.wikipedia.org/wiki/Entity_component_system).
 
-```bash
-spacetime init --lang=rust server
-```
+We chose ECS for this example project because it promotes scalability, modularity, and efficient data management, making it ideal for building multiplayer games with SpacetimeDB.
 
-This command creates a new folder named "server" within your Unity project directory and sets up the SpacetimeDB server project with Rust as the programming language.
+## C# Module Limitations & Nuances
 
-### SpacetimeDB Tables
+Since SpacetimeDB runs on [WebAssembly (WASM)](https://webassembly.org/), you may run into unexpected issues until aware of the following:
 
-In this section we'll be making some edits to the file `server/src/lib.cs`. We recommend you open up this file in an IDE like VSCode or RustRover.
+1. No DateTime-like types in Types or Tables:
+    - Use `string` for timestamps (exampled at [Utils.cs](https://github.com/clockworklabs/zeke-demo-project/tree/dylan/feat/mini-upgrade/Server-Csharp/src/Utils.cs)), or `long` for Unix Epoch time.
 
-**Important: Open the `server/src/lib.cs` file and delete its contents. We will be writing it from scratch here.**
+2. No Timers or async/await, such as those to create repeating loops:
+    - For repeating invokers, instead **re**schedule it from within a fired [Scheduler](https://spacetimedb.com/docs/modules/c-sharp#reducers) function.
 
-First we need to add some imports at the top of the file.
+3. Using `Debug` advanced option in the `Publisher` Unity editor tool will add callstack symbols for easier debugging:
+    - However, avoid using `Debug` mode when publishing outside a `localhost` server:
+        - Due to WASM buffer size limitations, this may cause publish failure.
 
-**Copy and paste into lib.cs:**
+4. If you `throw` a new `Exception`, no error logs will appear. Instead, use either:
+    1. Use `Log(message, LogLevel.Error);` before you throw.
+    2. Use the demo's static [Utils.cs](https://github.com/clockworklabs/zeke-demo-project/tree/dylan/feat/mini-upgrade/Server-Csharp/src/Utils.cs) class to `Utils.Throw()` to wrap the error log before throwing.
+
+5. `[AutoIncrement]` or `[PrimaryKeyAuto]` will never equal 0:
+    - Inserting a new row with an Auto key equaling 0 will always return a unique, non-0 value.
+    -
+6. Enums cannot declare values out of the default order:
+    - For example, `{ Foo = 0, Bar = 3 }` will fail to compile.
+
+## Namespaces
+
+Common `using` statements include:
 
 ```csharp
-// using SpacetimeDB; // Uncomment to omit `SpacetimeDB` attribute prefixes
-using SpacetimeDB.Module;
-using static SpacetimeDB.Runtime;
+using SpacetimeDB; // Contains class|func|struct attributes like [Table], [Type], [Reducer]
+using static SpacetimeDB.Runtime; // Contains Identity DbEventArgs, Log()
+using SpacetimeDB.Module; // Contains prop attributes like [Column]
+using Module.Utils; // Helper to workaround the `throw` and `DateTime` limitations noted above 
 ```
+
+- You will mostly see `SpacetimeDB.Module` in [Tables.cs](https://github.com/clockworklabs/zeke-demo-project/tree/dylan/feat/mini-upgrade/Server-Csharp/src/Tables.cs) for schema definitions
+- `SpacetimeDB` and `SpacetimeDB.Runtime` can be found in most all SpacetimeDB scripts
+- `Module.Utils` parse DateTimeOffset into a timestamp string and wraps `throw` with error logs
+
+## Partial Classes & Structs
+
+- Throughout the demo, you will notice most classes or structs with a SpacetimeDB [Attribute] such as `[Table]` or `[Reducer]` will be defined with the `partial` keyword. 
+
+- This allows the _Roslyn Compiler_ to [incrementally generate](https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.md) additions to the SpacetimeDB SDK, such as adding helper functions and utilities. This means SpacetimeDB takes care of all the low-level tooling for you, such as inserting, updating or querying the DB.
+  - This further allows you to separate your models from logic within the same class.
+
+* Notice that the module class, itself, is also a `static partial class`.
+
+## Types & Tables
+
+`[Table]` attributes are database columns, while `[Type]` attributes are define a schema.
+
+### Types
+
+`[Type]` attributes attach to properties containing `[Table]` attributes when you want to use a custom Type that's not [SpacetimeDB natively-supported](c-sharp#supported-types.). These are generally defined as a `partial struct` or `partial class`
+
+Let's inspect a real example `Type`; open [Server-cs/Tables.cs](https://github.com/clockworklabs/zeke-demo-project/tree/dylan/feat/mini-upgrade/Server-Csharp/src/Tables.cs):
+
+In Unity, you are likely familiar with the `Vector2` type. In SpacetimeDB, let's inspect the `StdbVector2` type to store 2D positions in the database:
+
+```csharp
+/// A spacetime type which can be used in tables & reducers to represent a 2D position (such as movement)
+[Type]
+public partial class StdbVector2
+{
+  public float X;
+  public float Z;
+
+  // This allows us to use StdbVector2::ZERO in reducers
+  public static readonly StdbVector2 ZERO = new()
+  {
+      X = 0, 
+      Z = 0,
+  };
+}
+```
+
+- Since `Types` are used in `Tables`, we can now use a custom SpacetimeDB `StdbVector3` `Type` in a `[Table]`.
+
+We may optionally include `static readonly` property "helper" functions such as the above-exampled `ZERO`.
+
+### Tables
+
+`[Table] attributes use `[Type]`s - either custom (like `StdbVector2` above) or [SpacetimeDB natively-supported types](../modules/c-sharp#supported-types). These are generally defined as a `struct` or `class`
+
+Let's inspect a real example `Table`, looking again at [Tables.cs](https://github.com/clockworklabs/zeke-demo-project/tree/dylan/feat/mini-upgrade/Server-Csharp/src/Tables.cs):
+
+```csharp
+/// Represents chat messages within the game, including the sender and message content
+[Table]
+public partial class ChatMessage
+{
+    /// Primary key, automatically incremented
+    [Column(ColumnAttrs.PrimaryKeyAuto)]
+    public ulong ChatEntityId;
+
+    /// The entity id of the player (or NPC) that sent the message
+    public ulong SourceEntityId;
+    
+    /// Message contents
+    public string? ChatText;
+    
+    /// <returns>
+    /// Stringified ISO 8601 format (Unix Epoch Time)
+    /// <code>
+    /// DateTime.ToUniversalTime().ToString("o");
+    /// </code></returns>
+    public static string GetTimestamp(DateTimeOffset dateTimeOffset) =>
+        dateTimeOffset.ToUniversalTime().ToString("o");
+}
+```
+
+- The `Id` vars are `ulong` types, commonly used for SpacetimeDB unique identifiers
+- Notice how `Timestamp` is a `string` instead of DateTimeOffset (a limitation mentioned earlier).
+
+```csharp
+/// This component will be created for all world objects that can move smoothly throughout the world,  keeping track 
+/// of position, the last time the component was updated & the direction the mobile object is currently moving.
+[Table]
+public partial class MobileEntityComponent
+{
+    /// Primary key for the mobile entity
+    [Column(ColumnAttrs.PrimaryKey)]
+    public ulong EntityId;
+
+    /// The last known location of this entity
+    public StdbVector2? Location;
+    
+    /// Movement direction, {0,0} if not moving at all.
+    public StdbVector2? Direction;
+    
+    /// Timestamp when movement started. Timestamp::UNIX_EPOCH if not moving.
+    public string? MoveStartTimestamp;
+}
+```
+
+**Let's break this down:**
+
+- `EntityId` is the unique identifier for the table, declared as a `ulong`
+- Location and Direction are both `StdbVector2` types discussed above
+- `MoveStartTimestamp` is a string of epoch time, as you cannot use `DateTime`-like types within Tables.
+  - See the [Limitations](#limitations.) section below
+
+## Reducers
+
+Reducers are cloud functions that run on the server and can be called from the client, always returning `void`.
+
+Looking at the most straight-forward example, open [Chat.cs](
+
+
+
+
+
+
+
+```csharp
 
 Then we are going to start by adding the global `Config` table. Right now it only contains the "message of the day" but it can be extended to store other configuration variables. This also uses a couple of macros, like `#[spacetimedb(table)]` which you can learn more about in our [C# module reference](/docs/modules/c-sharp). Simply put, this just tells SpacetimeDB to create a table which uses this struct as the schema for the table.
 
@@ -238,7 +372,7 @@ private static void UpdatePlayerLoginState(DbEventArgs dbEvent, bool loggedIn)
 
 Our final reducer handles player movement. In `UpdatePlayerPosition` we look up the `PlayerComponent` using the user's Identity. If we don't find one, we return an error because the client should not be sending moves without calling `CreatePlayer` first.
 
-Using the `EntityId` in the `PlayerComponent` we retrieved, we can lookup the `EntityComponent` that stores the entity's locations in the world. We update the values passed in from the client and call the auto-generated `Update` function.
+Using the `EntityId` in the `PlayerComponent` we retrieved, we can look up the `EntityComponent` that stores the entity's locations in the world. We update the values passed in from the client and call the auto-generated `Update` function.
 
 **Append to the bottom of lib.cs:**
 
@@ -289,7 +423,7 @@ cd server
 spacetime publish -c unity-tutorial
 ```
 
-If you get any errors from this command, double check that you correctly entered everything into `lib.cs`. You can also look at the [Client Troubleshooting](/docs/unity/part-3.md#Troubleshooting) section.
+If you get any errors from this command, double check that you correctly entered everything into `lib.cs`. You can also look at the [Client Troubleshooting](part-3.md#Troubleshooting) section.
 
 ### Finally, Add Chat Support
 
@@ -350,6 +484,6 @@ Now that we added chat support, let's publish the latest module version to Space
 spacetime publish -c unity-tutorial
 ```
 
-If you get any errors from this command, double check that you correctly entered everything into `lib.cs`. You can also look at the [Client Troubleshooting](/docs/unity/part-3.md#Troubleshooting) section.
+If you get any errors from this command, double check that you correctly entered everything into `lib.cs`. You can also look at the [Client Troubleshooting](part-3.md#Troubleshooting) section.
 
-From here, the tutorial continues with more-advanced topics. The [next tutorial](/docs/unity/part-4.md) introduces Resources & Scheduling.
+From here, the tutorial continues with more-advanced topics. The [next tutorial](part-41.md) introduces Resources & Scheduling.

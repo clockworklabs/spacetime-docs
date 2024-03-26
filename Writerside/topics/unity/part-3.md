@@ -3,8 +3,8 @@
 Need help with the tutorial? [Join our Discord server](https://discord.gg/spacetimedb)!
 
 This progressive tutorial is continued from one of the Part 2 tutorials: 
-- [Rust Server Module](/docs/unity/part-2a-rust.md)
-- [C# Server Module](/docs/unity/part-2)
+- [Rust Server Module](part-2a-rust1.md)
+- [C# Server Module](part-2.)
 
 ## Updating our Unity Project Client to use SpacetimeDB
 
@@ -18,7 +18,7 @@ Now we are ready to connect our _BitCraft Mini_ project to SpacetimeDB.
 https://github.com/clockworklabs/com.clockworklabs.spacetimedbsdk.git
 ```
 
-![Unity-PackageManager](/images/unity-tutorial/Unity-PackageManager.JPG)
+![Unity-PackageManager](Unity-PackageManager.JPG)
 
 3. The next step is to generate the module specific client files using the SpacetimeDB CLI. The files created by this command provide an interface for retrieving values from the local client cache of the database and for registering for callbacks to events. In your terminal or command window, run the following commands.
 
@@ -31,7 +31,7 @@ spacetime generate --out-dir ../client/Assets/module_bindings --lang=csharp
 
 The Unity SpacetimeDB SDK relies on there being a `NetworkManager` somewhere in the scene. Click on the GameManager object in the scene, and in the inspector, add the `NetworkManager` component.
 
-![Unity-AddNetworkManager](/images/unity-tutorial/Unity-AddNetworkManager.JPG)
+![Unity-AddNetworkManager](Unity-AddNetworkManager.JPG)
 
 Next we are going to connect to our SpacetimeDB module. Open `TutorialGameManager.cs` in your editor of choice and add the following code at the top of the file:
 
@@ -323,13 +323,13 @@ private void FixedUpdate()
 
 Finally, we need to update our connection settings in the inspector for our GameManager object in the scene. Click on the GameManager in the Hierarchy tab. The the inspector tab you should now see fields for `Module Address` and `Host Name`. Set the `Module Address` to the name you used when you ran `spacetime publish`. This is likely `unity-tutorial`. If you don't remember, you can go back to your terminal and run `spacetime publish` again from the `server` folder.
 
-![GameManager-Inspector2](/images/unity-tutorial/GameManager-Inspector2.JPG)
+![GameManager-Inspector2](GameManager-Inspector2.JPG)
 
 ### Play the Game!
 
 Go to File -> Build Settings... Replace the SampleScene with the Main scene we have been working in.
 
-![Unity-AddOpenScenes](/images/unity-tutorial/Unity-AddOpenScenes.JPG)
+![Unity-AddOpenScenes](Unity-AddOpenScenes.JPG)
 
 When you hit the `Build` button, it will kick off a build of the game which will use a different identity than the Unity Editor. Create your character in the build and in the Unity Editor by entering a name and clicking `Continue`. Now you can see each other in game running around the map.
 
@@ -455,7 +455,7 @@ Now when you run the game you should be able to send chat messages to other play
 
 This concludes the SpacetimeDB basic multiplayer tutorial, where we learned how to create a multiplayer game. In the next Unity tutorial, we will add resource nodes to the game and learn about _scheduled_ reducers:
 
-**Next Unity Tutorial:** [Resources & Scheduling](/docs/unity/part-4.md)
+**Next Unity Tutorial:** [Resources & Scheduling](part-41.md)
 
 ---
 

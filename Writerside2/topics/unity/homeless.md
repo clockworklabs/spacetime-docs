@@ -1,6 +1,6 @@
 ### Create the Module
 
-1. It is important that you already have the SpacetimeDB CLI tool [installed](/install).
+1. It is important that you already have the SpacetimeDB CLI tool [installed](install.).
 
 2. Run SpacetimeDB locally using the installed CLI. In a **new** terminal or command window, run the following command:
 
@@ -9,7 +9,7 @@ spacetime start
 ```
 
 💡 Standalone mode will run in the foreground.
-💡 Below examples Rust language, [but you may also use C#](../modules/c-sharp/index.md).
+💡 Below examples Rust language, [but you may also use C#](c-sharp_index.md).
 
 ## Create a Server Module
 
@@ -37,7 +37,7 @@ using SpacetimeDB.Module;
 using static SpacetimeDB.Runtime;
 ```
 
-Then we are going to start by adding the global `Config` table. Right now it only contains the "message of the day" but it can be extended to store other configuration variables. This also uses a couple of macros, like `#[spacetimedb(table)]` which you can learn more about in our [C# module reference](/docs/modules/c-sharp). Simply put, this just tells SpacetimeDB to create a table which uses this struct as the schema for the table.
+Then we are going to start by adding the global `Config` table. Right now it only contains the "message of the day" but it can be extended to store other configuration variables. This also uses a couple of macros, like `#[spacetimedb(table)]` which you can learn more about in our [C# module reference](c-sharp.). Simply put, this just tells SpacetimeDB to create a table which uses this struct as the schema for the table.
 
 **Append to the bottom of lib.cs:**
 
@@ -289,7 +289,7 @@ cd server
 spacetime publish -c unity-tutorial
 ```
 
-If you get any errors from this command, double check that you correctly entered everything into `lib.cs`. You can also look at the [Client Troubleshooting](/docs/unity/part-3.md#Troubleshooting) section.
+If you get any errors from this command, double check that you correctly entered everything into `lib.cs`. You can also look at the [Client Troubleshooting](part-3.md#Troubleshooting) section.
 
 ### Finally, Add Chat Support
 
@@ -350,6 +350,6 @@ Now that we added chat support, let's publish the latest module version to Space
 spacetime publish -c unity-tutorial
 ```
 
-If you get any errors from this command, double check that you correctly entered everything into `lib.cs`. You can also look at the [Client Troubleshooting](/docs/unity/part-3.md#Troubleshooting) section.
+If you get any errors from this command, double check that you correctly entered everything into `lib.cs`. You can also look at the [Client Troubleshooting](part-3.md#Troubleshooting) section.
 
-From here, the tutorial continues with more-advanced topics. The [next tutorial](/docs/unity/part-4.md) introduces Resources & Scheduling.
+From here, the tutorial continues with more-advanced topics. The [next tutorial](part-41.md) introduces Resources & Scheduling.
