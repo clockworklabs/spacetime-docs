@@ -4,7 +4,7 @@ SpacetimeDB supports both hosted and self-hosted publishing in multiple ways. Be
 
 1. Generally introduce Identities.
 1. Generally introduce Servers.
-1Choose to proceed with either a [Hosted](/docs/deploying/hosted.md) or [Self-Hosted](/docs/deploying/self-hosted.md) deployment.
+1. Choose to proceed with either a [Hosted](/docs/deploying/hosted.md) or [Self-Hosted](/docs/deploying/self-hosted.md) deployment.
 
 💡 This tutorial assumes that you have already [installed](/install) the SpacetimeDB CLI.
 
