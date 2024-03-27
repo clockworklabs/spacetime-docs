@@ -561,18 +561,8 @@ public class RemotePlayer : MonoBehaviour
         canvas.worldCamera = Camera.main;
 
         // Get the username from the PlayerComponent for this object and set it in the UI
-        PlayerComponent? playerComp = PlayerComponent.FilterByEntityId(EntityId).FirstOrDefault();
-        if (playerComp is null)
-        {
-            string inputUsername = UsernameElement.Text;
-            Debug.Log($"PlayerComponent not found - Creating a new player ({inputUsername})");
-            Reducer.CreatePlayer(inputUsername);
-            
-            // Try again, optimistically assuming success for simplicity
-            PlayerComponent? playerComp = PlayerComponent.FilterByEntityId(EntityId).FirstOrDefault();
-        }
-        
-        Username = playerComp.Username;
+        // FilterByEntityId is normally nullable, but we'll assume not null for simplicity
+        PlayerComponent playerComp = PlayerComponent.FilterByEntityId(EntityId).First();
 
         // Get the last location for this player and set the initial position
         EntityComponent entity = EntityComponent.FilterByEntityId(EntityId);
