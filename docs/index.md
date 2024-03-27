@@ -94,29 +94,27 @@ SpacetimeDB was designed first and foremost as the backend for multiplayer Unity
 1. What is SpacetimeDB?
    It's a whole cloud platform within a database that's fast enough to run real-time games.
 
-1. How do I use SpacetimeDB?
+2. How do I use SpacetimeDB?
    Install the `spacetime` command line tool, choose your favorite language, import the SpacetimeDB library, write your application, compile it to WebAssembly, and upload it to the SpacetimeDB cloud platform. Once it's uploaded you can call functions directly on your application and subscribe to changes in application state.
 
-1. How do I get/install SpacetimeDB?
+3. How do I get/install SpacetimeDB?
    Just install our command line tool and then upload your application to the cloud.
 
-1. How do I create a new database with SpacetimeDB?
+4. How do I create a new database with SpacetimeDB?
    Follow our [Quick Start](/docs/getting-started) guide!
 
-TL;DR in an empty directory:
+TL;DR in an empty directory, init and publish a barebones app named HelloWorld.
 
 ```bash
 spacetime init --lang=rust
-spacetime publish
+spacetime publish HelloWorld
 ```
 
 5. How do I create a Unity game with SpacetimeDB?
    Follow our [Unity Project](/docs/unity-project) guide!
 
-TL;DR in an empty directory:
+TL;DR after already initializing and publishing (see FAQ #5), generate the SDK:
 
 ```bash
-spacetime init --lang=rust
-spacetime publish
 spacetime generate --out-dir <path-to-unity-project> --lang=csharp
 ```
