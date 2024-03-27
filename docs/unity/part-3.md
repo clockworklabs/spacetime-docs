@@ -1,69 +1,61 @@
-# Unity Tutorial - Basic Multiplayer - Part 3 - Client
+# Unity Multiplayer Tutorial - Part 3
 
-Need help with the tutorial? [Join our Discord server](https://discord.gg/spacetimedb)!
+## Prerequisites
 
-This progressive tutorial is continued from one of the Part 2 tutorials: 
-- [Rust Server Module](/docs/unity/part-2a-rust.md)
-- [C# Server Module](/docs/unity/part-2)
+This progressive tutorial is continued from [Part 2](/docs/unity/part-2.md):
+1. You have already [setup your project](/docs/unity/index.md).
+2. You have already [published your server module](/docs/unity/part-2.md).
 
-## Updating our Unity Project Client to use SpacetimeDB
+## Analyzing the Unity Client Demo
 
-Now we are ready to connect our _BitCraft Mini_ project to SpacetimeDB.
+In this part of the tutorial, we will:
 
-### Import the SDK and Generate Module Files
+1. Explore the SpacetimeDB Unity SDK.
+2. Setup your `GameManager` connection properties.
+3. Inspect high-level client initialization.
+4. Press Play -> Breakdown game features.
 
-1. Add the SpacetimeDB Unity Package using the Package Manager. Open the Package Manager window by clicking on Window -> Package Manager. Click on the + button in the top left corner of the window and select "Add package from git URL". Enter the following URL and click Add.
+## SpacetimeDB Unity SDK
 
-```bash
-https://github.com/clockworklabs/com.clockworklabs.spacetimedbsdk.git
-```
+TODO
 
-![Unity-PackageManager](/images/unity-tutorial/Unity-PackageManager.JPG)
+## GameManager Connection Setup
 
-3. The next step is to generate the module specific client files using the SpacetimeDB CLI. The files created by this command provide an interface for retrieving values from the local client cache of the database and for registering for callbacks to events. In your terminal or command window, run the following commands.
+TODO
 
-```bash
-mkdir -p ../client/Assets/module_bindings
-spacetime generate --out-dir ../client/Assets/module_bindings --lang=csharp
-```
+## High-Level Client Initialization
 
-### Connect to Your SpacetimeDB Module
+TODO
 
-The Unity SpacetimeDB SDK relies on there being a `NetworkManager` somewhere in the scene. Click on the GameManager object in the scene, and in the inspector, add the `NetworkManager` component.
+## Play the Game
 
-![Unity-AddNetworkManager](/images/unity-tutorial/Unity-AddNetworkManager.JPG)
+TODO
 
-Next we are going to connect to our SpacetimeDB module. Open `TutorialGameManager.cs` in your editor of choice and add the following code at the top of the file:
+## Features Breakdown
 
-**Append to the top of TutorialGameManager.cs**
+### Feature: Chat
 
-```csharp
-using SpacetimeDB;
-using SpacetimeDB.Types;
-using System.Linq;
-```
+TODO
 
-At the top of the class definition add the following members:
+### Feature: Resource Gathering
 
-**Append to the top of TutorialGameManager class inside of TutorialGameManager.cs**
+TODO
 
-```csharp
-// These are connection variables that are exposed on the GameManager
-// inspector.
-[SerializeField] private string moduleAddress = "unity-tutorial";
-[SerializeField] private string hostName = "localhost:3000";
+### Feature: Inventory
 
-// This is the identity for this player that is automatically generated
-// the first time you log in. We set this variable when the
-// onIdentityReceived callback is triggered by the SDK after connecting
-private Identity local_identity;
-```
+TODO
 
-The first three fields will appear in your Inspector so you can update your connection details without editing the code. The `moduleAddress` should be set to the domain you used in the publish command. You should not need to change `hostName` if you are using SpacetimeDB locally.
+### Feature: Store
 
-Now add the following code to the `Start()` function. For clarity, replace your entire `Start()` function with the function below.
+TODO
 
-**REPLACE the Start() function in TutorialGameManager.cs**
+### Feature: Unlockables
+
+TODO
+
+
+______________________
+# OLD >> TODO: MV || DELETE
 
 ```csharp
 // Start is called before the first frame update

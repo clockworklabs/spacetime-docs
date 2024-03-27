@@ -1,6 +1,6 @@
 # Unity Multiplayer Tutorial - Part 2
 
-# Analyzing the C# Server Module
+## Analyzing the C# Server Module
 
 This progressive tutorial is continued from [Part 1](/docs/unity/part-1.md).
 
@@ -9,11 +9,16 @@ In this part of the tutorial, we will:
 1. Learn core concepts of the C# server module.
 2. Review limitations and common practices.
 3. Breakdown high-level concepts like Types, Tables, and Reducers. 
-4. Breakdown the initialization reducer and chat support from the demo for real-use examples.
+4. Breakdown the initialization reducer (entry point) and chat demo features.
 
 The server module will handle the game logic and data management for the game.
 
 💡 Need help? [Join our Discord server](https://discord.gg/spacetimedb)!
+
+### Prerequisites
+
+This progressive tutorial is continued from [Part 1](/docs/unity/part-1.md):
+* You have already [setup your project](/docs/unity/index.md).
 
 ## The Entity Component Systems (ECS)
 
