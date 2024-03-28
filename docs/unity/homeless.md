@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> TODO: Delete this file, when done
+
+_____
+
 ### Create the Module
 
 1. It is important that you already have the SpacetimeDB CLI tool [installed](/install).

@@ -1,5 +1,8 @@
 # Unity Multiplayer Tutorial - Part 2
 
+> [!IMPORTANT]
+> TODO: This draft may link to WIP repos, docs or temporarily-hosted images - be sure to replace with final links/images after prerequisite PRs are approved (that are not yet approved upon writing this) -> then delete this memo.
+
 ## Analyzing the C# Server Module
 
 This progressive tutorial is continued from [Part 1](/docs/unity/part-1.md).
@@ -7,9 +10,9 @@ This progressive tutorial is continued from [Part 1](/docs/unity/part-1.md).
 In this part of the tutorial, we will: 
 
 1. Learn core concepts of the C# server module.
-2. Review limitations and common practices.
-3. Breakdown high-level concepts like Types, Tables, and Reducers. 
-4. Breakdown the initialization reducer (entry point) and chat demo features.
+1. Review limitations and common practices.
+1. Breakdown high-level concepts like Types, Tables, and Reducers. 
+1. Breakdown the initialization reducer (entry point) and chat demo features.
 
 The server module will handle the game logic and data management for the game.
 
@@ -66,7 +69,7 @@ Common `using` statements include:
 using SpacetimeDB; // Contains class|func|struct attributes like [Table], [Type], [Reducer]
 using static SpacetimeDB.Runtime; // Contains Identity DbEventArgs, Log()
 using SpacetimeDB.Module; // Contains prop attributes like [Column]
-using Module.Utils; // Helper to workaround the `throw` and `DateTime` limitations noted above 
+using static Module.Utils; // Helper to workaround the `throw` and `DateTime` limitations noted above 
 ```
 
 - You will mostly see `SpacetimeDB.Module` in [Tables.cs](https://github.com/clockworklabs/zeke-demo-project/tree/dylan/feat/mini-upgrade/Server-Csharp/src/Tables.cs) for schema definitions
