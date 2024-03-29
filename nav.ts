@@ -36,11 +36,10 @@ const nav: Nav = {
     page("Self-Hosted",         "deploying/hosted",       "deploying/self-hosted.md"),
 
     section("Unity Tutorial - Basic Multiplayer"),
-    page("Overview",            "unity-tutorial",         "unity/index.md"),
-    page("1 - Setup",           "unity/part-1",           "unity/part-1.md"),
-    page("2a - Server (Rust)",  "unity/part-2a-rust",     "unity/part-2a-rust.md"),
-    page("2b - Server (C#)",    "unity/part-2",           "unity/part-2.md"),
-    page("3 - Client",          "unity/part-3",           "unity/part-3.md"),
+    page("Overview",                "unity-tutorial",     "unity/index.md"),
+    page("1 - Project Setup",       "unity/part-1",       "unity/part-1.md"),
+    page("2 - Server (C# Module)",  "unity/part-2",       "unity/part-2a-rust.md"),
+    page("3 - Client (Unity)",      "unity/part-2",       "unity/part-2.md"),
 
     section("Unity Tutorial - Advanced"),
     page("4 - Resources & Scheduling",   "unity/part-4",  "unity/part-4.md"),

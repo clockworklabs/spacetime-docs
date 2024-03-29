@@ -5,15 +5,15 @@
 
 ## Prerequisites
 
-This progressive tutorial is continued from [Part 2](/docs/unity/part-2.md):
-1. You have already [setup your project](/docs/unity/index.md).
-1. You have already [published your server module](/docs/unity/part-2.md).
+- This progressive tutorial is continued from [Part 2](/docs/unity/part-2.md).
+- Or [start from the beginning](/docs/unity/index.md).
 
 ## Analyzing the Unity Client Demo
 
 In this part of the tutorial, we will:
 
 1. Setup your `GameManager` connection properties.
+1. Use the _Publisher_ editor tool to deploy your module.
 1. Inspect high-level client initialization.
 1. Press Play -> Guided breakdown of game features:
     1. Chat
@@ -234,10 +234,11 @@ Purchasing from the store will trigger the following flows:
       1. `InventoryUpdate()` will clear `PlayerInventoryController.Local._pockets` and resync with the server's `newValue`.
     - **Config:** `onConfigComponentUpdate()` -> `PlayerInventoryController.Local.ConfigUpdate(newValue)` chain will be called.
 
-## Troubleshooting
-
-TODO?
-
 ## Conclusion
 
-TODO?
+✅ You've successfully finished the SpacetimeDB client-server multiplayer tutorial series! **From here:**
+
+- Check the [C# Reference Doc](../modules/c-sharp/index.md)
+- Explore the CLI tool by opening a terminal and typing `spacetime`, which expands upon the _Publisher_ and _Reducer_ Unity editor tools. 
+    - 💡Try starting with `spacetime sql -h` to learn how to query your database [via SQL queries](../sql/index.md)!  
+- Ask questions in our [Discord server](https://discord.gg/spacetimedb)

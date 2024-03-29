@@ -3,7 +3,7 @@
 > [!IMPORTANT]
 > TODO: This draft may link to WIP repos, docs or temporarily-hosted images - be sure to replace with final links/images after prerequisite PRs are approved (that are not yet approved upon writing this) -> then delete this memo.
 
-## Project Setup
+## Quickstart Project Setup
 
 This progressive tutorial will guide you to: 
 
@@ -29,15 +29,15 @@ This project repo is separated into two sub-projects:
 
 ## 2. Publishing the Project
 
-From Unity, you don't need CLI commands for common functionality:
+From Unity, you don't need CLI commands for common functionality: There's a Unity editor tool for that!
+
+![Unity Publisher Editor Tool GIF](https://i.imgur.com/Hbup2W9.gif)
 
 1. Open the _Publisher_ editor tool: `ALT+SHIFT+P` (or `Window/SpacetimeDB/Publisher` in the top menu)
 1. Create an identity -> Select `testnet` for the server
 1. Browse to your repo root `Server-Csharp` dir -> **Publish** -> **Generate** Unity files
 
 💡For the next section, we'll use the selected `Server` and publish result `Host`
-
-![Unity Publisher Tool](https://github.com/clockworklabs/zeke-demo-project/raw/dylan/feat/mini-upgrade/.doc/prev-publisher.jpg)
 
 ## 3. Connecting the Project
 
@@ -51,9 +51,7 @@ From Unity, you don't need CLI commands for common functionality:
 
 With the same `Main` scene open, press play!
 
-![Gameplay Screenshot](https://github.com/clockworklabs/zeke-demo-project/raw/dylan/feat/mini-upgrade/.doc/prev-action.jpg)
-
-![UI Screenshot](https://github.com/clockworklabs/zeke-demo-project/raw/dylan/feat/mini-upgrade/.doc/prev-ui.jpg)
+![Gameplay Actions<>UI GIF](https://i.imgur.com/e9uLx3a.gif)
 
 You should see your local player as a box in the scene: Notice some hints at the bottom-right for things to do.
 
@@ -61,4 +59,4 @@ You should see your local player as a box in the scene: Notice some hints at the
 
 Congratulations! You have successfully set up your multiplayer game project. 
 
-In the next section, we will break down how Server Modules work and analyze the demo code.
+In the next section, we will break down how Server Modules work and analyze the demo code. In a later section, we'll also analyze the Unity client demo.

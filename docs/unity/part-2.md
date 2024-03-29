@@ -3,6 +3,11 @@
 > [!IMPORTANT]
 > TODO: This draft may link to WIP repos, docs or temporarily-hosted images - be sure to replace with final links/images after prerequisite PRs are approved (that are not yet approved upon writing this) -> then delete this memo.
 
+### Prerequisites
+
+- This progressive tutorial is continued from [Part 1](/docs/unity/part-1.md):
+- Or [start from the beginning](/docs/unity/index.md).
+
 ## Analyzing the C# Server Module
 
 This progressive tutorial is continued from [Part 1](/docs/unity/part-1.md).
@@ -18,16 +23,13 @@ The server module will handle the game logic and data management for the game.
 
 💡 Need help? [Join our Discord server](https://discord.gg/spacetimedb)!
 
-### Prerequisites
-
-This progressive tutorial is continued from [Part 1](/docs/unity/part-1.md):
-* You have already [setup your project](/docs/unity/index.md).
-
 ## The Entity Component Systems (ECS)
 
 Before we continue to creating the server module, it's important to understand the basics of the ECS. 
 This is a game development architecture that separates game objects into components for better flexibility and performance. 
 You can read more about the ECS design pattern [here](https://en.wikipedia.org/wiki/Entity_component_system).
+
+![ECS Flow, Wikipedia Creative Commons CC0 1.0](https://i.imgur.com/NlJTevf.png)
 
 We chose ECS for this example project because it promotes scalability, modularity, and efficient data management, 
 making it ideal for building multiplayer games with SpacetimeDB.
@@ -267,20 +269,15 @@ While this is very high-level, **this is what's happening:**
 - `[Reducer(ReducerKind.Disconnect)]`
 - `[Reducer(ReducerKind.Update)]` - Not to be confused with Unity-style Update loops, this calls when a `[Table]` row is updated.
 
+## Publishing the Module
 
-## Wrapping Up
+To deploy outside of Unity, we'd normally use the `spacetime publish` CLI command. 
 
-💡View the [entire lib.cs file](https://gist.github.com/dylanh724/68067b4e843ea6e99fbd297fe1a87c49)
-
-Now that we added chat support, let's publish the latest module version to SpacetimeDB, assuming we're still in the `server` dir:
-
-```bash
-spacetime publish -c unity-tutorial
-```
+However, Unity has an integrated **Publisher** editor tool that will be introduced in the next section!
 
 ## Conclusion
 
-You have now learned the core concepts of the C# server module, reviewed limitations and common practices 
-and broke down high-level concepts like Types, Tables, and Reducers with real examples from the demo.
+You have now learned the core concepts of the C# server module, reviewed limitations/common practices 
+and broke down high-level concepts like Types, Tables, and Reducers - with real examples from the demo.
 
-In the next section, we will break down the client-side code and analyze the Unity demo code.
+In the next section, we'll publish our module, break down the **client-side** Unity code and analyze client-server flows.
