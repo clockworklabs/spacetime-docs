@@ -190,17 +190,17 @@ In `server/Lib.cs`, add the definition of the connect reducer to the `Module` cl
 
 ```csharp
 [SpacetimeDB.Reducer(ReducerKind.Connect)]
-public static void OnConnect(DbEventArgs dbEventArgs)
+public static void OnConnect(DbEventArgs dbEvent)
 {
-    Log($"Connect {dbEventArgs.Sender}");
-    var user = User.FindByIdentity(dbEventArgs.Sender);
+    Log($"Connect {dbEvent.Sender}");
+    var user = User.FindByIdentity(dbEvent.Sender);
 
     if (user is not null)
     {
         // If this is a returning user, i.e., we already have a `User` with this `Identity`,
         // set `Online: true`, but leave `Name` and `Identity` unchanged.
         user.Online = true;
-        User.UpdateByIdentity(dbEventArgs.Sender, user);
+        User.UpdateByIdentity(dbEvent.Sender, user);
     }
     else
     {
@@ -209,7 +209,7 @@ public static void OnConnect(DbEventArgs dbEventArgs)
         new User
         {
             Name = null,
-            Identity = dbEventArgs.Sender,
+            Identity = dbEvent.Sender,
             Online = true,
         }.Insert();
     }
@@ -222,15 +222,15 @@ Add the following code after the `OnConnect` lambda:
 
 ```csharp
 [SpacetimeDB.Reducer(ReducerKind.Disconnect)]
-public static void OnDisconnect(DbEventArgs dbEventArgs)
+public static void OnDisconnect(DbEventArgs dbEvent)
 {
-    var user = User.FindByIdentity(dbEventArgs.Sender);
+    var user = User.FindByIdentity(dbEvent.Sender);
 
     if (user is not null)
     {
         // This user should exist, so set `Online: false`.
         user.Online = false;
-        User.UpdateByIdentity(dbEventArgs.Sender, user);
+        User.UpdateByIdentity(dbEvent.Sender, user);
     }
     else
     {
