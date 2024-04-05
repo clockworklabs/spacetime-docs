@@ -31,7 +31,7 @@ This project repo is separated into two sub-projects:
 
 From Unity, you don't need CLI commands for common functionality: There's a Unity editor tool for that!
 
-![Unity Publisher Editor Tool GIF](https://i.imgur.com/Hbup2W9.gif)
+![Unity Publisher Editor Tool GIF](/images/unity-tutorial/part-1/unity-publisher-editor-tool-animated.gif)
 
 1. Open the _Publisher_ editor tool: `ALT+SHIFT+P` (or `Window/SpacetimeDB/Publisher` in the top menu)
 1. Create an identity -> Select `testnet` for the server
@@ -51,7 +51,7 @@ From Unity, you don't need CLI commands for common functionality: There's a Unit
 
 With the same `Main` scene open, press play!
 
-![Gameplay Actions<>UI GIF](https://i.imgur.com/e9uLx3a.gif)
+![Gameplay Actions<>UI GIF](/images/unity-tutorial/part-3/action-ui-animation.gif)
 
 You should see your local player as a box in the scene: Notice some hints at the bottom-right for things to do.
 

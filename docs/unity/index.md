@@ -14,7 +14,7 @@ Tested with Unity `2022.3.20 LTS` (and may also work on newer versions). We'll b
 ## Unity Tutorial - Basic Multiplayer
 Get started with the core client-server setup. For part 2, you may choose your server module preference of [Rust](/docs/modules/rust) or [C#](/docs/modules/c-sharp):
 
-![Core Architecture](https://i.imgur.com/Me0JlsK.png)
+![Core Architecture](/images/unity-tutorial/overview/core-architecture.png)
 
 1. [Setup](/docs/unity/part-1.md)
 2. [Server (C#)](/docs/unity/part-2.md) ☼

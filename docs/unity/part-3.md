@@ -26,7 +26,7 @@ Start by opening `Scenes/Main` in the Unity project from the repo `/Client` dir.
 
 ## GameManager Connection Setup
 
-![GameManager Inspector (+host name variations)](https://i.imgur.com/sHxYyS7.png)
+![GameManager Inspector (+host name variations)](/images/unity-tutorial/part-3/)
 
 Select the `GameManager` in the scene hierarchy:
 
@@ -111,7 +111,7 @@ private void connectToSpacetimeDb()
 ```
 
 ## Play the Demo Game
-![Gameplay Actions<>UI GIF](https://i.imgur.com/e9uLx3a.gif)
+![Gameplay Actions<>UI GIF](/images/unity-tutorial/part-3/action-ui-animation.gif)
 
 Notice at the bottom-right, you have some tips:
 
@@ -128,7 +128,7 @@ ___
 
 ### Feature: Chat
 
-![Chat<>Reducer Tool](https://i.imgur.com/Gm6YN1S.png)
+![Chat<>Reducer Tool](/images/unity-tutorial/part-3/chat-reducer-tool.min.png)
 
 Note the message of the day, directing you to emulate a third-party with the _Reducers_ editor tool:
 
@@ -138,7 +138,7 @@ Note the message of the day, directing you to emulate a third-party with the _Re
 
 1. CreatePlayer
 
-![Create Player via Reducer Tool](https://i.imgur.com/yl5WBXt.png)
+![Create Player via Reducer Tool](/images/unity-tutorial/part-3/create-player-via-reducer-tool.min.png)
 
 2. Repeat with `SendChatMessage` to see it appear in chat from your created "third-party" player.
    
@@ -146,7 +146,7 @@ Note the message of the day, directing you to emulate a third-party with the _Re
 
 ### Feature: Resource Gathering
 
-![Resource Gathering](https://i.imgur.com/McdvbHZ.png)
+![Resource Gathering](/images/unity-tutorial/part-3/resource-gathering.min.png)
 
 Thanks to our scheduler set by the server via the `Init()`, resources will spawn every 5~10 seconds (with the specified max cap): 
 
@@ -156,7 +156,7 @@ Thanks to our scheduler set by the server via the `Init()`, resources will spawn
 
 Extracting a resource will trigger the following flows:
 
-![initSubscribeToEvents-Resource-Extraction-Events](https://i.imgur.com/xqJQ3Xu.png)
+![initSubscribeToEvents-Resource-Extraction-Events](/images/unity-tutorial/part-3/initSubscribeToEvents-resource-extraction.min.png)
 
 1. **[Client]** Call `Reducer.Extract()` from `PlayerInputReceiver.cs` via `OnActionButton()`.
 
@@ -180,7 +180,7 @@ Extracting a resource will trigger the following flows:
 
 ### Feature: Inventory
 
-![Player Inventory](https://i.imgur.com/sBkgW48.png)
+![Player Inventory](/images/unity-tutorial/part-3/player-inventory.min.png)
 
 - On server [Player.cs::CreatePlayer()](./part-2.md#db-initialization), this chained to `createPlayerInventory()`, creating the default inventory `Pockets` and an empty set of `UnlockIds`.
    - When the `Pocket` was created, we started the new Player with 5x `Iron`. 
@@ -192,15 +192,15 @@ See the [Store](#feature-store) section below for example items being consumed a
 
 ### Feature: Unlockables
 
-![Unlockables](https://i.imgur.com/ShDOq4t.png)
+![Unlockables](/images/unity-tutorial/part-3/unlockables.min.png)
 
 See the [Store](#feature-store) section below for an example unlock store purchase.
 
 💡 Dive into `UIUnlocks.cs` to best further discover how client-side unlocks work.
 
-### Feature: Store
+### Feature: Shop
 
-![Store Purchase (+Logs)](https://i.imgur.com/tZmR0uE.gif)
+![Store Purchase (+Logs)](/images/unity-tutorial/part-3/shop-purchase-wLogsanimated.gif)
 
 Open **ShopRow.cs** to find the `Purchase()` function:
 
