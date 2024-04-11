@@ -30,6 +30,7 @@ This is a game development architecture that separates game objects into compone
 You can read more about the ECS design pattern [here](https://en.wikipedia.org/wiki/Entity_component_system).
 
 ![ECS Flow, Wikipedia Creative Commons CC0 1.0](/images/unity-tutorial/part-2/ecs-flow-wiki-creative-commons-cc0-v1.min.png)
+<!--[ECS Flow, Wikipedia Creative Commons CC0 1.0-PREV](https://i.imgur.com/NlJTevf.png) -->
 
 We chose ECS for this example project because it promotes scalability, modularity, and efficient data management, 
 making it ideal for building multiplayer games with SpacetimeDB.
