@@ -253,8 +253,6 @@ cd server
 spacetime publish -c unity-tutorial
 ```
 
-If you get any errors from this command, double check that you correctly entered everything into `lib.rs`. You can also look at the [Client Troubleshooting](/docs/unity/part-3.md#Troubleshooting) section.
-
 ### Finally, Add Chat Support
 
 The client project has a chat window, but so far, all it's used for is the message of the day. We are going to add the ability for players to send chat messages to each other.
@@ -311,5 +309,4 @@ Now that we added chat support, let's publish the latest module version to Space
 spacetime publish -c unity-tutorial
 ```
 
-If you get any errors from this command, double check that you correctly entered everything into `lib.rs`. You can also look at the [Client Troubleshooting](/docs/unity/part-3.md#Troubleshooting) section.
 From here, the [next tutorial](/docs/unity/part-4.md) continues with a Client (Unity) focus.
