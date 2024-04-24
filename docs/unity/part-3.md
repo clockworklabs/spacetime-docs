@@ -455,7 +455,7 @@ Now when you run the game you should be able to send chat messages to other play
 
 This concludes the SpacetimeDB basic multiplayer tutorial, where we learned how to create a multiplayer game. In the next Unity tutorial, we will add resource nodes to the game and learn about _scheduled_ reducers:
 
-**Next Unity Tutorial:** [Resources & Scheduling](/docs/unity/part-4.md)
+From here, the tutorial continues with more-advanced topics: The [next tutorial](/docs/unity/part-4.md) introduces Resources & Scheduling.
 
 ---
 

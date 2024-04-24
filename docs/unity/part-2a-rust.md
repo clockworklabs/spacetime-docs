@@ -312,5 +312,4 @@ spacetime publish -c unity-tutorial
 ```
 
 If you get any errors from this command, double check that you correctly entered everything into `lib.rs`. You can also look at the [Client Troubleshooting](/docs/unity/part-3.md#Troubleshooting) section.
-
-From here, the tutorial continues with more-advanced topics. The [next tutorial](/docs/unity/part-4.md) introduces Resources & Scheduling.
+From here, the [next tutorial](/docs/unity/part-4.md) continues with a Client (Unity) focus.
