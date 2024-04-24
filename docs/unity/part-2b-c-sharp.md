@@ -9,7 +9,7 @@ This progressive tutorial is continued from the [Part 1 Tutorial](/docs/unity/pa
 Run the following command to initialize the SpacetimeDB server module project with C# as the language:
 
 ```bash
-spacetime init --lang=rust server
+spacetime init --lang=csharp server
 ```
 
 This command creates a new folder named "server" within your Unity project directory and sets up the SpacetimeDB server project with Rust as the programming language.
