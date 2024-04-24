@@ -16,7 +16,7 @@ This command creates a new folder named "server" within your Unity project direc
 
 ### SpacetimeDB Tables
 
-In this section we'll be making some edits to the file `server/src/lib.cs`. We recommend you open up this file in an IDE like VSCode or RustRover.
+In this section we'll be making some edits to the file `server/src/lib.cs`. We recommend you open up this file in an IDE like VSCode.
 
 **Important: Open the `server/src/lib.cs` file and delete its contents. We will be writing it from scratch here.**
 
