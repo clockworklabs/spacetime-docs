@@ -6,7 +6,7 @@ This progressive tutorial is continued from the [Part 1 Tutorial](/docs/unity/pa
 
 ## Create a Server Module
 
-Run the following command to initialize the SpacetimeDB server module project with Rust as the language:
+Run the following command to initialize the SpacetimeDB server module project with C# as the language:
 
 ```bash
 spacetime init --lang=rust server
