@@ -12,7 +12,7 @@ Run the following command to initialize the SpacetimeDB server module project wi
 spacetime init --lang=csharp server
 ```
 
-This command creates a new folder named "server" within your Unity project directory and sets up the SpacetimeDB server project with Rust as the programming language.
+This command creates a new folder named "server" within your Unity project directory and sets up the SpacetimeDB server project with C# as the programming language.
 
 ### SpacetimeDB Tables
 
