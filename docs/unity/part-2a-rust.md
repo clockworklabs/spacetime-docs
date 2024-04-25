@@ -309,4 +309,4 @@ Now that we added chat support, let's publish the latest module version to Space
 spacetime publish -c unity-tutorial
 ```
 
-From here, the [next tutorial](/docs/unity/part-4.md) continues with a Client (Unity) focus.
+From here, the [next tutorial](/docs/unity/part-3.md) continues with a Client (Unity) focus.
