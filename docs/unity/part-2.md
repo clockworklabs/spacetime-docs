@@ -143,12 +143,22 @@ public partial class ChatMessage
     
     /// Message contents
     public string? ChatText;
+    
+    /// Microseconds Timestamp of when the message was sent
+    /// Convert between long and DateTimeOffset via Utils.TimeConvert
+    public long Timestamp;
+    
+    /// Microseconds DateTimeOffset representing Timestamp microseconds of when the action ended
+    /// Convert between long and DateTimeOffset via Utils.TimeConvert
+    public DateTimeOffset TimestampOffset => 
+        TimeConvert.FromMicrosecondsTimestamp(Timestamp);
 }
 ```
 
 - The `Id` vars are `ulong` types, commonly used for SpacetimeDB unique identifiers
-- Notice how `Timestamp` is a `string` instead of DateTimeOffset (a limitation mentioned earlier).
-  - 💡 We'll demonstrate how to set a timestamp correctly in the next section. 
+- Notice how `Timestamp` field is a `long` type instead of `DateTimeOffset` (a [limitation](#limitations) mentioned earlier):
+    - Take note the `TimestampOffset` helper, currying the function to a `TimeConvert` utils class.
+    - This ensures we preserve the time to the microsecond via unix epoch timestamps.
 
 ```csharp
 /// This component will be created for all world objects that can move smoothly throughout the world,  keeping track 
@@ -166,17 +176,19 @@ public partial class MobileEntityComponent
     /// Movement direction, {0,0} if not moving at all.
     public StdbVector2? Direction;
     
-    /// Timestamp when movement started.
-    /// This is a ISO 8601 format string; see Utils.GetTimestamp()
-    public string? MoveStartTimestamp;
+    /// Microseconds Timestamp of when the movement started
+    /// Convert between long and DateTimeOffset via Utils.TimeConvert
+    public long MoveStartTimestamp;
+    
+    /// Microseconds DateTimeOffset representing Timestamp microseconds of when the action ended
+    /// Convert between long and DateTimeOffset via Utils.TimeConvert
+    public DateTimeOffset MoveStartTimestampOffset => 
+        TimeConvert.FromMicrosecondsTimestamp(MoveStartTimestamp);
 }
 ```
 
 - `EntityId` is the unique identifier for the table, declared as a `ulong`
 - Location and Direction are both `StdbVector2` types discussed above
-- `MoveStartTimestamp` is a stringified timestamp, as you cannot use `DateTime`-like types within Tables
-  - One of the [limitations](#limitations) mentioned earlier
-
 
 ## Reducers
 
@@ -210,7 +222,7 @@ public static void SendChatMessage(DbEventArgs dbEvent, string text)
         ChatEntityId = 0, // This column auto-increments, so we can set it to 0
         SourceEntityId = player.EntityId,
         ChatText = text,
-        Timestamp = Utils.Timestamp(dbEvent.Time), // ISO 8601 format)
+        Timestamp = Utils.TimeConvert.ToMicrosecondsTimestamp(dbEvent.Time),
     }.Insert();
 }
 ```
@@ -220,7 +232,7 @@ public static void SendChatMessage(DbEventArgs dbEvent, string text)
   - Contains the sender's `Identity`, `DateTimeOffset` sent, and a semi-anonymous `Address` to compare sender vs others.
 - The `PlayerComponent` was found by passing the sender's `Identity` to `PlayerComponent.FindByOwnerId()`.
 - `Throw<T>()` is the helper function (workaround for one of the [limitations](#limitations) mentioned earlier) that logs an error before throwing.
-- This timestamp utilized `Utils.Timestamp()`; an easier-to-remember alias than `dbEvent.Time.ToUniversalTime().ToString("o");`.
+- This timestamp utilized `Utils.TimeConvert.ToMicrosecondsTimestamp()` for consistent time parsing.
 - Since `ChatEntityId` is tagged with the `[Column(ColumnAttrs.PrimaryKeyAuto)]` attribute, setting it to 0 will auto-increment.
 
 ### DB Initialization
