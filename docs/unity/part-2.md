@@ -37,10 +37,11 @@ making it ideal for building multiplayer games with SpacetimeDB.
 
 ## C# Module Limitations & Nuances
 
-Since SpacetimeDB runs on [WebAssembly (WASM)](https://webassembly.org/), you may run into unexpected issues until aware of the following:
+Since SpacetimeDB runs on [WebAssembly (WASM)](https://webassembly.org/), it's important to be aware of the following:
 
 1. No DateTime-like types in Types or Tables:
-    - Use `string` for timestamps (exampled at [Utils.cs](https://github.com/clockworklabs/zeke-demo-project/tree/dylan/feat/mini-upgrade/Server-Csharp/src/Utils.cs)), or `long` for Unix Epoch time.
+    - Use `long` for microsecond unix epoch timestamps
+    - See example usage and converts at the [_TimeConvert_ module demo class](https://github.com/clockworklabs/zeke-demo-project/blob/3fa1c94e75819a191bd785faa7a7d15ea4dc260c/Server-Csharp/src/Utils.cs#L19)
 
 
 2. No Timers or async/await, such as those to create repeating loops:

@@ -4,6 +4,36 @@ You can use the [C# SpacetimeDB library](https://github.com/clockworklabs/Spacet
 
 It uses [Roslyn incremental generators](https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.md) to add extra static methods to types, tables and reducers marked with special attributes and registers them with the database runtime.
 
+## C# Module Limitations & Nuances
+
+Since SpacetimeDB runs on [WebAssembly (WASM)](https://webassembly.org/), it's important to be aware of the following:
+
+1. No DateTime-like types in Types or Tables:
+   - Use `long` for microsecond unix epoch timestamps
+   - See example usage and converts at the [_TimeConvert_ module demo class](https://github.com/clockworklabs/zeke-demo-project/blob/3fa1c94e75819a191bd785faa7a7d15ea4dc260c/Server-Csharp/src/Utils.cs#L19) 
+
+
+2. No Timers or async/await, such as those to create repeating loops:
+   - For repeating invokers, instead **re**schedule it from within a fired [Scheduler](https://spacetimedb.com/docs/modules/c-sharp#reducers) function.
+
+
+3. Using `Debug` advanced option in the `Publisher` Unity editor tool will add callstack symbols for easier debugging:
+   - However, avoid using `Debug` mode when publishing outside a `localhost` server:
+      - Due to WASM buffer size limitations, this may cause publish failure.
+
+
+4. If you `throw` a new `Exception`, no error logs will appear. Instead, use either:
+   1. Use `Log(message, LogLevel.Error);` before you throw.
+   2. Use the demo's static [Utils.cs](https://github.com/clockworklabs/zeke-demo-project/tree/dylan/feat/mini-upgrade/Server-Csharp/src/Utils.cs) class to `Utils.Throw()` to wrap the error log before throwing.
+
+
+5. `[AutoIncrement]` or `[PrimaryKeyAuto]` will never equal 0:
+   - Inserting a new row with an Auto key equaling 0 will always return a unique, non-0 value.
+
+
+6. Enums cannot declare values out of the default order:
+   - For example, `{ Foo = 0, Bar = 3 }` will fail to compile.
+
 ## Example
 
 Let's start with a heavily commented version of the default example from the landing page:
