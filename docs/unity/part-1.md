@@ -118,5 +118,5 @@ We chose ECS for this example project because it promotes scalability, modularit
 ### Create the Server Module
 
 From here, the tutorial continues with your favorite server module language of choice:
-   - [Rust](part-2a-rust.md)
-   - [C#](part-2b-c-sharp.md)
+   - [Rust](/docs/unity/part-2a-rust.md)
+   - [C#](/docs/unity/part-2b-c-sharp.md)
