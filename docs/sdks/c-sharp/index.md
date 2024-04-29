@@ -65,11 +65,12 @@ dotnet add package spacetimedbsdk
 
 ### Using Unity
 
-To install the SpacetimeDB SDK into a Unity project, [download the SpacetimeDB SDK](https://github.com/clockworklabs/com.clockworklabs.spacetimedbsdk/releases/latest), packaged as a `.unitypackage`.
+To install the SpacetimeDB SDK into a Unity project, simply add the following line to your `Packages/manifest.json`:
+```json
+"com.clockworklabs.spacetimedbsdk": "https://github.com/clockworklabs/com.clockworklabs.spacetimedbsdk.git"
+```
 
-In Unity navigate to the `Assets > Import Package > Custom Package` menu in the menu bar. Select your `SpacetimeDB.Unity.Comprehensive.Tutorial.unitypackage` file and leave all folders checked.
-
-(See also the [Unity Tutorial](/docs/unity/part-1))
+💡 See also the [Unity Tutorial](/docs/unity/index.md)
 
 ## Generate module bindings
 

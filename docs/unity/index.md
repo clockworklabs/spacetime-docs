@@ -1,23 +1,24 @@
 # Unity Tutorial Overview
 
-Need help with the tutorial or CLI commands? [Join our Discord server](https://discord.gg/spacetimedb)!
+> [!IMPORTANT]
+> TODO: This draft may link to WIP repos, docs or temporarily-hosted images - be sure to replace with final links/images after prerequisite PRs are approved (that are not yet approved upon writing this) -> then delete this memo.
 
-The objective of this progressive tutorial is to help you become acquainted with the basic features of SpacetimeDB. By the end, you should have a basic understanding of what SpacetimeDB offers for developers making multiplayer games. It assumes that you have a basic understanding of the Unity Editor, using a command line terminal and coding.
+💡 Need help? [Join our Discord server](https://discord.gg/spacetimedb)!
+
+The objective of this progressive tutorial is to help you become acquainted with the basic features of SpacetimeDB. By the end, you should have a basic understanding of what SpacetimeDB offers for developers making multiplayer games. It assumes that you have a basic understanding of the Unity Editor, Git, using a commandline terminal and coding.
 
 We'll give you some CLI commands to execute. If you are using Windows, we recommend using Git Bash or PowerShell. For Mac, we recommend Terminal.
 
-Tested with UnityEngine `2022.3.20f1 LTS` (and may also work on newer versions).
+Tested with Unity `2022.3.20 LTS` (and may also work on newer versions). We'll be opening .cs files in an IDE like _Visual Studio_ or _Rider_.
 
 ## Unity Tutorial - Basic Multiplayer
 Get started with the core client-server setup. For part 2, you may choose your server module preference of [Rust](/docs/modules/rust) or [C#](/docs/modules/c-sharp):
 
-- [Part 1 - Setup](/docs/unity/part-1.md)
-- [Part 2a - Server (Rust)](/docs/unity/part-2a-rust.md)
-- [Part 2b - Server (C#)](/docs/unity/part-2b-csharp.md)
-- [Part 3 - Client](/docs/unity/part-3.md)
+![Core Architecture](/images/unity-tutorial/overview/core-architecture.png)
+<!-- ![Core Architecture-PREV](https://i.imgur.com/Me0JlsK.png) -->
 
-## Unity Tutorial - Advanced
-By this point, you should already have a basic understanding of SpacetimeDB client, server and CLI:
+1. [Setup](/docs/unity/part-1.md)
+2. [Server (C#)](/docs/unity/part-2.md) ☼
+3. [Client (Unity)](/docs/unity/part-3.md)
 
-- [Part 4 - Resources & Scheduling](/docs/unity/part-4.md)
-- [Part 5 - BitCraft Mini](/docs/unity/part-5.md)
+☼ While the tutorial uses C#, the repo cloned in [Part 1](/docs/unity/part-1.md) does include a legacy Rust example to optionally use, instead.

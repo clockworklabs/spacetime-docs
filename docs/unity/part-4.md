@@ -1,261 +1,297 @@
-# Unity Tutorial - Advanced - Part 4 - Resources and Scheduling
+# Unity Multiplayer Tutorial - Part 2
 
-Need help with the tutorial? [Join our Discord server](https://discord.gg/spacetimedb)!
+> [!IMPORTANT]
+> TODO: This draft may link to WIP repos, docs or temporarily-hosted images - be sure to replace with final links/images after prerequisite PRs are approved (that are not yet approved upon writing this) -> then delete this memo.
 
-This progressive tutorial is continued from the [Part 3](/docs/unity/part-3.md) Tutorial.
+### Prerequisites
 
-**Oct 14th, 2023: This tutorial has not yet been updated for the recent 0.7.0 release, it will be updated asap!**
+- This progressive tutorial is continued from [Part 1](/docs/unity/part-1.md):
+- Or [start from the beginning](/docs/unity/index.md).
 
-In this second part of the lesson, we'll add resource nodes to our project and learn about scheduled reducers. Then we will spawn the nodes on the client so they are visible to the player.
+## Analyzing the C# Server Module
 
-## Add Resource Node Spawner
+This progressive tutorial is continued from [Part 1](/docs/unity/part-1.md).
 
-In this section we will add functionality to our server to spawn the resource nodes.
+In this part of the tutorial, we will: 
 
-### Step 1: Add the SpacetimeDB Tables for Resource Nodes
+1. Learn core concepts of the C# server module.
+1. Review limitations and common practices.
+1. Breakdown high-level concepts like Types, Tables, and Reducers. 
+1. Breakdown the initialization reducer (entry point) and chat demo features.
 
-1. Before we start adding code to the server, we need to add the ability to use the rand crate in our SpacetimeDB module so we can generate random numbers. Open the `Cargo.toml` file in the `Server` directory and add the following line to the `[dependencies]` section.
+The server module will handle the game logic and data management for the game.
 
-```toml
-rand = "0.8.5"
-```
+💡 Need help? [Join our Discord server](https://discord.gg/spacetimedb)!
 
-We also need to add the `getrandom` feature to our SpacetimeDB crate. Update the `spacetimedb` line to:
+## The Entity Component Systems (ECS)
 
-```toml
-spacetimedb = { "0.5", features = ["getrandom"] }
-```
+Before we continue to creating the server module, it's important to understand the basics of the ECS. 
+This is a game development architecture that separates game objects into components for better flexibility and performance. 
+You can read more about the ECS design pattern [here](https://en.wikipedia.org/wiki/Entity_component_system).
 
-2. The first entity component we are adding, `ResourceNodeComponent`, stores the resource type. We'll define an enum to describe a `ResourceNodeComponent`'s type. For now, we'll just have one resource type: Iron. In the future, though, we'll add more resources by adding variants to the `ResourceNodeType` enum. Since we are using a custom enum, we need to mark it with the `SpacetimeType` attribute. Add the following code to lib.rs.
+![ECS Flow, Wikipedia Creative Commons CC0 1.0](/images/unity-tutorial/part-2/ecs-flow-wiki-creative-commons-cc0-v1.min.png)
+<!--[ECS Flow, Wikipedia Creative Commons CC0 1.0-PREV](https://i.imgur.com/NlJTevf.png) -->
 
-```rust
-#[derive(SpacetimeType, Clone)]
-pub enum ResourceNodeType {
-    Iron,
-}
+We chose ECS for this example project because it promotes scalability, modularity, and efficient data management, 
+making it ideal for building multiplayer games with SpacetimeDB.
 
-#[spacetimedb(table)]
-#[derive(Clone)]
-pub struct ResourceNodeComponent {
-    #[primarykey]
-    pub entity_id: u64,
+## C# Module Limitations & Nuances
 
-    // Resource type of this resource node
-    pub resource_type: ResourceNodeType,
-}
-```
+Since SpacetimeDB runs on [WebAssembly (WASM)](https://webassembly.org/), it's important to be aware of the following:
 
-Because resource nodes never move, the `MobileEntityComponent` is overkill. Instead, we will add a new entity component named `StaticLocationComponent` that only stores the position and rotation.
+1. No DateTime-like types in Types or Tables:
+    - Use `long` for microsecond unix epoch timestamps
+    - See example usage and converts at the [_TimeConvert_ module demo class](https://github.com/clockworklabs/zeke-demo-project/blob/3fa1c94e75819a191bd785faa7a7d15ea4dc260c/Server-Csharp/src/Utils.cs#L19)
 
-```rust
-#[spacetimedb(table)]
-#[derive(Clone)]
-pub struct StaticLocationComponent {
-    #[primarykey]
-    pub entity_id: u64,
 
-    pub location: StdbVector2,
-    pub rotation: f32,
-}
-```
+2. No Timers or async/await, such as those to create repeating loops:
+    - For repeating invokers, instead **re**schedule it from within a fired [Scheduler](https://spacetimedb.com/docs/modules/c-sharp#reducers) function.
 
-3. We are also going to add a couple of additional column to our Config table. `map_extents` let's our spawner know where it can spawn the nodes. `num_resource_nodes` is the maximum number of nodes to spawn on the map. Update the config table in lib.rs.
 
-```rust
-#[spacetimedb(table)]
-pub struct Config {
-    // Config is a global table with a single row. This table will be used to
-    // store configuration or global variables
+3. Using `Debug` advanced option in the `Publisher` Unity editor tool will add callstack symbols for easier debugging:
+    - However, avoid using `Debug` mode when publishing outside a `localhost` server:
+        - Due to WASM buffer size limitations, this may cause publish failure.
 
-    #[primarykey]
-    // always 0
-    // having a table with a primarykey field which is always zero is a way to store singleton global state
-    pub version: u32,
 
-    pub message_of_the_day: String,
+4. If you `throw` a new `Exception`, no error logs will appear. Instead, use either:
+    1. Use `Log(message, LogLevel.Error);` before you throw.
+    2. Use the demo's static [Utils.cs](https://github.com/clockworklabs/zeke-demo-project/tree/dylan/feat/mini-upgrade/Server-Csharp/src/Utils.cs) class to `Utils.Throw()` to wrap the error log before throwing.
 
-    // new variables for resource node spawner
-    // X and Z range of the map (-map_extents to map_extents)
-    pub map_extents: u32,
-    // maximum number of resource nodes to spawn on the map
-    pub num_resource_nodes: u32,
-}
-```
 
-4. In the `init` reducer, we need to set the initial values of our two new variables. Update the following code:
+5. `[AutoIncrement]` or `[PrimaryKeyAuto]` will never equal 0:
+    - Inserting a new row with an Auto key equaling 0 will always return a unique, non-0 value.
 
-```rust
-    Config::insert(Config {
-        version: 0,
-        message_of_the_day: "Hello, World!".to_string(),
 
-        // new variables for resource node spawner
-        map_extents: 25,
-        num_resource_nodes: 10,
-    })
-    .expect("Failed to insert config.");
-```
+6. Enums cannot declare values out of the default order:
+    - For example, `{ Foo = 0, Bar = 3 }` will fail to compile.
 
-### Step 2: Write our Resource Spawner Repeating Reducer
+## Namespaces
 
-1. Add the following code to lib.rs. We are using a special attribute argument called repeat which will automatically schedule the reducer to run every 1000ms.
-
-```rust
-#[spacetimedb(reducer, repeat = 1000ms)]
-pub fn resource_spawner_agent(_ctx: ReducerContext, _prev_time: Timestamp) -> Result<(), String> {
-    let config = Config::filter_by_version(&0).unwrap();
-
-    // Retrieve the maximum number of nodes we want to spawn from the Config table
-    let num_resource_nodes = config.num_resource_nodes as usize;
-
-    // Count the number of nodes currently spawned and exit if we have reached num_resource_nodes
-    let num_resource_nodes_spawned = ResourceNodeComponent::iter().count();
-    if num_resource_nodes_spawned >= num_resource_nodes {
-        log::info!("All resource nodes spawned. Skipping.");
-        return Ok(());
-    }
-
-    // Pick a random X and Z based off the map_extents
-    let mut rng = rand::thread_rng();
-    let map_extents = config.map_extents as f32;
-    let location = StdbVector2 {
-        x: rng.gen_range(-map_extents..map_extents),
-        z: rng.gen_range(-map_extents..map_extents),
-    };
-    // Pick a random Y rotation in degrees
-    let rotation = rng.gen_range(0.0..360.0);
-
-    // Insert our SpawnableEntityComponent which assigns us our entity_id
-    let entity_id = SpawnableEntityComponent::insert(SpawnableEntityComponent { entity_id: 0 })
-        .expect("Failed to create resource spawnable entity component.")
-        .entity_id;
-
-    // Insert our static location with the random position and rotation we selected
-    StaticLocationComponent::insert(StaticLocationComponent {
-        entity_id,
-        location: location.clone(),
-        rotation,
-    })
-    .expect("Failed to insert resource static location component.");
-
-    // Insert our resource node component, so far we only have iron
-    ResourceNodeComponent::insert(ResourceNodeComponent {
-        entity_id,
-        resource_type: ResourceNodeType::Iron,
-    })
-    .expect("Failed to insert resource node component.");
-
-    // Log that we spawned a node with the entity_id and location
-    log::info!(
-        "Resource node spawned: {} at ({}, {})",
-        entity_id,
-        location.x,
-        location.z,
-    );
-
-    Ok(())
-}
-```
-
-2. Since this reducer uses `rand::Rng` we need add include it. Add this `use` statement to the top of lib.rs.
-
-```rust
-use rand::Rng;
-```
-
-3. Even though our reducer is set to repeat, we still need to schedule it the first time. Add the following code to the end of the `init` reducer. You can use this `schedule!` macro to schedule any reducer to run in the future after a certain amount of time.
-
-```rust
-    // Start our resource spawner repeating reducer
-    spacetimedb::schedule!("1000ms", resource_spawner_agent(_, Timestamp::now()));
-```
-
-4. Next we need to generate our client code and publish the module. Since we changed the schema we need to make sure we include the `--clear-database` flag. Run the following commands from your Server directory:
-
-```bash
-spacetime generate --out-dir ../Assets/autogen --lang=csharp
-
-spacetime publish -c yourname/bitcraftmini
-```
-
-Your resource node spawner will start as soon as you publish since we scheduled it to run in our init reducer. You can watch the log output by using the `--follow` flag on the logs CLI command.
-
-```bash
-spacetime logs -f yourname/bitcraftmini
-```
-
-### Step 3: Spawn the Resource Nodes on the Client
-
-1. First we need to update the `GameResource` component in Unity to work for multiplayer. Open GameResource.cs and add `using SpacetimeDB.Types;` to the top of the file. Then change the variable `Type` to be of type `ResourceNodeType` instead of `int`. Also add a new variable called `EntityId` of type `ulong`.
+Common `using` statements include:
 
 ```csharp
+using SpacetimeDB; // Contains class|func|struct attributes like [Table], [Type], [Reducer]
+using static SpacetimeDB.Runtime; // Contains Identity DbEventArgs, Log()
+using SpacetimeDB.Module; // Contains prop attributes like [Column]
+using static Module.Utils; // Helper to workaround the `throw` and `DateTime` limitations noted above 
+```
+
+- You will mostly see `SpacetimeDB.Module` in [Tables.cs](https://github.com/clockworklabs/zeke-demo-project/tree/dylan/feat/mini-upgrade/Server-Csharp/src/Tables.cs) for schema definitions
+- `SpacetimeDB` and `SpacetimeDB.Runtime` can be found in most all SpacetimeDB scripts
+- `Module.Utils` parse DateTimeOffset into a timestamp string and wraps `throw` with error logs
+
+## Partial Classes & Structs
+
+- Throughout the demo, you will notice most classes or structs with a SpacetimeDB [Attribute] such as `[Table]` or `[Reducer]` will be defined with the `partial` keyword. 
+
+- This allows the _Roslyn Compiler_ to [incrementally generate](https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.md) additions to the SpacetimeDB SDK, such as adding helper functions and utilities. This means SpacetimeDB takes care of all the low-level tooling for you, such as inserting, updating or querying the DB.
+  - This further allows you to separate your models from logic within the same class.
+
+* Notice that the module class, itself, is also a `static partial class`.
+
+## Types & Tables
+
+`[Table]` attributes are database columns, while `[Type]` attributes are define a schema.
+
+### Types
+
+`[Type]` attributes attach to properties containing `[Table]` attributes when you want to use a custom Type that's not [SpacetimeDB natively-supported](../modules/c-sharp#supported-types). These are generally defined as a `partial struct` or `partial class`
+
+Let's inspect a real example `Type`; open [Server-cs/Tables.cs](https://github.com/clockworklabs/zeke-demo-project/tree/dylan/feat/mini-upgrade/Server-Csharp/src/Tables.cs):
+
+In Unity, you are likely familiar with the `Vector2` type. In SpacetimeDB, let's inspect the `StdbVector2` type to store 2D positions in the database:
+
+```csharp
+/// A spacetime type which can be used in tables & reducers to represent a 2D position (such as movement)
+[Type]
+public partial class StdbVector2
+{
+  public float X;
+  public float Z;
+
+  // This allows us to use StdbVector2::ZERO in reducers
+  public static readonly StdbVector2 ZERO = new()
+  {
+      X = 0, 
+      Z = 0,
+  };
+}
+```
+
+- Since `Types` are used in `Tables`, we can now use a custom SpacetimeDB `StdbVector3` `Type` in a `[Table]`.
+
+We may optionally include `static readonly` property "helper" functions such as the above-exampled `ZERO`.
+
+### Tables
+
+`[Table]` attributes use `[Type]`s - either custom (like `StdbVector2` above) or [SpacetimeDB natively-supported types](../modules/c-sharp#supported-types). 
+These are generally defined as a `struct` or `class`.
+
+Let's inspect a real example `Table`, looking again at [Tables.cs](https://github.com/clockworklabs/zeke-demo-project/tree/dylan/feat/mini-upgrade/Server-Csharp/src/Tables.cs):
+
+```csharp
+/// Represents chat messages within the game, including the sender and message content
+[Table]
+public partial class ChatMessage
+{
+    /// Primary key, automatically incremented
+    [Column(ColumnAttrs.PrimaryKeyAuto)]
+    public ulong ChatEntityId;
+
+    /// The entity id of the player (or NPC) that sent the message
+    public ulong SourceEntityId;
+    
+    /// Message contents
+    public string? ChatText;
+    
+    /// Microseconds Timestamp of when the message was sent
+    /// Convert between long and DateTimeOffset via Utils.TimeConvert
+    public long Timestamp;
+    
+    /// Microseconds DateTimeOffset representing Timestamp microseconds of when the action ended
+    /// Convert between long and DateTimeOffset via Utils.TimeConvert
+    public DateTimeOffset TimestampOffset => 
+        TimeConvert.FromMicrosecondsTimestamp(Timestamp);
+}
+```
+
+- The `Id` vars are `ulong` types, commonly used for SpacetimeDB unique identifiers
+- Notice how `Timestamp` field is a `long` type instead of `DateTimeOffset` (a [limitation](#limitations) mentioned earlier):
+    - Take note the `TimestampOffset` helper, currying the function to a `TimeConvert` utils class.
+    - This ensures we preserve the time to the microsecond via unix epoch timestamps.
+
+```csharp
+/// This component will be created for all world objects that can move smoothly throughout the world,  keeping track 
+/// of position, the last time the component was updated & the direction the mobile object is currently moving.
+[Table]
+public partial class MobileEntityComponent
+{
+    /// Primary key for the mobile entity
+    [Column(ColumnAttrs.PrimaryKey)]
     public ulong EntityId;
 
-    public ResourceNodeType Type = ResourceNodeType.Iron;
+    /// The last known location of this entity
+    public StdbVector2? Location;
+    
+    /// Movement direction, {0,0} if not moving at all.
+    public StdbVector2? Direction;
+    
+    /// Microseconds Timestamp of when the movement started
+    /// Convert between long and DateTimeOffset via Utils.TimeConvert
+    public long MoveStartTimestamp;
+    
+    /// Microseconds DateTimeOffset representing Timestamp microseconds of when the action ended
+    /// Convert between long and DateTimeOffset via Utils.TimeConvert
+    public DateTimeOffset MoveStartTimestampOffset => 
+        TimeConvert.FromMicrosecondsTimestamp(MoveStartTimestamp);
+}
 ```
 
-2. Now that we've changed the `Type` variable, we need to update the code in the `PlayerAnimator` component that references it. Open PlayerAnimator.cs and update the following section of code. We need to add `using SpacetimeDB.Types;` to this file as well. This fixes the compile errors that result from changing the type of the `Type` variable to our new server generated enum.
+- `EntityId` is the unique identifier for the table, declared as a `ulong`
+- Location and Direction are both `StdbVector2` types discussed above
 
-```csharp
-            var resourceType = res?.Type ?? ResourceNodeType.Iron;
-            switch (resourceType)
-            {
-                case ResourceNodeType.Iron:
-                    _animator.SetTrigger("Mine");
-                    Interacting = true;
-                    break;
-                default:
-                    Interacting = false;
-                    break;
-            }
-            for (int i = 0; i < _tools.Length; i++)
-            {
-                _tools[i].SetActive(((int)resourceType) == i);
-            }
-            _target = res;
-```
+## Reducers
 
-3. Now that our `GameResource` is ready to be spawned, lets update the `BitcraftMiniGameManager` component to actually create them. First, we need to add the new tables to our SpacetimeDB subscription. Open BitcraftMiniGameManager.cs and update the following code:
+Reducers are static cloud functions with a `[Reducer]` attribute that run on the server. 
+These called from the client, always returning `void`. They are defined with the `[Reducer]` attribute and take 
+a `DbEventArgs` object as the first argument, followed by any number of arguments that you want to pass to the reducer.
 
-```csharp
-            SpacetimeDBClient.instance.Subscribe(new List<string>()
-            {
-                "SELECT * FROM Config",
-                "SELECT * FROM SpawnableEntityComponent",
-                "SELECT * FROM PlayerComponent",
-                "SELECT * FROM MobileEntityComponent",
-                // Our new tables for part 2 of the tutorial
-                "SELECT * FROM ResourceNodeComponent",
-                "SELECT * FROM StaticLocationComponent"
-            });
-```
+While there are some premade Reducers, such as for init and [dis]connection, you may also create your own.
 
-4. Next let's add an `OnInsert` handler for the `ResourceNodeComponent`. Add the following line to the `Start` function.
+> [!NOTE]
+> In a fully developed game, the server would typically perform server-side validation on client-requested actions to ensure
+they comply with game boundaries, rules, and mechanics.
 
-```csharp
-        ResourceNodeComponent.OnInsert += ResourceNodeComponent_OnInsert;
-```
+### Overview
 
-5. Finally we add the new function to handle the insert event. This function will be called whenever a new `ResourceNodeComponent` is inserted into our local client cache. We can use this to spawn the resource node in the world. Add the following code to the `BitcraftMiniGameManager` class.
+Looking at the most straight-forward example, open [Chat.cs](https://github.com/clockworklabs/zeke-demo-project/tree/dylan/feat/mini-upgrade/Server-Csharp/src/Chat.cs):
 
-To get the position and the rotation of the node, we look up the `StaticLocationComponent` for this entity by using the EntityId.
+```c#
+/// Add a chat entry to the ChatMessage table
+[Reducer]
+public static void SendChatMessage(DbEventArgs dbEvent, string text)
+{
+    // Get the player component based on the sender identity
+    PlayerComponent player = PlayerComponent.FindByOwnerId(dbEvent.Sender) ?? 
+        Throw<PlayerComponent>($"{nameof(SendChatMessage)} Error: Player not found");
 
-```csharp
-    private void ResourceNodeComponent_OnInsert(ResourceNodeComponent insertedValue, ReducerEvent callInfo)
+    // Now that we have the player we can insert the chat message
+    // using the player entity id.
+    new ChatMessage
     {
-        switch(insertedValue.ResourceType)
-        {
-            case ResourceNodeType.Iron:
-                var iron = Instantiate(IronPrefab);
-                StaticLocationComponent loc = StaticLocationComponent.FilterByEntityId(insertedValue.EntityId);
-                Vector3 nodePos = new Vector3(loc.Location.X, 0.0f, loc.Location.Z);
-                iron.transform.position = new Vector3(nodePos.x, MathUtil.GetTerrainHeight(nodePos), nodePos.z);
-                iron.transform.rotation = Quaternion.Euler(0.0f, loc.Rotation, 0.0f);
-                break;
-        }
-    }
+        ChatEntityId = 0, // This column auto-increments, so we can set it to 0
+        SourceEntityId = player.EntityId,
+        ChatText = text,
+        Timestamp = Utils.TimeConvert.ToMicrosecondsTimestamp(dbEvent.Time),
+    }.Insert();
+}
 ```
 
-### Step 4: Play the Game!
+- Every reducer starts with `[Reducer] public static void Foo(DbEventArgs dbEvent, ...)`.
+- Every reducer contains a `DbEventArgs` as the 1st arg.
+  - Contains the sender's `Identity`, `DateTimeOffset` sent, and a semi-anonymous `Address` to compare sender vs others.
+- The `PlayerComponent` was found by passing the sender's `Identity` to `PlayerComponent.FindByOwnerId()`.
+- `Throw<T>()` is the helper function (workaround for one of the [limitations](#limitations) mentioned earlier) that logs an error before throwing.
+- This timestamp utilized `Utils.TimeConvert.ToMicrosecondsTimestamp()` for consistent time parsing.
+- Since `ChatEntityId` is tagged with the `[Column(ColumnAttrs.PrimaryKeyAuto)]` attribute, setting it to 0 will auto-increment.
 
-6. Hit Play in the Unity Editor and you should now see your resource nodes spawning in the world!
+### DB Initialization
+
+Let's find the entry point that gets called every time we **publish** or **clear** the database: 
+Open [Lib.cs](https://github.com/clockworklabs/zeke-demo-project/tree/dylan/feat/mini-upgrade/Server-Csharp/src/Lib.cs):
+
+> [!TIP]
+> Not to be confused with the `Connect` ReducerKind for **player** initialization!
+
+```csharp
+/// Initial configuration for the game world.
+/// Called when the module is initially published.
+[Reducer(ReducerKind.Init)]
+public static void Init()
+{
+    try
+    {
+        Config config = initConfig(); // Create our global config table.
+        
+        spawnRocks(config, spawnCount: 10);
+        List<UnlockInfo> unlocks = initUnlocks();
+        ShopComponent shopComponent = getInitShopComponent(unlocks);
+        initItemCatalog();
+        SpawnShop(shopComponent, requiredUnlock: null);
+        initResourceSpawners();
+    }
+    catch (Exception e)
+    {
+        Throw<Exception>($"{nameof(Init)} Error: {e.Message}");
+    }
+}
+```
+
+While this is very high-level, **this is what's happening:**
+
+1. We init the Config table, treating it as a singleton (there's only 1 Config at row `0`).
+2. We spawn rocks into the world.
+3. We create an unlockable and init our shop with these in-mind.
+4. We init the item catalog, containing static metadata for the items, such as names<>ids.
+5. We init our resource spawners, using the [Scheduler](https://spacetimedb.com/docs/modules/c-sharp#reducers) to spawn our common and uncommon resources.
+    - For the common ones, we initially schedule them to fire almost-immediately.
+    - When the scheduler function fires, we **re**schedule them to infinitely call upon itself in intervals.
+
+### Other Premade Reducers
+
+- `[Reducer(ReducerKind.Connect)]` - Their `Identity` can be found in the `Sender` value of the `DbEventArgs`.
+- `[Reducer(ReducerKind.Disconnect)]`
+- `[Reducer(ReducerKind.Update)]` - Not to be confused with Unity-style Update loops, this calls when a `[Table]` row is updated.
+
+## Publishing the Module
+
+To deploy outside of Unity, we'd normally use the `spacetime publish` CLI command. 
+
+However, Unity has an integrated **Publisher** editor tool that will be introduced in the next section!
+
+## Conclusion
+
+You have now learned the core concepts of the C# server module, reviewed limitations/common practices 
+and broke down high-level concepts like Types, Tables, and Reducers - with real examples from the demo.
+
+In the next section, we'll publish our module, break down the **client-side** Unity code and analyze client-server flows.

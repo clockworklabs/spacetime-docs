@@ -9,14 +9,22 @@ function section(title) {
 const nav = {
     items: [
         section("Intro"),
-        page("Overview", "index", "index.md"),
+        page("Overview", "index", "index.md"), // TODO(BREAKING): For consistency & clarity, 'index' slug should be renamed 'intro'?
+        page("Getting Started", "getting-started", "getting-started.md"),
+        page("Overview", "index", "index.md"), // TODO(BREAKING): For consistency & clarity, 'index' slug should be renamed 'intro'?
         page("Getting Started", "getting-started", "getting-started.md"),
         section("Deploying"),
-        page("Testnet", "deploying/testnet", "deploying/testnet.md"),
-        section("Unity Tutorial"),
-        page("Part 1 - Basic Multiplayer", "unity/part-1", "unity/part-1.md"),
-        page("Part 2 - Resources And Scheduling", "unity/part-2", "unity/part-2.md"),
-        page("Part 3 - BitCraft Mini", "unity/part-3", "unity/part-3.md"),
+        page("Overview", "deploying", "deploying/index.md"),
+        page("Hosted", "deploying/hosted", "deploying/hosted.md"),
+        page("Self-Hosted", "deploying/hosted", "deploying/self-hosted.md"),
+        section("Unity Tutorial - Basic Multiplayer"),
+        page("Overview", "unity-tutorial", "unity/index.md"),
+        page("1 - Project Setup", "unity/part-1", "unity/part-1.md"),
+        page("2 - Server (C# Module)", "unity/part-2", "unity/part-2a-rust.md"),
+        page("3 - Client (Unity)", "unity/part-2", "unity/part-2.md"),
+        section("Unity Tutorial - Advanced"),
+        page("4 - Resources & Scheduling", "unity/part-4", "unity/part-4.md"),
+        page("5 - BitCraft Mini", "unity/part-5", "unity/part-5.md"),
         section("Server Module Languages"),
         page("Overview", "modules", "modules/index.md"),
         page("Rust Quickstart", "modules/rust/quickstart", "modules/rust/quickstart.md"),
