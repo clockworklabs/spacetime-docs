@@ -9,7 +9,7 @@
         "tsup": "^8.0.2"
     },
     "scripts": {
-        "build": "tsup nav.ts"
+        "build": "node build.js"
     },
     "author": "Clockwork Labs",
     "license": "ISC"
