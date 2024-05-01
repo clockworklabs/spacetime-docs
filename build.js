@@ -21,8 +21,9 @@ const script = new Script(final);
 const out = script.runInContext(context);
 
 await writeFile(
-	'docs/nav.js',
-	'export default ' + inspect(out, { depth: null, compact: false, breakLength: 120 })
+    'docs/nav.js',
+    'export default ' +
+        inspect(out, { depth: null, compact: false, breakLength: 120 })
 );
 
 await rm('dist/out.js', { recursive: true });
