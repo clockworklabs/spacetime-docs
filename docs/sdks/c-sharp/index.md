@@ -865,7 +865,7 @@ Save a token to the filesystem.
 ### Class `Identity`
 
 ```cs
-namespace SpacetimeDB 
+namespace SpacetimeDB
 {
     public struct Identity : IEquatable<Identity>
     {
@@ -885,8 +885,9 @@ A unique public identifier for a user of a database.
 Columns of type `Identity` inside a module will be represented in the C# SDK as properties of type `byte[]`. `Identity` is essentially just a wrapper around `byte[]`, and you can use the `Bytes` property to get a `byte[]` that can be used to filter tables and so on.
 
 ### Class `Identity`
+
 ```cs
-namespace SpacetimeDB 
+namespace SpacetimeDB
 {
     public struct Address : IEquatable<Address>
     {

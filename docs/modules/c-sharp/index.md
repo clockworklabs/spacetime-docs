@@ -42,7 +42,7 @@ static partial class Module
     {
         // We can skip (or explicitly set to zero) auto-incremented fields when creating new rows.
         var person = new Person { Name = name, Age = age };
-        
+
         // `Insert()` method is auto-generated and will insert the given row into the table.
         person.Insert();
         // After insertion, the auto-incremented fields will be populated with their actual values.
@@ -119,7 +119,6 @@ And a couple of special custom types:
 - `SpacetimeDB.SATS.Unit` - semantically equivalent to an empty struct, sometimes useful in generic contexts where C# doesn't permit `void`.
 - `Identity` (`SpacetimeDB.Runtime.Identity`) - a unique identifier for each user; internally a byte blob but can be printed, hashed and compared for equality.
 - `Address` (`SpacetimeDB.Runtime.Address`) - an identifier which disamgibuates connections by the same `Identity`; internally a byte blob but can be printed, hashed and compared for equality.
-
 
 #### Custom types
 
@@ -212,10 +211,10 @@ public partial struct Person
 
     // Finds a row in the table with the given value in the `Id` column and returns it, or `null` if no such row exists.
     public static Person? FindById(int id);
-    
+
     // Deletes a row in the table with the given value in the `Id` column and returns `true` if the row was found and deleted, or `false` if no such row exists.
     public static bool DeleteById(int id);
-    
+
     // Updates a row in the table with the given value in the `Id` column and returns `true` if the row was found and updated, or `false` if no such row exists.
     public static bool UpdateById(int oldId, Person newValue);
 }
@@ -294,7 +293,6 @@ These are two special kinds of reducers that can be used to respond to module li
 - `ReducerKind.Update` - this reducer will be invoked when the module is updated.
 - `ReducerKind.Connect` - this reducer will be invoked when a client connects to the database.
 - `ReducerKind.Disconnect` - this reducer will be invoked when a client disconnects from the database.
-
 
 Example:
 

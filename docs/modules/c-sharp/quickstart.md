@@ -19,6 +19,7 @@ If you haven't already, start by [installing SpacetimeDB](/install). This will i
 Next we need to [install .NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) so that we can build and publish our module.
 
 You may already have .NET 8 and can be checked:
+
 ```bash
 dotnet --list-sdks
 ```
@@ -46,7 +47,7 @@ spacetime init --lang csharp server
 
 ## Declare imports
 
-`spacetime init` generated a few files: 
+`spacetime init` generated a few files:
 
 1. Open `server/StdbModule.csproj` to generate a .sln file for intellisense/validation support.
 2. Open `server/Lib.cs`, a trivial module.
@@ -60,9 +61,9 @@ using SpacetimeDB.Module;
 using static SpacetimeDB.Runtime;
 ```
 
-- `System.Runtime.CompilerServices` 
-- `SpacetimeDB.Module` 
-  - Contains the special attributes we'll use to define our module. 
+- `System.Runtime.CompilerServices`
+- `SpacetimeDB.Module`
+  - Contains the special attributes we'll use to define our module.
   - Allows us to use the `ModuleInitializer` attribute, which we'll use to register our `OnConnect` and `OnDisconnect` callbacks.
 - `SpacetimeDB.Runtime` contains the raw API bindings SpacetimeDB uses to communicate with the database.
 
@@ -79,7 +80,6 @@ static partial class Module
 To get our chat server running, we'll need to store two kinds of data: information about each user, and records of all the messages that have been sent.
 
 For each `User`, we'll store their `Identity`, an optional name they can set to identify themselves to other users, and whether they're online or not. We'll designate the `Identity` as our primary key, which enforces that it must be unique, indexes it for faster lookup, and allows clients to track updates.
-
 
 In `server/Lib.cs`, add the definition of the table `User` to the `Module` class:
 

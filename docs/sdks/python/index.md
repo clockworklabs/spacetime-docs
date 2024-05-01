@@ -44,7 +44,7 @@ The following functions and types are used in both the Basic and Async clients.
 ### API at a glance
 
 | Definition                                                                                              | Description                                                                                  |
-|---------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | Type [`Identity`](#type-identity)                                                                       | A unique public identifier for a client.                                                     |
 | Type [`Address`](#type-address)                                                                         | An opaque identifier for differentiating connections by the same `Identity`.                 |
 | Type [`ReducerEvent`](#type-reducerevent)                                                               | `class` containing information about the reducer that triggered a row update event.          |
@@ -95,7 +95,7 @@ class Address:
 ```
 
 | Member        | Type      | Meaning                             |
-|---------------|-----------|-------------------------------------|
+| ------------- | --------- | ----------------------------------- |
 | `from_string` | `str`     | Create an Address from a hex string |
 | `from_bytes`  | `bytes`   | Create an Address from raw bytes    |
 | `__str__`     | `None`    | Convert the Address to a hex string |
@@ -116,7 +116,7 @@ class ReducerEvent:
 ```
 
 | Member            | Type                | Meaning                                                                            |
-|-------------------|---------------------|------------------------------------------------------------------------------------|
+| ----------------- | ------------------- | ---------------------------------------------------------------------------------- |
 | `caller_identity` | `Identity`          | The identity of the user who invoked the reducer                                   |
 | `caller_address`  | `Optional[Address]` | The address of the user who invoked the reducer, or `None` for scheduled reducers. |
 | `reducer_name`    | `str`               | The name of the reducer that was invoked                                           |
@@ -353,7 +353,7 @@ spacetime_client.schedule_event(0.1, application_tick)
 ### API at a glance
 
 | Definition                                                                                                       | Description                                                                                                                      |
-|------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | Function [`SpacetimeDBClient::init`](#function-init)                                                             | Create a network manager instance.                                                                                               |
 | Function [`SpacetimeDBClient::subscribe`](#function-subscribe)                                                   | Subscribe to receive data and transaction updates for the provided queries.                                                      |
 | Function [`SpacetimeDBClient::register_on_event`](#function-register_on_event)                                   | Register a callback function to handle transaction update events.                                                                |
@@ -384,7 +384,7 @@ def init(
 Create a network manager instance.
 
 | Argument          | Type                                       | Meaning                                                                                                                                                                                              |
-|-------------------|--------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ----------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `auth_token`      | `str`                                      | This is the token generated by SpacetimeDB that matches the user's identity. If None, token will be generated                                                                                        |
 | `host`            | `str`                                      | Hostname:port for SpacetimeDB connection                                                                                                                                                             |
 | `address_or_name` | `str`                                      | The name or address of the database to connect to                                                                                                                                                    |

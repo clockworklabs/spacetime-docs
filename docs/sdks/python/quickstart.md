@@ -216,7 +216,7 @@ def print_message(message):
 We can also register callbacks to run each time a reducer is invoked. We register these callbacks using the `register_on_<reducer>` method, which is automatically implemented for each reducer by `spacetime generate`.
 
 Each reducer callback takes four fixed arguments:
- 
+
 1. The `Identity` of the client who requested the reducer invocation.
 2. The `Address` of the client who requested the reducer invocation, or `None` for scheduled reducers.
 3. The `Status` of the reducer run, one of `committed`, `failed` or `outofenergy`.
@@ -254,7 +254,7 @@ Add this function before the `register_callbacks` function:
 def on_send_message_reducer(sender_id, sender_address, status, message, msg):
     if sender_id == local_identity:
         if status == "failed":
-            print(f"Failed to send message: {message}")            
+            print(f"Failed to send message: {message}")
 ```
 
 ### OnSubscriptionApplied callback

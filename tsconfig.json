@@ -1,8 +1,8 @@
 {
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "commonjs",
-    "outDir": "./docs",
-    "skipLibCheck": true
-  }
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "commonjs",
+        "outDir": "./docs",
+        "skipLibCheck": true
+    }
 }
