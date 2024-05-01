@@ -4,12 +4,13 @@
     "type": "module",
     "description": "This repository contains the markdown files which are used to display documentation on our [website](https://spacetimedb.com/docs).",
     "main": "index.js",
-    "dependencies": {},
     "devDependencies": {
+        "prettier": "^3.2.5",
         "tsup": "^8.0.2"
     },
     "scripts": {
-        "build": "node build.js"
+        "build": "node build.js",
+        "prettier": "prettier --write ."
     },
     "author": "Clockwork Labs",
     "license": "ISC"

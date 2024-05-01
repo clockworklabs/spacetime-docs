@@ -7,6 +7,9 @@ settings:
 importers:
     .:
         devDependencies:
+            prettier:
+                specifier: ^3.2.5
+                version: 3.2.5
             tsup:
                 specifier: ^8.0.2
                 version: 8.0.2
@@ -901,6 +904,14 @@ packages:
             ts-node:
                 optional: true
 
+    prettier@3.2.5:
+        resolution:
+            {
+                integrity: sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==
+            }
+        engines: { node: '>=14' }
+        hasBin: true
+
     punycode@2.3.1:
         resolution:
             {
@@ -1554,6 +1565,8 @@ snapshots:
         dependencies:
             lilconfig: 3.1.1
             yaml: 2.4.2
+
+    prettier@3.2.5: {}
 
     punycode@2.3.1: {}
 
