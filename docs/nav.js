@@ -50,7 +50,7 @@ module.exports = {
     },
     {
       type: 'page',
-      path: 'unity/part-2a-c-sharp.md',
+      path: 'unity/part-2b-c-sharp.md',
       slug: 'unity/part-2b-c-sharp',
       title: '2b - Server (C#)'
     },

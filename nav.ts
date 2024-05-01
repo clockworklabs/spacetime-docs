@@ -47,7 +47,7 @@ const nav: Nav = {
         page(
             '2b - Server (C#)',
             'unity/part-2b-c-sharp',
-            'unity/part-2a-c-sharp.md'
+            'unity/part-2b-c-sharp.md'
         ),
         page('3 - Client', 'unity/part-3', 'unity/part-3.md'),
 
