@@ -1,7 +1,7 @@
 {
     "name": "spacetime-docs",
     "version": "1.0.0",
-    "type": "commonjs",
+    "type": "module",
     "description": "This repository contains the markdown files which are used to display documentation on our [website](https://spacetimedb.com/docs).",
     "main": "index.js",
     "devDependencies": {

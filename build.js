@@ -22,7 +22,7 @@ const out = script.runInContext(context);
 
 await writeFile(
     'docs/nav.js',
-    'export ' +
+    'export default ' +
         inspect(out, { depth: null, compact: false, breakLength: 120 })
 );
 
