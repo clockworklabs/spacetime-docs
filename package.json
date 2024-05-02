@@ -1,12 +1,12 @@
 {
     "name": "spacetime-docs",
     "version": "1.0.0",
-    "type": "module",
+    "type": "commonjs",
     "description": "This repository contains the markdown files which are used to display documentation on our [website](https://spacetimedb.com/docs).",
     "main": "index.js",
-    "dependencies": {},
     "devDependencies": {
-        "tsup": "^8.0.2"
+        "tsup": "^8.0.2",
+        "typescript": "^5.4.5"
     },
     "scripts": {
         "build": "node build.js"
