@@ -34,9 +34,9 @@ The Unity SpacetimeDB SDK relies on there being a `NetworkManager` somewhere in 
 
 ![Unity-AddNetworkManager](/images/unity-tutorial/Unity-AddNetworkManager.JPG)
 
-Next we are going to connect to our SpacetimeDB module. Open `TutorialGameManager.cs` in your editor of choice and add the following code at the top of the file:
+Next we are going to connect to our SpacetimeDB module. Open `Assets/_Project/Game/BitcraftMiniGameManager.cs` in your editor of choice and add the following code at the top of the file:
 
-**Append to the top of TutorialGameManager.cs**
+**Append to the top of BitcraftMiniGameManager.cs**
 
 ```csharp
 using SpacetimeDB;
@@ -46,7 +46,7 @@ using System.Linq;
 
 At the top of the class definition add the following members:
 
-**Append to the top of TutorialGameManager class inside of TutorialGameManager.cs**
+**Append to the top of BitcraftMiniGameManager class inside of BitcraftMiniGameManager.cs**
 
 ```csharp
 // These are connection variables that are exposed on the GameManager
@@ -71,6 +71,8 @@ Now add the following code to the `Start()` function. For clarity, replace your 
 void Start()
 {
     instance = this;
+
+    Application.runInBackground = true;
 
     SpacetimeDBClient.instance.onConnect += () =>
     {
