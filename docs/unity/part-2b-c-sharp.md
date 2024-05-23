@@ -134,7 +134,7 @@ public static void CreatePlayer(DbEventArgs dbEvent, string username)
    catch
    {
        Log("Error: Failed to create a unique PlayerComponent", LogLevel.Error);
-       Throw;
+       throw;
    }
 
    // The PlayerComponent uses the same entity_id and stores the identity of
