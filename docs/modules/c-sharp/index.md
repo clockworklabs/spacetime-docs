@@ -154,18 +154,34 @@ SpacetimeDB has support for tagged enums which can be found in languages like Ru
 
 To bridge the gap, a special marker interface `SpacetimeDB.TaggedEnum` can be used on any `SpacetimeDB.Type`-marked `struct` or `class` to mark it as a SpacetimeDB tagged enum. It accepts a tuple of 2 or more named items and will generate methods to check which variant is currently active, as well as accessors for each variant.
 
-It is expected that you will use the `Is*` methods to check which variant is active before accessing the corresponding field, as the accessor will throw an exception on a state mismatch.
+It is expected that you will use the `Is*` methods, or `.Tag` property to check which variant is active before accessing the corresponding field, as the accessor will throw an exception on a state mismatch.
 
 ```csharp
 // Example declaration:
 [SpacetimeDB.Type]
-partial struct Option<T> : SpacetimeDB.TaggedEnum<(T Some, Unit None)> { }
+partial struct Option : SpacetimeDB.TaggedEnum<(int Number, string Text)> { }
 
-// Usage:
-var option = new Option<int> { Some = 42 };
-if (option.IsSome)
+// Usage with Is* methods:
+var option = new Option { Number = 42 };
+if (option.IsNumber)
 {
-    Log($"Value: {option.Some}");
+    Log($"Number value: {option.Number}");
+}
+else if (option.IsText)
+{
+    Log($"Text value: {option.Text}");
+}
+
+// Usage with .Tag property:
+var option = new Option { Number = 42 };
+switch (option.Tag)
+{
+    case Option.TagKind.Number:
+        Log($"Number value: {option.Number}");
+        break;
+    case Option.TagKind.Text:
+        Log($"Text value: {option.Text}");
+        break;
 }
 ```
 
@@ -288,7 +304,7 @@ public static void AddIn5Minutes(DbEventArgs e, string name, int age)
 
 #### Special reducers
 
-These are two special kinds of reducers that can be used to respond to module lifecycle events. They're stored in the `SpacetimeDB.Module.ReducerKind` class and can be used as an argument to the `[SpacetimeDB.Reducer]` attribute:
+These are four special kinds of reducers that can be used to respond to module lifecycle events. They're stored in the `SpacetimeDB.Module.ReducerKind` class and can be used as an argument to the `[SpacetimeDB.Reducer]` attribute:
 
 - `ReducerKind.Init` - this reducer will be invoked when the module is first published.
 - `ReducerKind.Update` - this reducer will be invoked when the module is updated.
@@ -304,4 +320,21 @@ public static void Init()
 {
     Log("...and we're live!");
 }
-```
+
+[SpacetimeDB.Reducer(ReducerKind.Update)]
+public static void Update()
+{
+    Log("Update get!");
+}
+
+[SpacetimeDB.Reducer(ReducerKind.Connect)]
+public static void OnConnect(DbEventArgs ctx)
+{
+    Log($"{ctx.Sender} has connected from {ctx.Address}!");
+}
+
+[SpacetimeDB.Reducer(ReducerKind.Disconnect)]
+public static void OnDisconnect(DbEventArgs ctx)
+{
+    Log($"{ctx.Sender} has disconnected.");
+}```
