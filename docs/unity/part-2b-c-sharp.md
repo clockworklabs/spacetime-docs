@@ -216,7 +216,7 @@ public static void ClientDisonnected(DbEventArgs dbEvent) =>
 ```csharp
 /// This helper function gets the PlayerComponent, sets the LoggedIn
 /// variable and updates the PlayerComponent table row.
-private static void UpdatePlayerLoginState(DbEventArgs dbEvent, bool loggedIn)
+public static void UpdatePlayerLoginState(DbEventArgs dbEvent, bool loggedIn)
 {
    PlayerComponent? player = PlayerComponent.FindByIdentity(dbEvent.Sender);
    if (player is null)
