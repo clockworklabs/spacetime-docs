@@ -41,7 +41,7 @@ Then we are going to start by adding the global `Config` table. Right now it onl
 public partial class Config
 {
    [SpacetimeDB.Column(ColumnAttrs.PrimaryKey)]
-   public Identity Version;
+   public uint Version;
    public string? MessageOfTheDay;
 }
 ```
