@@ -150,7 +150,7 @@ void OnSubscriptionApplied()
 
 ### Adding the Multiplayer Functionality
 
-Now we have to change what happens when you press the "Continue" button in the name dialog window. Instead of calling start game like we did in the single player version, we call the `create_player` reducer on the SpacetimeDB module using the auto-generated code. Open `UIUsernameChooser.cs`.
+Now we have to change what happens when you press the "Continue" button in the name dialog window. Instead of calling start game like we did in the single player version, we call the `create_player` reducer on the SpacetimeDB module using the auto-generated code. Open `Assets/_Project/Username/UIUsernameChooser.cs`.
 
 **Append to the top of UIUsernameChooser.cs**
 
@@ -173,7 +173,7 @@ public void ButtonPressed()
 }
 ```
 
-We need to create a `RemotePlayer` script that we attach to remote player objects. In the same folder as `LocalPlayer.cs`, create a new C# script called `RemotePlayer`. In the start function, we will register an OnUpdate callback for the `EntityComponent` and query the local cache to get the player’s initial position. **Make sure you include a `using SpacetimeDB.Types;`** at the top of the file.
+We need to create a `RemotePlayer` script that we attach to remote player objects. In the same folder as `Assets/_Project/Player/LocalPlayer.cs`, create a new C# script called `RemotePlayer`. In the start function, we will register an OnUpdate callback for the `EntityComponent` and query the local cache to get the player’s initial position. **Make sure you include a `using SpacetimeDB.Types;`** at the top of the file.
 
 First append this using to the top of `RemotePlayer.cs`
 
@@ -202,15 +202,15 @@ public class RemotePlayer : MonoBehaviour
         canvas.worldCamera = Camera.main;
 
         // Get the username from the PlayerComponent for this object and set it in the UI
-        PlayerComponent? playerComp = PlayerComponent.FilterByEntityId(EntityId).FirstOrDefault();
+        PlayerComponent? playerComp = PlayerComponent.FilterByEntityId(EntityId);
         if (playerComp is null)
         {
-            string inputUsername = UsernameElement.Text;
+            string inputUsername = UsernameElement.text;
             Debug.Log($"PlayerComponent not found - Creating a new player ({inputUsername})");
             Reducer.CreatePlayer(inputUsername);
 
             // Try again, optimistically assuming success for simplicity
-            PlayerComponent? playerComp = PlayerComponent.FilterByEntityId(EntityId).FirstOrDefault();
+            playerComp = PlayerComponent.FilterByEntityId(EntityId);
         }
 
         Username = playerComp.Username;
