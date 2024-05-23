@@ -133,7 +133,7 @@ public static void CreatePlayer(DbEventArgs dbEvent, string username)
    }
    catch
    {
-       Log("Error: Failed to create a unique PlayerComponent", LogLevel.Error);
+       Log("Error: Failed to create a unique EntityComponent", LogLevel.Error);
        throw;
    }
 
