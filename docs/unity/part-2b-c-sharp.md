@@ -203,7 +203,7 @@ We use the `Connect` and `Disconnect` reducers to update the logged in state of 
 
 ```csharp
 /// Called when the client connects, we update the LoggedIn state to true
-[SpacetimeDB.Reducer(ReducerKind.Init)]
+[SpacetimeDB.Reducer(ReducerKind.Connect)]
 public static void ClientConnected(DbEventArgs dbEvent) =>
    UpdatePlayerLoginState(dbEvent, loggedIn:true);
 ```
