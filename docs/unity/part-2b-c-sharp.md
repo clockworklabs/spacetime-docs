@@ -275,15 +275,6 @@ In a fully developed game, the server would typically perform server-side valida
 
 ---
 
-### Publishing a Module to SpacetimeDB
-
-Now that we've written the code for our server module and reached a clean checkpoint, we need to publish it to SpacetimeDB. This will create the database and call the init reducer. In your terminal or command window, run the following commands.
-
-```bash
-cd server
-spacetime publish -c unity-tutorial
-```
-
 ### Finally, Add Chat Support
 
 The client project has a chat window, but so far, all it's used for is the message of the day. We are going to add the ability for players to send chat messages to each other.
@@ -334,12 +325,13 @@ public static void SendChatMessage(DbEventArgs dbEvent, string text)
 ```
 
 ## Wrapping Up
-
+### Publishing a Module to SpacetimeDB
 💡View the [entire lib.cs file](https://gist.github.com/dylanh724/68067b4e843ea6e99fbd297fe1a87c49)
 
-Now that we added chat support, let's publish the latest module version to SpacetimeDB, assuming we're still in the `server` dir:
+Now that we've written the code for our server module and reached a clean checkpoint, we need to publish it to SpacetimeDB. This will create the database and call the init reducer. In your terminal or command window, run the following commands.
 
 ```bash
+cd server
 spacetime publish -c unity-tutorial
 ```
 
