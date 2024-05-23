@@ -248,7 +248,7 @@ private void EntityComponent_OnUpdate(EntityComponent oldObj, EntityComponent ob
 
 Next we need to handle what happens when a `PlayerComponent` is added to our local cache. We will handle it differently based on if it’s our local player entity or a remote player. We are going to register for the `OnInsert` event for our `PlayerComponent` table. Add the following code to the `Start` function in `TutorialGameManager`.
 
-**Append to bottom of Start() function in TutorialGameManager.cs:**
+**Append to bottom of Start() function in BitcraftMiniGameManager.cs:**
 
 ```csharp
 PlayerComponent.OnInsert += PlayerComponent_OnInsert;
@@ -256,13 +256,13 @@ PlayerComponent.OnInsert += PlayerComponent_OnInsert;
 
 Create the `PlayerComponent_OnInsert` function which does something different depending on if it's the component for the local player or a remote player. If it's the local player, we set the local player object's initial position and call `StartGame`. If it's a remote player, we instantiate a `PlayerPrefab` with the `RemotePlayer` component. The start function of `RemotePlayer` handles initializing the player position.
 
-**Append to bottom of TutorialGameManager class in TutorialGameManager.cs:**
+**Append to bottom of TutorialGameManager class in BitcraftMiniGameManager.cs:**
 
 ```csharp
 private void PlayerComponent_OnInsert(PlayerComponent obj, ReducerEvent callInfo)
 {
     // If the identity of the PlayerComponent matches our user identity then this is the local player
-    if(obj.OwnerId == local_identity)
+    if(obj.Identity == local_identity)
     {
         // Now that we have our initial position we can start the game
         StartGame();
