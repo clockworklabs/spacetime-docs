@@ -87,7 +87,7 @@ void Start()
     // Called when we have an error connecting to SpacetimeDB
     SpacetimeDBClient.instance.onConnectError += (error, message) =>
     {
-        Debug.LogError($"Connection error: " + message);
+        Debug.LogError($"Connection error: {error} - {message}");
     };
 
     // Called when we are disconnected from SpacetimeDB
