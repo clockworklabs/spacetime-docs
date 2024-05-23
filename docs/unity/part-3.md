@@ -63,7 +63,7 @@ The first three fields will appear in your Inspector so you can update your conn
 
 Now add the following code to the `Start()` function. For clarity, replace your entire `Start()` function with the function below.
 
-**REPLACE the Start() function in TutorialGameManager.cs**
+**REPLACE the Start() function in BitcraftMiniGameManager.cs**
 
 ```csharp
 // Start is called before the first frame update
@@ -124,7 +124,7 @@ The "local client cache" is a client-side view of the database defined by the su
 
 Next we write the `OnSubscriptionApplied` callback. When this event occurs for the first time, it signifies that our local client cache is fully populated. At this point, we can verify if a player entity already exists for the corresponding user. If we do not have a player entity, we need to show the `UserNameChooser` dialog so the user can enter a username. We also put the message of the day into the chat window. Finally we unsubscribe from the callback since we only need to do this once.
 
-**Append after the Start() function in TutorialGameManager.cs**
+**Append after the Start() function in BitcraftMiniGameManager.cs**
 
 ```csharp
 void OnSubscriptionApplied()
@@ -132,7 +132,7 @@ void OnSubscriptionApplied()
     // If we don't have any data for our player, then we are creating a
     // new one. Let's show the username dialog, which will then call the
     // create player reducer
-    var player = PlayerComponent.FilterByOwnerId(local_identity);
+    var player = PlayerComponent.FilterByIdentity(local_identity);
     if (player == null)
     {
        // Show username selection
