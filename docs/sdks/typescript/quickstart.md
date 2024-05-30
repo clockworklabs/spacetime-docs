@@ -271,9 +271,9 @@ function userNameOrIdentity(user: User): string {
   if (user.name !== null) {
     return user.name || "";
   } else {
-    var identityStr = new Identity(user.identity).toHexString();
+    var identityStr = new Identity(user.identity.toUint8Array()).toHexString();
     console.log(`Name: ${identityStr} `);
-    return new Identity(user.identity).toHexString().substring(0, 8);
+    return new Identity(user.identity.toUint8Array()).toHexString().substring(0, 8);
   }
 }
 
@@ -298,7 +298,7 @@ function setAllMessagesInOrder() {
 
 client.current.on("initialStateSync", () => {
   setAllMessagesInOrder();
-  var user = User.filterByIdentity(local_identity?.current?.toUint8Array()!);
+  var user = User.filterByIdentity(local_identity?.current!);
   setName(userNameOrIdentity(user!));
 });
 ```
