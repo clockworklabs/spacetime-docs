@@ -185,7 +185,7 @@ First, we need to create a SpacetimeDB client and connect to the module. Create 
 
 We are going to create a stateful variable to store our client's SpacetimeDB identity when we receive it. Also, we are using `localStorage` to retrieve your auth token if this client has connected before. We will explain these later.
 
-Replace `<module-name>` with the name you chose when publishing your module during the module quickstart. If you are using SpacetimeDB Cloud, the host will be `wss://spacetimedb.com/spacetimedb`.
+Replace `<module-name>` with the name you chose when publishing your module during the module quickstart. If you are using SpacetimeDB Cloud, the host will be `wss://spacetimedb.com`.
 
 Add this before the `App` function declaration:
 
