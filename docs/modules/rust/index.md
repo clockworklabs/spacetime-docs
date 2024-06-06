@@ -88,8 +88,9 @@ Now we'll get into details on all the macro APIs SpacetimeDB provides, starting 
 
 ### Defining tables
 
-The `#[spacetimedb(table(...))]` is applied to a Rust struct with named fields.
-There are two versions of the `table` macro: `#[spacetimedb(table(public))]` and `#[spacetimedb(table(private))]`. **Public** tables are readable by all users, but can still only be modified by your server module code. **Private** tables can only be read by the table owner and by your server module code.
+The `#[spacetimedb(table)]` is applied to a Rust struct with named fields.
+By default, tables are considered **private**. This means that they are only readable by the table owner, and by server module code.
+The `#[spacetimedb(table(public))]` macro makes a table public. **Public** tables are readable by all users, but can still only be modified by your server module code.
 
 ```rust
 #[spacetimedb(table(public))]

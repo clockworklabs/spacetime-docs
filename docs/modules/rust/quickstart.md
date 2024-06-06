@@ -7,7 +7,8 @@ A SpacetimeDB module is code that gets compiled to WebAssembly and is uploaded t
 Each SpacetimeDB module defines a set of tables and a set of reducers.
 
 Each table is defined as a Rust `struct` annotated with `#[spacetimedb(table(...))]`, where an instance represents a row, and each field represents a column.
-There are two versions of the `table` macro: `#[spacetimedb(table(public))]` and `#[spacetimedb(table(private))]`. **Public** tables are readable by all users, but can still only be modified by your server module code. **Private** tables can only be read by the table owner and by your server module code.
+By default, tables are **private**. This means that they are only readable by the table owner, and by server module code.
+The `#[spacetimedb(table(public))]` macro makes a table public. **Public** tables are readable by all users, but can still only be modified by your server module code.
 
 _Coming soon: We plan to add much more robust access controls than just `public` or `private`. Stay tuned!_
 
