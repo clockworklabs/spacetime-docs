@@ -92,6 +92,8 @@ The `#[spacetimedb(table)]` is applied to a Rust struct with named fields.
 By default, tables are considered **private**. This means that they are only readable by the table owner, and by server module code.
 The `#[spacetimedb(table(public))]` macro makes a table public. **Public** tables are readable by all users, but can still only be modified by your server module code.
 
+_Coming soon: We plan to add much more robust access controls than just public or private. Stay tuned!_
+
 ```rust
 #[spacetimedb(table(public))]
 struct Table {

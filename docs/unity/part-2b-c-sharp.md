@@ -37,7 +37,7 @@ Then we are going to start by adding the global `Config` table. Right now it onl
 ```csharp
 /// We're using this table as a singleton,
 /// so there should typically only be one element where the version is 0.
-[SpacetimeDB.Table]
+[SpacetimeDB.Table(Public = true)]
 public partial class Config
 {
    [SpacetimeDB.Column(ColumnAttrs.PrimaryKey)]
@@ -67,7 +67,7 @@ Now we're going to create a table which actually uses the `StdbVector3` that we 
 /// This stores information related to all entities in our game. In this tutorial
 /// all entities must at least have an entity_id, a position, a direction and they
 /// must specify whether or not they are moving.
-[SpacetimeDB.Table]
+[SpacetimeDB.Table(Public = true)]
 public partial class EntityComponent
 {
    [SpacetimeDB.Column(ColumnAttrs.PrimaryKeyAuto)]
@@ -85,7 +85,7 @@ Next, we will define the `PlayerComponent` table. The `PlayerComponent` table is
 ```csharp
 /// All players have this component and it associates an entity with the user's
 /// Identity. It also stores their username and whether or not they're logged in.
-[SpacetimeDB.Table]
+[SpacetimeDB.Table(Public = true)]
 public partial class PlayerComponent
 {
    // An EntityId that matches an EntityId in the `EntityComponent` table.
@@ -293,7 +293,7 @@ First lets add a new `ChatMessage` table to the SpacetimeDB module. Add the foll
 **Append to the bottom of server/src/lib.cs:**
 
 ```csharp
-[SpacetimeDB.Table]
+[SpacetimeDB.Table(Public = true)]
 public partial class ChatMessage
 {
    // The primary key for this table will be auto-incremented
