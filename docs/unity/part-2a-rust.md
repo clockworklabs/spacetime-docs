@@ -29,7 +29,7 @@ use spacetimedb::{spacetimedb, Identity, SpacetimeType, ReducerContext};
 use log;
 ```
 
-Then we are going to start by adding the global `Config` table. Right now it only contains the "message of the day" but it can be extended to store other configuration variables. This also uses a couple of macros, like `#[spacetimedb(table(...))]` which you can learn more about in our [Rust module reference](/docs/modules/rust) (including making your tables `private`!). Simply put, this just tells SpacetimeDB to create a table which uses this struct as the schema for the table.
+Then we are going to start by adding the global `Config` table. Right now it only contains the "message of the day" but it can be extended to store other configuration variables. This also uses a couple of macros, like `#[spacetimedb(table)]` which you can learn more about in our [Rust module reference](/docs/modules/rust) (including making your tables `private`!). Simply put, this just tells SpacetimeDB to create a table which uses this struct as the schema for the table.
 
 **Append to the bottom of lib.rs:**
 
@@ -44,7 +44,7 @@ pub struct Config {
 }
 ```
 
-Next, we're going to define a new `SpacetimeType` called `StdbVector3` which we're going to use to store positions. The difference between a `#[derive(SpacetimeType)]` and a `#[spacetimedb(table(...))]` is that tables actually store data, whereas the deriving `SpacetimeType` just allows you to create a new column of that type in a SpacetimeDB table. Therefore, `StdbVector3` is not, itself, a table.
+Next, we're going to define a new `SpacetimeType` called `StdbVector3` which we're going to use to store positions. The difference between a `#[derive(SpacetimeType)]` and a `#[spacetimedb(table)]` is that tables actually store data, whereas the deriving `SpacetimeType` just allows you to create a new column of that type in a SpacetimeDB table. Therefore, `StdbVector3` is not, itself, a table.
 
 **Append to the bottom of lib.rs:**
 

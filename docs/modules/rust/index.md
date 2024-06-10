@@ -120,7 +120,7 @@ And common data structures:
 - `Option<T> where T: SpacetimeType`
 - `Vec<T> where T: SpacetimeType`
 
-All `#[spacetimedb(table(...))]` types are `SpacetimeType`s, and accordingly, all of their fields have to be.
+All `#[spacetimedb(table)]` types are `SpacetimeType`s, and accordingly, all of their fields have to be.
 
 ```rust
 #[spacetimedb(table(public))]
