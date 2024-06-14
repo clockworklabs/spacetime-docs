@@ -201,7 +201,7 @@ public class RemotePlayer : MonoBehaviour
         canvas.worldCamera = Camera.main;
 
         // Get the username from the PlayerComponent for this object and set it in the UI
-        PlayerComponent? playerComp = PlayerComponent.FilterByEntityId(EntityId);
+        PlayerComponent playerComp = PlayerComponent.FindByEntityId(EntityId);
         if (playerComp is null)
         {
             string inputUsername = UsernameElement.text;
@@ -215,7 +215,7 @@ public class RemotePlayer : MonoBehaviour
         Username = playerComp.Username;
 
         // Get the last location for this player and set the initial position
-        EntityComponent entity = EntityComponent.FilterByEntityId(EntityId);
+        EntityComponent entity = EntityComponent.FindByEntityId(EntityId);
         transform.position = new Vector3(entity.Position.X, entity.Position.Y, entity.Position.Z);
 
         // Register for a callback that is called when the client gets an
