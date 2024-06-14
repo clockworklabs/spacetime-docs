@@ -152,35 +152,32 @@ public enum Color
 
 SpacetimeDB has support for tagged enums which can be found in languages like Rust, but not C#.
 
-To bridge the gap, a special marker interface `SpacetimeDB.TaggedEnum` can be used on any `SpacetimeDB.Type`-marked `struct` or `class` to mark it as a SpacetimeDB tagged enum. It accepts a tuple of 2 or more named items and will generate methods to check which variant is currently active, as well as accessors for each variant.
+To bridge the gap, a special marker interface `SpacetimeDB.TaggedEnum` can be used on any `SpacetimeDB.Type`-marked as a `record` which marks it as a SpacetimeDB tagged enum. It accepts a tuple of 2 or more named items that can be built-in types or even `[SpacetimeDB.Type]`-marked types.
 
-It is expected that you will use the `Is*` methods, or `.Tag` property to check which variant is active before accessing the corresponding field, as the accessor will throw an exception on a state mismatch.
+It is expected that you will use C#'s pattern matching, with `is` or with switch statements.
 
 ```csharp
 // Example declaration:
 [SpacetimeDB.Type]
-partial struct Option : SpacetimeDB.TaggedEnum<(int Number, string Text)> { }
+public partial record Option : SpacetimeDB.TaggedEnum<(int Number, string Text)> { }
 
-// Usage with Is* methods:
-var option = new Option { Number = 42 };
-if (option.IsNumber)
+// Creating a TaggedEnum record
+Option option = new Option.Number(42);
+
+// Usage with C# `is`
+if (option is Option.Number number)
 {
-    Log($"Number value: {option.Number}");
-}
-else if (option.IsText)
-{
-    Log($"Text value: {option.Text}");
+    Log($"Number value: {number.Number_}");
 }
 
-// Usage with .Tag property:
-var option = new Option { Number = 42 };
-switch (option.Tag)
+// Usage with a switch
+switch (option)
 {
-    case Option.TagKind.Number:
-        Log($"Number value: {option.Number}");
+    case Option.Number num:
+        Log($"Number value: {num.Number_}");
         break;
-    case Option.TagKind.Text:
-        Log($"Text value: {option.Text}");
+    case Option.Text txt:
+        Log($"Text value: {txt.Text_}");
         break;
 }
 ```
