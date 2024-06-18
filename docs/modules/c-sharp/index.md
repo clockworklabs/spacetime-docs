@@ -152,9 +152,9 @@ public enum Color
 
 SpacetimeDB has support for tagged enums which can be found in languages like Rust, but not C#.
 
-To bridge the gap, we allow to declare tagged enums by inheriting from a special marker `record SpacetimeDB.TaggedEnum<(...types and names of the variants as a tuple...)>`.
+We provide a tagged enum support for C# modules via a special `record SpacetimeDB.TaggedEnum<(...types and names of the variants as a tuple...)>`.
 
-The `SpacetimeDB.TaggedEnum` marker will generate variants as subclasses of the marked type, so you can use regular C# pattern matching operators like `is` or `switch` to determine which variant a given tagged enum holds at any time.
+When you inherit from the `SpacetimeDB.TaggedEnum` marker, it will generate variants as subclasses of the annotated type, so you can use regular C# pattern matching operators like `is` or `switch` to determine which variant a given tagged enum holds at any time.
 
 For unit variants (those without any data payload) you can use a built-in `SpacetimeDB.Unit` as the variant type.
 
