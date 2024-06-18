@@ -2,7 +2,7 @@
 
 Need help with the tutorial? [Join our Discord server](https://discord.gg/spacetimedb)!
 
-This progressive tutorial is continued from the [Part 1 Tutorial](/docs/unity/part-1.md)
+This progressive tutorial is continued from the [Part 1 Tutorial](/docs/unity/part-1)
 
 ## Create a Server Module
 
@@ -29,13 +29,13 @@ use spacetimedb::{spacetimedb, Identity, SpacetimeType, ReducerContext};
 use log;
 ```
 
-Then we are going to start by adding the global `Config` table. Right now it only contains the "message of the day" but it can be extended to store other configuration variables. This also uses a couple of macros, like `#[spacetimedb(table)]` which you can learn more about in our [Rust module reference](/docs/modules/rust). Simply put, this just tells SpacetimeDB to create a table which uses this struct as the schema for the table.
+Then we are going to start by adding the global `Config` table. Right now it only contains the "message of the day" but it can be extended to store other configuration variables. This also uses a couple of macros, like `#[spacetimedb(table)]` which you can learn more about in our [Rust module reference](/docs/modules/rust) (including making your tables `private`!). Simply put, this just tells SpacetimeDB to create a table which uses this struct as the schema for the table.
 
 **Append to the bottom of lib.rs:**
 
 ```rust
 // We're using this table as a singleton, so there should typically only be one element where the version is 0.
-#[spacetimedb(table)]
+#[spacetimedb(table(public))]
 #[derive(Clone)]
 pub struct Config {
     #[primarykey]
@@ -64,7 +64,7 @@ Now we're going to create a table which actually uses the `StdbVector3` that we 
 // This stores information related to all entities in our game. In this tutorial
 // all entities must at least have an entity_id, a position, a direction and they
 // must specify whether or not they are moving.
-#[spacetimedb(table)]
+#[spacetimedb(table(public))]
 #[derive(Clone)]
 pub struct EntityComponent {
     #[primarykey]
@@ -84,15 +84,15 @@ Next, we will define the `PlayerComponent` table. The `PlayerComponent` table is
 **Append to the bottom of lib.rs:**
 
 ```rust
-// All players have this component and it associates an entity with the user's 
+// All players have this component and it associates an entity with the user's
 // Identity. It also stores their username and whether or not they're logged in.
 #[derive(Clone)]
-#[spacetimedb(table)]
+#[spacetimedb(table(public))]
 pub struct PlayerComponent {
     // An entity_id that matches an entity_id in the `EntityComponent` table.
     #[primarykey]
     pub entity_id: u64,
-    
+
     // The user's identity, which is unique to each player
     #[unique]
     pub owner_id: Identity,
@@ -120,9 +120,9 @@ pub fn create_player(ctx: ReducerContext, username: String) -> Result<(), String
     }
 
     // Create a new entity for this player and get a unique `entity_id`.
-    let entity_id = EntityComponent::insert(EntityComponent 
-    { 
-        entity_id: 0, 
+    let entity_id = EntityComponent::insert(EntityComponent
+    {
+        entity_id: 0,
         position: StdbVector3 { x: 0.0, y: 0.0, z: 0.0 },
         direction: 0.0,
         moving: false,
@@ -183,6 +183,7 @@ pub fn client_connected(ctx: ReducerContext) {
     update_player_login_state(ctx, true);
 }
 ```
+
 ```rust
 // Called when the client disconnects, we update the logged_in state to false
 #[spacetimedb(disconnect)]
@@ -190,6 +191,7 @@ pub fn client_disconnected(ctx: ReducerContext) {
     update_player_login_state(ctx, false);
 }
 ```
+
 ```rust
 // This helper function gets the PlayerComponent, sets the logged
 // in variable and updates the PlayerComponent table row.
@@ -230,7 +232,7 @@ pub fn update_player_position(
         }
     }
 
-    // If we can not find the PlayerComponent or EntityComponent for 
+    // If we can not find the PlayerComponent or EntityComponent for
     // this player then something went wrong.
     return Err("Player not found".to_string());
 }
@@ -257,12 +259,12 @@ spacetime publish -c unity-tutorial
 
 The client project has a chat window, but so far, all it's used for is the message of the day. We are going to add the ability for players to send chat messages to each other.
 
-First lets add a new `ChatMessage` table to the SpacetimeDB module. Add the following code to ``lib.rs``.
+First lets add a new `ChatMessage` table to the SpacetimeDB module. Add the following code to `lib.rs`.
 
 **Append to the bottom of server/src/lib.rs:**
 
 ```rust
-#[spacetimedb(table)]
+#[spacetimedb(table(public))]
 pub struct ChatMessage {
     // The primary key for this table will be auto-incremented
     #[primarykey]
@@ -309,4 +311,4 @@ Now that we added chat support, let's publish the latest module version to Space
 spacetime publish -c unity-tutorial
 ```
 
-From here, the [next tutorial](/docs/unity/part-3.md) continues with a Client (Unity) focus.
+From here, the [next tutorial](/docs/unity/part-3) continues with a Client (Unity) focus.

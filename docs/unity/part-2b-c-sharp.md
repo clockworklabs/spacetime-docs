@@ -2,7 +2,7 @@
 
 Need help with the tutorial? [Join our Discord server](https://discord.gg/spacetimedb)!
 
-This progressive tutorial is continued from the [Part 1 Tutorial](/docs/unity/part-1.md)
+This progressive tutorial is continued from the [Part 1 Tutorial](/docs/unity/part-1)
 
 ## Create a Server Module
 
@@ -30,14 +30,14 @@ using SpacetimeDB.Module;
 using static SpacetimeDB.Runtime;
 ```
 
-Then we are going to start by adding the global `Config` table. Right now it only contains the "message of the day" but it can be extended to store other configuration variables. This also uses a couple of macros, like `#[spacetimedb(table)]` which you can learn more about in our [C# module reference](/docs/modules/c-sharp). Simply put, this just tells SpacetimeDB to create a table which uses this struct as the schema for the table.
+Then we are going to start by adding the global `Config` table. Right now it only contains the "message of the day" but it can be extended to store other configuration variables. This also uses a couple of attributes, like `[SpacetimeDB.Table]` which you can learn more about in our [C# module reference](/docs/modules/c-sharp). Simply put, this just tells SpacetimeDB to create a table which uses this struct as the schema for the table.
 
 **Append to the bottom of lib.cs:**
 
 ```csharp
 /// We're using this table as a singleton,
 /// so there should typically only be one element where the version is 0.
-[SpacetimeDB.Table]
+[SpacetimeDB.Table(Public = true)]
 public partial class Config
 {
    [SpacetimeDB.Column(ColumnAttrs.PrimaryKey)]
@@ -67,7 +67,7 @@ Now we're going to create a table which actually uses the `StdbVector3` that we 
 /// This stores information related to all entities in our game. In this tutorial
 /// all entities must at least have an entity_id, a position, a direction and they
 /// must specify whether or not they are moving.
-[SpacetimeDB.Table]
+[SpacetimeDB.Table(Public = true)]
 public partial class EntityComponent
 {
    [SpacetimeDB.Column(ColumnAttrs.PrimaryKeyAuto)]
@@ -85,13 +85,13 @@ Next, we will define the `PlayerComponent` table. The `PlayerComponent` table is
 ```csharp
 /// All players have this component and it associates an entity with the user's
 /// Identity. It also stores their username and whether or not they're logged in.
-[SpacetimeDB.Table]
+[SpacetimeDB.Table(Public = true)]
 public partial class PlayerComponent
 {
    // An EntityId that matches an EntityId in the `EntityComponent` table.
    [SpacetimeDB.Column(ColumnAttrs.PrimaryKey)]
    public ulong EntityId;
-   
+
    // The user's identity, which is unique to each player
    [SpacetimeDB.Column(ColumnAttrs.Unique)]
    public Identity Identity;
@@ -136,7 +136,7 @@ public static void CreatePlayer(DbEventArgs dbEvent, string username)
        Log("Error: Failed to create a unique EntityComponent", LogLevel.Error);
        throw;
    }
-  
+
    // The PlayerComponent uses the same entity_id and stores the identity of
    // the owner, username, and whether or not they are logged in.
    try
@@ -207,12 +207,14 @@ We use the `Connect` and `Disconnect` reducers to update the logged in state of 
 public static void ClientConnected(DbEventArgs dbEvent) =>
    UpdatePlayerLoginState(dbEvent, loggedIn:true);
 ```
+
 ```csharp
 /// Called when the client disconnects, we update the logged_in state to false
 [SpacetimeDB.Reducer(ReducerKind.Disconnect)]
 public static void ClientDisonnected(DbEventArgs dbEvent) =>
    UpdatePlayerLoginState(dbEvent, loggedIn:false);
 ```
+
 ```csharp
 /// This helper function gets the PlayerComponent, sets the LoggedIn
 /// variable and updates the PlayerComponent table row.
@@ -257,7 +259,7 @@ private static void UpdatePlayerPosition(
    {
        throw new ArgumentException($"Player Entity '{playerEntityId}' not found");
    }
-   
+
    entity.Position = position;
    entity.Direction = direction;
    entity.Moving = moving;
@@ -277,20 +279,20 @@ In a fully developed game, the server would typically perform server-side valida
 
 The client project has a chat window, but so far, all it's used for is the message of the day. We are going to add the ability for players to send chat messages to each other.
 
-First lets add a new `ChatMessage` table to the SpacetimeDB module. Add the following code to ``lib.cs``.
+First lets add a new `ChatMessage` table to the SpacetimeDB module. Add the following code to `lib.cs`.
 
 **Append to the bottom of server/src/lib.cs:**
 
 ```csharp
-[SpacetimeDB.Table]
+[SpacetimeDB.Table(Public = true)]
 public partial class ChatMessage
 {
    // The primary key for this table will be auto-incremented
    [SpacetimeDB.Column(ColumnAttrs.PrimaryKeyAuto)]
-  
+
    // The entity id of the player that sent the message
    public ulong SenderId;
-  
+
    // Message contents
    public string? Text;
 }
@@ -333,4 +335,4 @@ cd server
 spacetime publish -c unity-tutorial
 ```
 
-From here, the [next tutorial](/docs/unity/part-3.md) continues with a Client (Unity) focus.
+From here, the [next tutorial](/docs/unity/part-3) continues with a Client (Unity) focus.
