@@ -185,7 +185,7 @@ First, we need to create a SpacetimeDB client and connect to the module. Create 
 
 We are going to create a stateful variable to store our client's SpacetimeDB identity when we receive it. Also, we are using `localStorage` to retrieve your auth token if this client has connected before. We will explain these later.
 
-Replace `<module-name>` with the name you chose when publishing your module during the module quickstart. If you are using SpacetimeDB Cloud, the host will be `wss://spacetimedb.com/spacetimedb`.
+Replace `<module-name>` with the name you chose when publishing your module during the module quickstart. If you are using SpacetimeDB Cloud, the host will be `wss://spacetimedb.com`.
 
 Add this before the `App` function declaration:
 
@@ -271,9 +271,9 @@ function userNameOrIdentity(user: User): string {
   if (user.name !== null) {
     return user.name || "";
   } else {
-    var identityStr = new Identity(user.identity).toHexString();
+    var identityStr = new Identity(user.identity.toUint8Array()).toHexString();
     console.log(`Name: ${identityStr} `);
-    return new Identity(user.identity).toHexString().substring(0, 8);
+    return new Identity(user.identity.toUint8Array()).toHexString().substring(0, 8);
   }
 }
 
@@ -298,7 +298,7 @@ function setAllMessagesInOrder() {
 
 client.current.on("initialStateSync", () => {
   setAllMessagesInOrder();
-  var user = User.filterByIdentity(local_identity?.current?.toUint8Array()!);
+  var user = User.filterByIdentity(local_identity?.current!);
   setName(userNameOrIdentity(user!));
 });
 ```
