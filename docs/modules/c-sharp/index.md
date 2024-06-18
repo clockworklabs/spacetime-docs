@@ -152,21 +152,46 @@ public enum Color
 
 SpacetimeDB has support for tagged enums which can be found in languages like Rust, but not C#.
 
-To bridge the gap, a special marker interface `SpacetimeDB.TaggedEnum` can be used on any `SpacetimeDB.Type`-marked `struct` or `class` to mark it as a SpacetimeDB tagged enum. It accepts a tuple of 2 or more named items and will generate methods to check which variant is currently active, as well as accessors for each variant.
+To bridge the gap, we allow to declare tagged enums by inheriting from a special marker `record SpacetimeDB.TaggedEnum<(...types and names of the variants as a tuple...)>`.
 
-It is expected that you will use the `Is*` methods to check which variant is active before accessing the corresponding field, as the accessor will throw an exception on a state mismatch.
+It will generate variants as subclasses of the marked type, so you can use regular C# pattern matching operators like `is` or `switch` to determine which variant a given tagged enum holds at any time.
+
+For unit variants (those without any data payload) you can use a built-in `SpacetimeDB.Unit` as the variant type.
+
+Example:
 
 ```csharp
 // Example declaration:
 [SpacetimeDB.Type]
-partial struct Option<T> : SpacetimeDB.TaggedEnum<(T Some, Unit None)> { }
+public partial record MyEnum : SpacetimeDB.TaggedEnum<(
+    string String,
+    int Int,
+    SpacetimeDB.Unit None
+)>;
 
-// Usage:
-var option = new Option<int> { Some = 42 };
-if (option.IsSome)
+void PrintEnum(MyEnum e)
 {
-    Log($"Value: {option.Some}");
+    switch (e)
+    {
+        case MyEnum.String(var s):
+            Console.WriteLine(s);
+            break;
+
+        case MyEnum.Int(var i):
+            Console.WriteLine(i);
+            break;
+
+        case MyEnum.None:
+            Console.WriteLine("(none)");
+            break;
+    }
 }
+
+bool IsSome(MyEnum e) => e is not MyEnum.None;
+
+var myEnum = new MyEnum.String("Hello, world!");
+Console.WriteLine($"IsSome: {IsSome(myEnum)}");
+PrintEnum(myEnum);
 ```
 
 ### Tables
