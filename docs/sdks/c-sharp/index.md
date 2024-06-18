@@ -419,7 +419,7 @@ class TABLE {
 }
 ```
 
-For each unique column of a table (those annotated `#[unique]` or `#[primarykey]`), `spacetime generate` generates a static method on the [table class](#class-table) to seek subscribed rows where that column matches a requested value.
+For each unique column of a table (those annotated `#[unique]` or `#[primarykey]`), `spacetime generate` generates a static method on the [table class](#class-table) to seek a subscribed row where that column matches a requested value.
 
 These methods are named `findBy{COLUMN}`, where `{COLUMN}` is the column name converted to `PascalCase`. Those methods return a single instance of the [table class](#class-table) if a row is found, or `null` if no row matches the query.
 
