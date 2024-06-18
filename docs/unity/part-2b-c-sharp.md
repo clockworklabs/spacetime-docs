@@ -108,10 +108,10 @@ Next, we write our very first reducer, `CreatePlayer`. From the client we will c
 /// This reducer is called when the user logs in for the first time and
 /// enters a username.
 [SpacetimeDB.Reducer]
-public static void CreatePlayer(DbEventArgs dbEvent, string username)
+public static void CreatePlayer(ReducerContext ctx, string username)
 {
    // Get the Identity of the client who called this reducer
-   Identity sender = dbEvent.Sender;
+   Identity sender = ctx.Sender;
 
    // Make sure we don't already have a player with this identity
    PlayerComponent? user = PlayerComponent.FindByIdentity(sender);
@@ -144,7 +144,7 @@ public static void CreatePlayer(DbEventArgs dbEvent, string username)
        new PlayerComponent
        {
            // EntityId = 0, // 0 is the same as leaving null to get a new, unique Id
-           Identity = dbEvent.Sender,
+           Identity = ctx.Sender,
            Username = username,
            LoggedIn = true,
        }.Insert();
@@ -172,7 +172,7 @@ SpacetimeDB gives you the ability to define custom reducers that automatically t
 - `Connect` - Called when a user connects to the SpacetimeDB module. Their identity can be found in the `Sender` value of the `ReducerContext`.
 - `Disconnect` - Called when a user disconnects from the SpacetimeDB module.
 
-Next, we are going to write a custom `Init` reducer that inserts the default message of the day into our `Config` table. The `Config` table only ever contains a single row with version 0, which we retrieve using `Config.FilterByVersion(0)`.
+Next, we are going to write a custom `Init` reducer that inserts the default message of the day into our `Config` table.
 
 **Append to the bottom of lib.cs:**
 
@@ -203,31 +203,31 @@ We use the `Connect` and `Disconnect` reducers to update the logged in state of 
 
 ```csharp
 /// Called when the client connects, we update the LoggedIn state to true
-[SpacetimeDB.Reducer(ReducerKind.Connect)]
-public static void ClientConnected(DbEventArgs dbEvent) =>
-   UpdatePlayerLoginState(dbEvent, loggedIn:true);
+[SpacetimeDB.Reducer(ReducerKind.Init)]
+public static void ClientConnected(ReducerContext ctx) =>
+   UpdatePlayerLoginState(ctx, loggedIn:true);
 ```
 
 ```csharp
 /// Called when the client disconnects, we update the logged_in state to false
 [SpacetimeDB.Reducer(ReducerKind.Disconnect)]
-public static void ClientDisonnected(DbEventArgs dbEvent) =>
-   UpdatePlayerLoginState(dbEvent, loggedIn:false);
+public static void ClientDisonnected(ReducerContext ctx) =>
+   UpdatePlayerLoginState(ctx, loggedIn:false);
 ```
 
 ```csharp
 /// This helper function gets the PlayerComponent, sets the LoggedIn
 /// variable and updates the PlayerComponent table row.
-public static void UpdatePlayerLoginState(DbEventArgs dbEvent, bool loggedIn)
+private static void UpdatePlayerLoginState(ReducerContext ctx, bool loggedIn)
 {
-   PlayerComponent? player = PlayerComponent.FindByIdentity(dbEvent.Sender);
+   PlayerComponent? player = PlayerComponent.FindByIdentity(ctx.Sender);
    if (player is null)
    {
        throw new ArgumentException("Player not found");
    }
 
    player.LoggedIn = loggedIn;
-   PlayerComponent.UpdateByIdentity(dbEvent.Sender, player);
+   PlayerComponent.UpdateByIdentity(ctx.Sender, player);
 }
 ```
 
@@ -241,13 +241,13 @@ Using the `EntityId` in the `PlayerComponent` we retrieved, we can lookup the `E
 /// Updates the position of a player. This is also called when the player stops moving.
 [SpacetimeDB.Reducer]
 private static void UpdatePlayerPosition(
-   DbEventArgs dbEvent,
+   ReducerContext ctx,
    StdbVector3 position,
    float direction,
    bool moving)
 {
    // First, look up the player using the sender identity
-   PlayerComponent? player = PlayerComponent.FindByIdentity(dbEvent.Sender);
+   PlayerComponent? player = PlayerComponent.FindByIdentity(ctx.Sender);
    if (player is null)
    {
        throw new ArgumentException("Player not found");
@@ -305,10 +305,10 @@ Now we need to add a reducer to handle inserting new chat messages.
 ```csharp
 /// Adds a chat entry to the ChatMessage table
 [SpacetimeDB.Reducer]
-public static void SendChatMessage(DbEventArgs dbEvent, string text)
+public static void SendChatMessage(ReducerContext ctx, string text)
 {
    // Get the player's entity id
-   PlayerComponent? player = PlayerComponent.FindByIdentity(dbEvent.Sender);
+   PlayerComponent? player = PlayerComponent.FindByIdentity(ctx.Sender);
    if (player is null)
    {
        throw new ArgumentException("Player not found");
