@@ -154,14 +154,15 @@ SpacetimeDB has support for tagged enums which can be found in languages like Ru
 
 To bridge the gap, we allow to declare tagged enums by inheriting from a special marker `record SpacetimeDB.TaggedEnum<(...types and names of the variants as a tuple...)>`.
 
-It will generate variants as subclasses of the marked type, so you can use regular C# pattern matching operators like `is` or `switch` to determine which variant a given tagged enum holds at any time.
+The `SpacetimeDB.TaggedEnum` marker will generate variants as subclasses of the marked type, so you can use regular C# pattern matching operators like `is` or `switch` to determine which variant a given tagged enum holds at any time.
 
 For unit variants (those without any data payload) you can use a built-in `SpacetimeDB.Unit` as the variant type.
 
 Example:
 
 ```csharp
-// Example declaration:
+// Define a tagged enum named `MyEnum` with three variants,
+// `MyEnum.String`, `MyEnum.Int` and `MyEnum.None`.
 [SpacetimeDB.Type]
 public partial record MyEnum : SpacetimeDB.TaggedEnum<(
     string String,
@@ -169,6 +170,7 @@ public partial record MyEnum : SpacetimeDB.TaggedEnum<(
     SpacetimeDB.Unit None
 )>;
 
+// Print an instance of `MyEnum`, using `switch`/`case` to determine the active variant.
 void PrintEnum(MyEnum e)
 {
     switch (e)
@@ -187,8 +189,10 @@ void PrintEnum(MyEnum e)
     }
 }
 
+// Test whether an instance of `MyEnum` holds some value (either a string or an int one).
 bool IsSome(MyEnum e) => e is not MyEnum.None;
 
+// Construct an instance of `MyEnum` with the `String` variant active.
 var myEnum = new MyEnum.String("Hello, world!");
 Console.WriteLine($"IsSome: {IsSome(myEnum)}");
 PrintEnum(myEnum);
