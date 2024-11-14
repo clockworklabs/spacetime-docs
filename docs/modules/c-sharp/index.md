@@ -370,13 +370,13 @@ public static void Init(ReducerContext ctx)
 }
 
 [SpacetimeDB.Reducer(ReducerKind.ClientConnected)]
-public static void OnConnect(ReducerContext ctx)
+public static void Connect(ReducerContext ctx)
 {
     Log.Info($"{ctx.CallerIdentity} has connected from {ctx.CallerAddress}!");
 }
 
 [SpacetimeDB.Reducer(ReducerKind.ClientDisconnected)]
-public static void OnDisconnect(ReducerContext ctx)
+public static void Disconnect(ReducerContext ctx)
 {
     Log.Info($"{ctx.CallerIdentity} has disconnected.");
 }```
