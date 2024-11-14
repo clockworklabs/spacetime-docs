@@ -10,14 +10,13 @@ Let's start with a heavily commented version of the default example from the lan
 
 ```csharp
 // These imports bring into the scope common APIs you'll need to expose items from your module and to interact with the database runtime.
-using SpacetimeDB.Module;
-using static SpacetimeDB.Runtime;
+using SpacetimeDB;
 
 // Roslyn generators are statically generating extra code as-if they were part of the source tree, so,
 // in order to inject new methods, types they operate on as well as their parents have to be marked as `partial`.
 //
 // We start with the top-level `Module` class for the module itself.
-static partial class Module
+public static partial class Module
 {
     // `[SpacetimeDB.Table]` registers a struct or a class as a SpacetimeDB table.
     //
@@ -25,9 +24,10 @@ static partial class Module
     [SpacetimeDB.Table(Public = true)]
     public partial struct Person
     {
-        // `[SpacetimeDB.Column]` allows to specify column attributes / constraints such as
+        // SpacetimeDB allows you to specify column attributes / constraints such as
         // "this field should be unique" or "this field should get automatically assigned auto-incremented value".
-        [SpacetimeDB.Column(ColumnAttrs.Unique | ColumnAttrs.AutoInc)]
+        [SpacetimeDB.Unique]
+        [SpacetimeDB.PrimaryKey]
         public int Id;
         public string Name;
         public int Age;
@@ -38,29 +38,29 @@ static partial class Module
     // Reducers are functions that can be invoked from the database runtime.
     // They can't return values, but can throw errors that will be caught and reported back to the runtime.
     [SpacetimeDB.Reducer]
-    public static void Add(string name, int age)
+    public static void Add(ReducerContext ctx, string name, int age)
     {
         // We can skip (or explicitly set to zero) auto-incremented fields when creating new rows.
         var person = new Person { Name = name, Age = age };
 
         // `Insert()` method is auto-generated and will insert the given row into the table.
-        person.Insert();
+        ctx.Db.Person.Insert(person);
         // After insertion, the auto-incremented fields will be populated with their actual values.
         //
-        // `Log()` function is provided by the runtime and will print the message to the database log.
+        // `Log` class is provided by the runtime and will print messages to the database log.
         // It should be used instead of `Console.WriteLine()` or similar functions.
-        Log($"Inserted {person.Name} under #{person.Id}");
+        Log.Info($"Inserted {person.Name} under #{person.Id}");
     }
 
     [SpacetimeDB.Reducer]
-    public static void SayHello()
+    public static void SayHello(ReducerContext ctx)
     {
         // Each table type gets a static Iter() method that can be used to iterate over the entire table.
-        foreach (var person in Person.Iter())
+        foreach (var person in ctx.Db.Person.Iter())
         {
-            Log($"Hello, {person.Name}!");
+            Log.Info($"Hello, {person.Name}!");
         }
-        Log("Hello, World!");
+        Log.Info("Hello, World!");
     }
 }
 ```
@@ -73,28 +73,21 @@ Now we'll get into details on all the APIs SpacetimeDB provides for writing modu
 
 First of all, logging as we're likely going to use it a lot for debugging and reporting errors.
 
-`SpacetimeDB.Runtime` provides a `Log` function that will print the given message to the database log, along with the source location and a log level it was provided.
+`SpacetimeDB` provides a `Log` class that will print messages to the database log, along with the source location and a log level it was provided.
 
-Supported log levels are provided by the `LogLevel` enum:
+Supported log levels are provided by different methods on the `Log` class:
 
 ```csharp
-public enum LogLevel
-{
-    Error,
-    Warn,
-    Info,
-    Debug,
-    Trace,
-    Panic
+    public static void Trace(string message);
+    public static void Debug(string message);
+    public static void Info(string message);
+    public static void Warn(string message);
+    public static void Error(string message);
+    public static void Exception(string message);
 }
 ```
 
-If omitted, the log level will default to `Info`, so these two forms are equivalent:
-
-```csharp
-Log("Hello, World!");
-Log("Hello, World!", LogLevel.Info);
-```
+You should use `Log.Info` by default.
 
 ### Supported types
 
@@ -116,9 +109,9 @@ The following types are supported out of the box and can be stored in the databa
 
 And a couple of special custom types:
 
-- `SpacetimeDB.SATS.Unit` - semantically equivalent to an empty struct, sometimes useful in generic contexts where C# doesn't permit `void`.
-- `Identity` (`SpacetimeDB.Runtime.Identity`) - a unique identifier for each user; internally a byte blob but can be printed, hashed and compared for equality.
-- `Address` (`SpacetimeDB.Runtime.Address`) - an identifier which disamgibuates connections by the same `Identity`; internally a byte blob but can be printed, hashed and compared for equality.
+- `SpacetimeDB.Unit` - semantically equivalent to an empty struct, sometimes useful in generic contexts where C# doesn't permit `void`.
+- `Identity` (`SpacetimeDB.Identity`) - a unique identifier for each user; internally a byte blob but can be printed, hashed and compared for equality.
+- `Address` (`SpacetimeDB.Address`) - an identifier which disamgibuates connections by the same `Identity`; internally a byte blob but can be printed, hashed and compared for equality.
 
 #### Custom types
 
@@ -193,7 +186,7 @@ bool IsSome(MyEnum e) => e is not MyEnum.None;
 
 // Construct an instance of `MyEnum` with the `String` variant active.
 var myEnum = new MyEnum.String("Hello, world!");
-Console.WriteLine($"IsSome: {IsSome(myEnum)}");
+Log.Info($"IsSome: {IsSome(myEnum)}");
 PrintEnum(myEnum);
 ```
 
@@ -211,7 +204,8 @@ It implies `[SpacetimeDB.Type]`, so you must not specify both attributes on the 
 [SpacetimeDB.Table(Public = true)]
 public partial struct Person
 {
-    [SpacetimeDB.Column(ColumnAttrs.Unique | ColumnAttrs.AutoInc)]
+    [SpacetimeDB.PrimaryKey]
+    [SpacetimeDB.AutoInc]
     public int Id;
     public string Name;
     public int Age;
@@ -221,10 +215,10 @@ public partial struct Person
 The example above will generate the following extra methods:
 
 ```csharp
-public partial struct Person
+public partial class ReducerCtx.Db.Person
 {
     // Inserts current instance as a new row into the table.
-    public void Insert();
+    public void Insert(Person row);
 
     // Returns an iterator over all rows in the table, e.g.:
     // `for (var person in Person.Iter()) { ... }`
@@ -234,22 +228,31 @@ public partial struct Person
     // `for (var person in Person.Query(p => p.Age >= 18)) { ... }`
     public static IEnumerable<Person> Query(Expression<Func<Person, bool>> filter);
 
-    // Generated for each column:
+    // Generated for each column with the `Indexed` attribute:
 
-    // Returns an iterator over all rows in the table that have the given value in the `Name` column.
-    public static IEnumerable<Person> FilterByName(string name);
+    public static class Name {
+        // Returns an iterator over all rows in the table that have the given value in the `Name` column.
+        public static IEnumerable<Person> Filter(string name);
+        public static void Update(Person row);
+        public static Person Find(string name);
+    }
+    public static class Name {
+        // Returns an iterator over all rows in the table that have the given value in the `Name` column.
+        public static IEnumerable<Person> Filter(string name);
+    }
     public static IEnumerable<Person> FilterByAge(int age);
 
     // Generated for each unique column:
+    public static partial class Id {
+        // Find a `Person` based on `id == $key`
+        public static Person? Find(int key);
 
-    // Finds a row in the table with the given value in the `Id` column and returns it, or `null` if no such row exists.
-    public static Person? FindById(int id);
+        // Delete a row by `key` on the row
+        public static bool Delete(int key);
 
-    // Deletes a row in the table with the given value in the `Id` column and returns `true` if the row was found and deleted, or `false` if no such row exists.
-    public static bool DeleteById(int id);
-
-    // Updates a row in the table with the given value in the `Id` column and returns `true` if the row was found and updated, or `false` if no such row exists.
-    public static bool UpdateById(int oldId, Person newValue);
+        // Update based on the `id` of the row
+        public static bool Update(Person row);
+    }
 }
 ```
 
@@ -259,38 +262,33 @@ Attribute `[SpacetimeDB.Column]` can be used on any field of a `SpacetimeDB.Tabl
 
 The supported column attributes are:
 
-- `ColumnAttrs.AutoInc` - this column should be auto-incremented.
-- `ColumnAttrs.Unique` - this column should be unique.
-- `ColumnAttrs.PrimaryKey` - this column should be a primary key, it implies `ColumnAttrs.Unique` but also allows clients to subscribe to updates via `OnUpdate` which will use this field to match the old and the new version of the row with each other.
-
-These attributes are bitflags and can be combined together, but you can also use some predefined shortcut aliases:
-
-- `ColumnAttrs.Identity` - same as `ColumnAttrs.Unique | ColumnAttrs.AutoInc`.
-- `ColumnAttrs.PrimaryKeyAuto` - same as `ColumnAttrs.PrimaryKey | ColumnAttrs.AutoInc`.
-
+- `SpacetimeDB.AutoInc` - this column should be auto-incremented.
+- `SpacetimeDB.Unique` - this column should be unique.
+- `SpacetimeDB.PrimaryKey` - this column should be a primary key, it implies `SpacetimeDB.Unique` but also allows clients to subscribe to updates via `OnUpdate` which will use this field to match the old and the new version of the row with each other.
+- 
 ### Reducers
 
-Attribute `[SpacetimeDB.Reducer]` can be used on any `static void` method to register it as a SpacetimeDB reducer. The method must accept only supported types as arguments. If it throws an exception, those will be caught and reported back to the database runtime.
+Attribute `[SpacetimeDB.Reducer]` can be used on any `public static void` method to register it as a SpacetimeDB reducer. The method must accept only supported types as arguments. If it throws an exception, those will be caught and reported back to the database runtime.
 
 ```csharp
 [SpacetimeDB.Reducer]
-public static void Add(string name, int age)
+public static void Add(ReducerContext ctx, string name, int age)
 {
     var person = new Person { Name = name, Age = age };
-    person.Insert();
-    Log($"Inserted {person.Name} under #{person.Id}");
+    ctx.Db.Person.Insert(person);
+    Log.Info($"Inserted {person.Name} under #{person.Id}");
 }
 ```
 
-If a reducer has an argument with a type `ReducerContext` (`SpacetimeDB.Runtime.ReducerContext`), it will be provided with event details such as the sender identity (`SpacetimeDB.Runtime.Identity`), sender address (`SpacetimeDB.Runtime.Address?`) and the time (`DateTimeOffset`) of the invocation:
+If a reducer has an argument with a type `ReducerContext` (`SpacetimeDB.ReducerContext`), it will be provided with event details such as the sender identity (`SpacetimeDB.Identity`), sender address (`SpacetimeDB.Address?`) and the time (`DateTimeOffset`) of the invocation:
 
 ```csharp
 [SpacetimeDB.Reducer]
-public static void PrintInfo(ReducerContext e)
+public static void PrintInfo(ReducerContext ctx)
 {
-    Log($"Sender identity: {e.Sender}");
-    Log($"Sender address: {e.Address}");
-    Log($"Time: {e.Time}");
+    Log.Info($"Sender identity: {ctx.CallerIdentity}");
+    Log.Info($"Sender address: {ctx.CallerAddress}");
+    Log.Info($"Time: {ctx.Timestamp}");
 }
 ```
 
@@ -325,21 +323,23 @@ public static partial class Timers
     {
 
         // Schedule a one-time reducer call by inserting a row.
-        new SendMessageTimer
+        var timer = new SendMessageTimer
         {
             Text = "bot sending a message",
             ScheduledAt = ctx.Time.AddSeconds(10),
             ScheduledId = 1,
-        }.Insert();
+        };
+        ctx.Db.SendMessageTimer.Insert(timer);
 
 
         // Schedule a recurring reducer.
-        new SendMessageTimer
+        var timer = new SendMessageTimer
         {
             Text = "bot sending a message",
             ScheduledAt = new TimeStamp(10),
             ScheduledId = 2,
-        }.Insert();
+        };
+        ctx.Db.SendMessageTimer.Insert(timer);
     }
 }
 ```
@@ -354,7 +354,7 @@ public static partial class Timers
     {
         public string Text;         // fields of original struct
 
-        [SpacetimeDB.Column(ColumnAttrs.PrimaryKeyAuto)]
+        [SpacetimeDB.PrimaryKey]
         public ulong ScheduledId;   // unique identifier to be used internally
 
         public SpacetimeDB.ScheduleAt ScheduleAt;   // Scheduling details (Time or Inteval)
@@ -370,34 +370,27 @@ public abstract partial record ScheduleAt: SpacetimeDB.TaggedEnum<(DateTimeOffse
 These are four special kinds of reducers that can be used to respond to module lifecycle events. They're stored in the `SpacetimeDB.Module.ReducerKind` class and can be used as an argument to the `[SpacetimeDB.Reducer]` attribute:
 
 - `ReducerKind.Init` - this reducer will be invoked when the module is first published.
-- `ReducerKind.Update` - this reducer will be invoked when the module is updated.
-- `ReducerKind.Connect` - this reducer will be invoked when a client connects to the database.
-- `ReducerKind.Disconnect` - this reducer will be invoked when a client disconnects from the database.
+- `ReducerKind.ClientConnected` - this reducer will be invoked when a client connects to the database.
+- `ReducerKind.ClientDisconnected` - this reducer will be invoked when a client disconnects from the database.
 
 Example:
 
 ````csharp
 [SpacetimeDB.Reducer(ReducerKind.Init)]
-public static void Init()
+public static void Init(ReducerContext ctx)
 {
-    Log("...and we're live!");
+    Log.Info("...and we're live!");
 }
 
-[SpacetimeDB.Reducer(ReducerKind.Update)]
-public static void Update()
+[SpacetimeDB.Reducer(ReducerKind.ClientConnected)]
+public static void OnConnect(ReducerContext ctx)
 {
-    Log("Update get!");
+    Log.Info($"{ctx.CallerIdentity} has connected from {ctx.CallerAddress}!");
 }
 
-[SpacetimeDB.Reducer(ReducerKind.Connect)]
-public static void OnConnect(DbEventArgs ctx)
+[SpacetimeDB.Reducer(ReducerKind.ClientDisconnected)]
+public static void OnDisconnect(ReducerContext ctx)
 {
-    Log($"{ctx.Sender} has connected from {ctx.Address}!");
-}
-
-[SpacetimeDB.Reducer(ReducerKind.Disconnect)]
-public static void OnDisconnect(DbEventArgs ctx)
-{
-    Log($"{ctx.Sender} has disconnected.");
+    Log.Info($"{ctx.CallerIdentity} has disconnected.");
 }```
 ````
