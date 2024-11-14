@@ -78,13 +78,12 @@ First of all, logging as we're likely going to use it a lot for debugging and re
 Supported log levels are provided by different methods on the `Log` class:
 
 ```csharp
-    public static void Trace(string message);
-    public static void Debug(string message);
-    public static void Info(string message);
-    public static void Warn(string message);
-    public static void Error(string message);
-    public static void Exception(string message);
-}
+public static void Trace(string message);
+public static void Debug(string message);
+public static void Info(string message);
+public static void Warn(string message);
+public static void Error(string message);
+public static void Exception(string message);
 ```
 
 You should use `Log.Info` by default.
@@ -220,38 +219,26 @@ public partial class ReducerCtx.Db.Person
     // Inserts current instance as a new row into the table.
     public void Insert(Person row);
 
+    // Deletes current instance from the table
+    public void Delete(Person row);
+
+    // Gets the number of rows in the table
+    public ulong Count { get { ... } };
+
     // Returns an iterator over all rows in the table, e.g.:
     // `for (var person in Person.Iter()) { ... }`
-    public static IEnumerable<Person> Iter();
-
-    // Returns an iterator over all rows in the table that match the given filter, e.g.:
-    // `for (var person in Person.Query(p => p.Age >= 18)) { ... }`
-    public static IEnumerable<Person> Query(Expression<Func<Person, bool>> filter);
-
-    // Generated for each column with the `Indexed` attribute:
-
-    public static class Name {
-        // Returns an iterator over all rows in the table that have the given value in the `Name` column.
-        public static IEnumerable<Person> Filter(string name);
-        public static void Update(Person row);
-        public static Person Find(string name);
-    }
-    public static class Name {
-        // Returns an iterator over all rows in the table that have the given value in the `Name` column.
-        public static IEnumerable<Person> Filter(string name);
-    }
-    public static IEnumerable<Person> FilterByAge(int age);
+    public IEnumerable<Person> Iter();
 
     // Generated for each unique column:
     public static partial class Id {
         // Find a `Person` based on `id == $key`
-        public static Person? Find(int key);
+        public Person? Find(int key);
 
         // Delete a row by `key` on the row
-        public static bool Delete(int key);
+        public bool Delete(int key);
 
         // Update based on the `id` of the row
-        public static bool Update(Person row);
+        public bool Update(Person row);
     }
 }
 ```
