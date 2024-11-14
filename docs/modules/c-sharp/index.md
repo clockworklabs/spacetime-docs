@@ -27,7 +27,7 @@ public static partial class Module
         // SpacetimeDB allows you to specify column attributes / constraints such as
         // "this field should be unique" or "this field should get automatically assigned auto-incremented value".
         [SpacetimeDB.Unique]
-        [SpacetimeDB.PrimaryKey]
+        [SpacetimeDB.AutoInc]
         public int Id;
         public string Name;
         public int Age;
