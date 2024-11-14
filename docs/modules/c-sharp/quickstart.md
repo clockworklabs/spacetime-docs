@@ -155,7 +155,7 @@ public static string ValidateName(string name)
 
 ## Send messages
 
-We define a reducer `SendMessage`, which clients will call to send messages. It will validate the message's text, then insert a new `Message` record using `Ctx.Db.Message.Insert`, with the `Sender` identity and `Time` timestamp taken from the `ReducerContext`.
+We define a reducer `SendMessage`, which clients will call to send messages. It will validate the message's text, then insert a new `Message` record using `Ctx.Db.Message.Insert`, with the `CallerIdentity` identity and `Time` timestamp taken from the `ReducerContext`.
 
 In `server/Lib.cs`, add to the `Module` class:
 
@@ -208,7 +208,7 @@ In `server/Lib.cs`, add the definition of the connect reducer to the `Module` cl
 [SpacetimeDB.Reducer(ReducerKind.ClientConnected)]
 public static void Connect(ReducerContext ctx)
 {
-    Log.info($"Connect {ReducerContext.Sender}");
+    Log.info($"Connect {ctx.CallerIdentity}");
     var user = ctx.Db.User.Identity.Find(ctx.CallerIdentity);
 
     if (user is not null)
@@ -225,7 +225,7 @@ public static void Connect(ReducerContext ctx)
         var user = new User
         {
             Name = null,
-            Identity = ReducerContext.Sender,
+            Identity = ctx.CallerIdentity,
             Online = true,
         };
         ctx.Db.User.Insert(user);
