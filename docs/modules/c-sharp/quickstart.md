@@ -60,18 +60,15 @@ spacetime init --lang csharp server
 To the top of `server/Lib.cs`, add some imports we'll be using:
 
 ```csharp
-using System.Runtime.CompilerServices;
-using SpacetimeDB.Module;
-using static SpacetimeDB.Runtime;
+using SpacetimeDB;
 ```
 
-- `SpacetimeDB.Module` contains the special attributes we'll use to define tables and reducers in our module.
-- `SpacetimeDB.Runtime` contains the raw API bindings SpacetimeDB uses to communicate with the database.
+- `SpacetimeDB` contains the special attributes we'll use to define tables and reducers in our module and the raw API bindings SpacetimeDB uses to communicate with the database.
 
 We also need to create our static module class which all of the module code will live in. In `server/Lib.cs`, add:
 
 ```csharp
-static partial class Module
+public static partial class Module
 {
 }
 ```
@@ -88,7 +85,7 @@ In `server/Lib.cs`, add the definition of the table `User` to the `Module` class
 [SpacetimeDB.Table(Public = true)]
 public partial class User
 {
-    [SpacetimeDB.Column(ColumnAttrs.PrimaryKey)]
+    [SpacetimeDB.PrimaryKey]
     public Identity Identity;
     public string? Name;
     public bool Online;
@@ -113,7 +110,7 @@ public partial class Message
 
 We want to allow users to set their names, because `Identity` is not a terribly user-friendly identifier. To that effect, we define a reducer `SetName` which clients can invoke to set their `User.Name`. It will validate the caller's chosen name, using a function `ValidateName` which we'll define next, then look up the `User` record for the caller and update it to store the validated name. If the name fails the validation, the reducer will fail.
 
-Each reducer may accept as its first argument a `ReducerContext`, which includes the `Identity` and `Address` of the client that called the reducer, and the `Timestamp` when it was invoked. For now, we only need the `Identity`, `ctx.Sender`.
+Each reducer may accept as its first argument a `ReducerContext`, which includes the `Identity` and `Address` of the client that called the reducer, and the `Timestamp` when it was invoked. For now, we only need the `Identity`, `ctx.CallerIdentity`.
 
 It's also possible to call `SetName` via the SpacetimeDB CLI's `spacetime call` command without a connection, in which case no `User` record will exist for the caller. We'll return an error in this case, but you could alter the reducer to insert a `User` row for the module owner. You'll have to decide whether the module owner is always online or always offline, though.
 
@@ -125,11 +122,11 @@ public static void SetName(ReducerContext ctx, string name)
 {
     name = ValidateName(name);
 
-    var user = User.FindByIdentity(ctx.Sender);
+    var user = ctx.Db.User.Identity.Find(ctx.CallerIdentity);
     if (user is not null)
     {
         user.Name = name;
-        User.UpdateByIdentity(ctx.Sender, user);
+        ctx.Db.User.Identity.Update(user);
     }
 }
 ```
@@ -158,7 +155,7 @@ public static string ValidateName(string name)
 
 ## Send messages
 
-We define a reducer `SendMessage`, which clients will call to send messages. It will validate the message's text, then insert a new `Message` record using `Message.Insert`, with the `Sender` identity and `Time` timestamp taken from the `ReducerContext`.
+We define a reducer `SendMessage`, which clients will call to send messages. It will validate the message's text, then insert a new `Message` record using `Ctx.Db.Message.Insert`, with the `Sender` identity and `Time` timestamp taken from the `ReducerContext`.
 
 In `server/Lib.cs`, add to the `Module` class:
 
@@ -167,13 +164,14 @@ In `server/Lib.cs`, add to the `Module` class:
 public static void SendMessage(ReducerContext ctx, string text)
 {
     text = ValidateMessage(text);
-    Log(text);
-    new Message
+    Log.info(text);
+    var msg = new Message
     {
-        Sender = ctx.Sender,
+        Sender = ctx.CallerIdentity,
         Text = text,
         Sent = ctx.Time.ToUnixTimeMilliseconds(),
-    }.Insert();
+    };
+    ctx.Db.Message.Insert(msg);
 }
 ```
 
@@ -200,60 +198,61 @@ You could extend the validation in `ValidateMessage` in similar ways to `Validat
 
 ## Set users' online status
 
-In C# modules, you can register for `Connect` and `Disconnect` events by using a special `ReducerKind`. We'll use the `Connect` event to create a `User` record for the client if it doesn't yet exist, and to set its online status.
+In C# modules, you can register for `ClientConnected` and `ClientDisconnected` events by using a special `ReducerKind`. We'll use the `ClientConnected` event to create a `User` record for the client if it doesn't yet exist, and to set its online status.
 
-We'll use `User.FindByIdentity` to look up a `User` row for `ctx.Sender`, if one exists. If we find one, we'll use `User.UpdateByIdentity` to overwrite it with a row that has `Online: true`. If not, we'll use `User.Insert` to insert a new row for our new user. All three of these methods are generated by the `[SpacetimeDB.Table]` attribute, with rows and behavior based on the row attributes. `FindByIdentity` returns a nullable `User`, because the unique constraint from the `[SpacetimeDB.Column(ColumnAttrs.PrimaryKey)]` attribute means there will be either zero or one matching rows. `Insert` will throw an exception if the insert violates this constraint; if we want to overwrite a `User` row, we need to do so explicitly using `UpdateByIdentity`.
+We'll use `ctx.Db.User.Identity.Find` to look up a `User` row for `ctx.CallerIdentity`, if one exists. If we find one, we'll use `ctx.Db.User.Identity.Update` to overwrite it with a row that has `Online: true`. If not, we'll use `ctx.Db.User.Insert` to insert a new row for our new user. All three of these methods are generated by the `[SpacetimeDB.Table]` attribute, with rows and behavior based on the row attributes. `Ctx.Db.User.Identity.Find` returns a nullable `User`, because the unique constraint from the `[SpacetimeDB.PrimaryKey]` attribute means there will be either zero or one matching rows. `Insert` will throw an exception if the insert violates this constraint; if we want to overwrite a `User` row, we need to do so explicitly using `ctx.Db.User.Identity.Update`.
 
 In `server/Lib.cs`, add the definition of the connect reducer to the `Module` class:
 
 ```csharp
-[SpacetimeDB.Reducer(ReducerKind.Connect)]
-public static void OnConnect(ReducerContext ReducerContext)
+[SpacetimeDB.Reducer(ReducerKind.ClientConnected)]
+public static void Connect(ReducerContext ctx)
 {
-    Log($"Connect {ReducerContext.Sender}");
-    var user = User.FindByIdentity(ReducerContext.Sender);
+    Log.info($"Connect {ReducerContext.Sender}");
+    var user = ctx.Db.User.Identity.Find(ctx.CallerIdentity);
 
     if (user is not null)
     {
         // If this is a returning user, i.e., we already have a `User` with this `Identity`,
         // set `Online: true`, but leave `Name` and `Identity` unchanged.
         user.Online = true;
-        User.UpdateByIdentity(ReducerContext.Sender, user);
+        ctx.Db.User.Identity.Update(user);
     }
     else
     {
         // If this is a new user, create a `User` object for the `Identity`,
         // which is online, but hasn't set a name.
-        new User
+        var user = new User
         {
             Name = null,
             Identity = ReducerContext.Sender,
             Online = true,
-        }.Insert();
+        };
+        ctx.Db.User.Insert(user);
     }
 }
 ```
 
-Similarly, whenever a client disconnects, the module will execute the `OnDisconnect` event if it's registered with `ReducerKind.Disconnect`. We'll use it to un-set the `Online` status of the `User` for the disconnected client.
+Similarly, whenever a client disconnects, the module will execute the `Disconnect` event if it's registered with `ReducerKind.ClientDisconnected`. We'll use it to un-set the `Online` status of the `User` for the disconnected client.
 
 Add the following code after the `OnConnect` handler:
 
 ```csharp
-[SpacetimeDB.Reducer(ReducerKind.Disconnect)]
-public static void OnDisconnect(ReducerContext ReducerContext)
+[SpacetimeDB.Reducer(ReducerKind.ClientDisconnected)]
+public static void OnDisconnect(ReducerContext ctx)
 {
-    var user = User.FindByIdentity(ReducerContext.Sender);
+    var user = ctx.Db.User.Identity.Find(ctx.CallerIdentity);
 
     if (user is not null)
     {
         // This user should exist, so set `Online: false`.
         user.Online = false;
-        User.UpdateByIdentity(ReducerContext.Sender, user);
+        ctx.Db.User.Identity.Update(user);
     }
     else
     {
         // User does not exist, log warning
-        Log("Warning: No user found for disconnected client.");
+        Log.Warning("No user found for disconnected client.");
     }
 }
 ```
@@ -271,6 +270,8 @@ From the `quickstart-chat` directory, run:
 ```bash
 spacetime publish --project-path server <module-name>
 ```
+
+Install wasm-opt for optimized builds either from NPM or from the [binaryen releases](https://github.com/WebAssembly/binaryen/releases).
 
 ```bash
 npm i wasm-opt -g
@@ -312,6 +313,6 @@ spacetime sql <module-name> "SELECT * FROM Message"
 
 ## What's next?
 
-You've just set up your first database in SpacetimeDB! The next step would be to create a client module that interacts with this module. You can use any of SpacetimDB's supported client languages to do this. Take a look at the quick start guide for your client language of choice: [Rust](/docs/languages/rust/rust-sdk-quickstart-guide), [C#](/docs/languages/csharp/csharp-sdk-quickstart-guide), or [TypeScript](/docs/languages/typescript/typescript-sdk-quickstart-guide).
+You've just set up your first database in SpacetimeDB! The next step would be to create a client module that interacts with this module. You can use any of SpacetimDB's supported client languages to do this. Take a look at the quick start guide for your client language of choice: [Rust](/docs/sdks/rust/quickstart), [C#](/docs/sdks/c-sharp/quickstart), or [TypeScript](/docs/sdks/typescript/quickstart).
 
-If you are planning to use SpacetimeDB with the Unity game engine, you can skip right to the [Unity Comprehensive Tutorial](/docs/unity/part-1) or check out our example game, [BitcraftMini](/docs/unity/part-3).
+If you are planning to use SpacetimeDB with the Unity game engine, you can skip right to the [Unity Comprehensive Tutorial](/docs/unity/part-1) or check out our example game, [BitcraftMini](/docs/unity/part-5).
