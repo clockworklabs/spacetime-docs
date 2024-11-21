@@ -40,7 +40,7 @@ Speed and latency achieved by holding all of your application state in memory, w
 
 SpacetimeDB can generate client code in a [variety of languages](#client-side-sdks). This code is like a library custom-designed to interface with your application. It provides easy-to-use interfaces for logging in and submitting requests to the server. It can also **automatically mirror state** from your module's database.
 
-You write SQL requests specifying what information a client is interested in -- for instance, the terrain and items near a player's avatar. SpacetimeDB's built-in ORM will generate types in your client language for every table in the database, and feed your client live updates whenever the database state changes. Don't worry about security, this is a **read-only** mirror -- the only way to change the database is to submit requests, which are validated on the server.
+You write SQL requests specifying what information a client is interested in -- for instance, the terrain and items near a player's avatar. SpacetimeDB's built-in ORM will generate types in your client language for the relevant tables, and feed your client live updates whenever the database state changes. Don't worry about security, this is a **read-only** mirror -- the only way to change the database is to submit requests, which are validated on the server.
 
 ## Language Support
 
@@ -70,13 +70,71 @@ SpacetimeDB was designed first and foremost as the backend for multiplayer Unity
 
 ## Key architectural concepts
 
-TODO: this wants to be its own
+### Host
+A SpacetimeDB **host** is a combination of a database and server that runs [modules](#module). You can run your own SpacetimeDB host, or use a public host.
+Public hosts typically charge [energy](#energy) to run modules with a large amount of data or clients. However, the SpacetimeDB testnet is free.
+
+### Module
+A SpacetimeDB **module** is an application that runs on a [host](#host).
+
+A module exports [tables](#table), which store data, and [reducers](#reducer), which allow [clients](#client) to make requests.
+
+Technically, a SpacetimeDB module is a [WebAssembly module](https://developer.mozilla.org/en-US/docs/WebAssembly) that imports a specific low-level [WebAssembly API](/webassembly-api) and exports a small number of special functions. However, the SpacetimeDB [server-side libraries](#server-side-libraries) hide these low-level details. As a developer, writing a module is mostly like writing any other C# or Rust application, except for the fact that a [special CLI tool](/install) is used to build and deploy the application.
+
+### Table
+A SpacetimeDB **table** is a database table. Tables are declared in a module's native language. For instance, in Rust, a table is declared like so:
+
+```rust
+#[spacetimedb::table(name = person, public)]
+pub struct Player {
+   id: u64,
+   name: String,
+   age: u32,
+   user: Identity,
+}
+```
+
+The contents of a table can be read by [reducers](#reducer).
+Tables marked `public` can also be read by [clients](#client).
+
+### Reducer
+A **reducer** is a function exported by a [module](#module).
+Connected [clients](#client-side-sdks) can call reducers to interact with the module.
+This is a form of [remote procedure call](https://en.wikipedia.org/wiki/Remote_procedure_call).
+Reducers can be invoked across languages. For example, a Rust [module](#module) can export a reducer like so:
+
+```rust
+#[spacetimedb::reducer]
+pub fn set_player_name(ctx: &spacetimedb::ReducerContext, id: u64, name: String) -> Result<(), String> {
+   // ...
+}
+```
+
+And a C# [client](#client) can call that reducer:
+
+```cs
+void Main() {
+   // ...setup code, then...
+   Reducer.SetPlayerName(57, "Marceline");
+}
+```
+
+These look mostly like regular function calls, but under the hood, they are cross-language RPC calls.
+
+The `ReducerContext` passed into a reducer includes information about the caller's [identity](#identity) and [address](#address).
+It also allows accessing the database and scheduling future operations.
+
+### Client
+A **client** is an application that connects to a [module](#module). Clients are written using the [client-side SDKs](#client-side-sdks).
+
+A client logs in using an [identity](#identity) and receives an [address](#address) to identify the connection.
 
 ### Identity
+<!-- TODO: The following will need to be updated when we implement Tyler's Identity and Auth proposals. -->
 
 A SpacetimeDB `Identity` allows someone to log in to a SpacetimeDB module.
 
-You can configure how your module issues Identities and which Identities it trusts. A user's `Identity` is attached to every request they make, and you can use this to decide what they are allowed to do.
+You can configure how your module issues Identities and which Identities it trusts. A user's `Identity` is attached to every [reducer call](#reducer), and you can use this to decide what they are allowed to do.
 
 Currently, SpacetimeDB supports only a limited selection of `Identity` providers. Our long-term goal is to provide integration with most third-party [OpenID Connect](https://openid.net/developers/how-connect-works/) providers.
 
@@ -84,10 +142,14 @@ Currently, SpacetimeDB supports only a limited selection of `Identity` providers
 
 An `Address` identifies both client connections and SpacetimeDB modules.
 
-A user has a single `Identity`, but may open multiple connections to your module. Each of these will receive a unique `Address`.
+A user has a single [`Identity`](#identity), but may open multiple connections to your module. Each of these will receive a unique `Address`.
 
-Your module itself also has an `Address`. If your module lives on a shared SpacetimeDB host, like [https://testnet.spacetimedb.com](https://testnet.spacetimedb.com), this `Address` is used to distinguish it from other modules. Your client application will need to provide this `Address` when connecting to the host.
+Your module itself also has an `Address`. If your module lives on a shared SpacetimeDB [host](#host), like https://testnet.spacetimedb.com, this `Address` is used to distinguish it from other modules. Your client application will need to provide this `Address` when connecting to the host.
 
+### Energy
+**Energy** is the currency used to pay for data storage and compute operations in a SpacetimeDB host.
+
+Currently, energy tracking is relatively limited.
 
 ## FAQ
 
