@@ -14,13 +14,11 @@ To get started running your own standalone instance of SpacetimeDB check out our
 
 ## What is SpacetimeDB?
 
-You can think of SpacetimeDB as a database that is also a server.
+SpacetimeDB is a database that is also a server.
 
-It is a relational database system that lets you upload your application logic directly into the database by way of very fancy stored procedures called "modules".
+SpacetimeDB is a full-featured relational database system that lets you run your application logic **inside** the database. You no longer need to deploy a separate web or game server. [Several programming languages](#server-side-libraries) are supported, including C# and Rust. You can still write authorization logic, just like you would in a traditional server.
 
-Instead of deploying a web or game server that sits in between your clients and your database, your clients connect directly to the database and execute your application logic inside the database itself. You can write all of your permission and authorization logic right inside your module just as you would in a normal server.
-
-This means that you can write your entire application in a single language, Rust, and deploy it as a single binary. No more microservices, no more containers, no more Kubernetes, no more Docker, no more VMs, no more DevOps, no more infrastructure, no more ops, no more servers.
+This means that you can write your entire application in a single language and deploy it as a single binary. No more microservices, no more containers, no more Kubernetes, no more Docker, no more VMs, no more DevOps, no more infrastructure, no more ops, no more servers. An application deployed this way is called a **module**.
 
 <figure>
     <img src="/images/basic-architecture-diagram.png" alt="SpacetimeDB Architecture" style="width:100%">
@@ -30,48 +28,30 @@ This means that you can write your entire application in a single language, Rust
     </figcaption>
 </figure>
 
-It's actually similar to the idea of smart contracts, except that SpacetimeDB is a database, has nothing to do with blockchain, and it's a lot faster than any smart contract system.
+(This is similar to ["smart contracts"](https://en.wikipedia.org/wiki/Smart_contract), except that SpacetimeDB is a **database** and has nothing to do with blockchain. Because it isn't a blockchain, it can be dramatically faster than many "smart contract" systems.
 
-So fast, in fact, that the entire backend our MMORPG [BitCraft Online](https://bitcraftonline.com) is just a SpacetimeDB module. We don't have any other servers or services running, which means that everything in the game, all of the chat messages, items, resources, terrain, and even the locations of the players are stored and processed by the database before being synchronized out to all of the clients in real-time.
+In fact, it's so fast that we've been able to write the entire backend of our MMORPG [BitCraft Online](https://bitcraftonline.com) as a Spacetime module. We don't have any other servers or services running. Everything in the game -- chat messages, items, resources, terrain, and player locations -- is stored and processed by the database. SpacetimeDB [automatically mirrors](#state-mirroring) relevant state to connected players in real-time.)
 
-SpacetimeDB is optimized for maximum speed and minimum latency rather than batch processing or OLAP workloads. It is designed to be used for real-time applications like games, chat, and collaboration tools.
+SpacetimeDB is optimized for maximum speed and minimum latency, rather than batch processing or analytical workloads. It is designed for real-time applications like games, chat, and collaboration tools.
 
-This speed and latency is achieved by holding all of application state in memory, while persisting the data in a write-ahead-log (WAL) which is used to recover application state.
+Speed and latency achieved by holding all of your application state in memory, while persisting data to a [write-ahead-log](https://en.wikipedia.org/wiki/Write-ahead_logging) which is used to recover data after system crashes.
 
-## State Synchronization
+## State Mirroring
 
-SpacetimeDB syncs client and server state for you so that you can just write your application as though you're accessing the database locally. No more messing with sockets for a week before actually writing your game.
+SpacetimeDB can generate client code in a [variety of languages](#client-side-sdks). This code is like a library custom-designed to interface with your application. It provides easy-to-use interfaces for logging in and submitting requests to the server. It can also **automatically mirror state** from your module's database.
 
-## Identities
-
-A SpacetimeDB `Identity` is a unique identifier that is used to authenticate and authorize access to the database. Importantly, while it represents who someone is, does NOT represent what they can do. Your application's logic will determine what a given identity is able to do by allowing or disallowing a transaction based on the caller's `Identity` along with any module-defined data and logic.
-
-SpacetimeDB associates each user with a 256-bit (32-byte) integer `Identity`. These identities are usually formatted as 64-digit hexadecimal strings. Identities are public information, and applications can use them to identify users. Identities are a global resource, so a user can use the same identity with multiple applications, so long as they're hosted by the same SpacetimeDB instance.
-
-Each identity has a corresponding authentication token. The authentication token is private, and should never be shared with anyone. Specifically, authentication tokens are [JSON Web Tokens](https://datatracker.ietf.org/doc/html/rfc7519) signed by a secret unique to the SpacetimeDB instance.
-
-Additionally, each database has an owner `Identity`. Many database maintenance operations, like publishing a new version or evaluating arbitrary SQL queries, are restricted to only authenticated connections by the owner.
-
-SpacetimeDB provides tools in the CLI and the [client SDKs](/docs/sdks) for managing credentials.
-
-## Addresses
-
-A SpacetimeDB `Address` is an opaque identifier for a database or a client connection. An `Address` is a 128-bit integer, usually formatted as a 32-character (16-byte) hexadecimal string.
-
-Each SpacetimeDB database has an `Address`, generated by the SpacetimeDB host, which can be used to connect to the database or to request information about it. Databases may also have human-readable names, which are mapped to addresses internally.
-
-Each client connection has an `Address`. These addresses are opaque, and do not correspond to any metadata about the client. They are notably not IP addresses or device identifiers. A client connection can be uniquely identified by its `(Identity, Address)` pair, but client addresses may not be globally unique; it is possible for multiple connections with the same `Address` but different identities to co-exist. SpacetimeDB modules should treat `Identity` as differentiating users, and `Address` as differentiating connections by the same user.
+You write SQL requests specifying what information a client is interested in -- for instance, the terrain and items near a player's avatar. SpacetimeDB's built-in ORM will generate types in your client language for every table in the database, and feed your client live updates whenever the database state changes. Don't worry about security, this is a **read-only** mirror -- the only way to change the database is to submit requests, which are validated on the server.
 
 ## Language Support
 
 ### Server-side Libraries
 
-Currently, Rust is the best-supported language for writing SpacetimeDB modules. Support for lots of other languages is in the works!
+Currently, Rust is the best-supported language for writing SpacetimeDB modules. C# is also well-supported.
 
 - [Rust](/docs/modules/rust) - [(Quickstart)](/docs/modules/rust/quickstart)
 - [C#](/docs/modules/c-sharp) - [(Quickstart)](/docs/modules/c-sharp/quickstart)
-- Python (Coming soon)
-- Typescript (Coming soon)
+- Python (Planned)
+- Typescript (Planned)
 - C++ (Planned)
 - Lua (Planned)
 
@@ -88,13 +68,34 @@ Currently, Rust is the best-supported language for writing SpacetimeDB modules. 
 
 SpacetimeDB was designed first and foremost as the backend for multiplayer Unity games. To learn more about using SpacetimeDB with Unity, jump on over to the [SpacetimeDB Unity Tutorial](/docs/unity/part-1).
 
+## Key architectural concepts
+
+TODO: this wants to be its own
+
+### Identity
+
+A SpacetimeDB `Identity` allows someone to log in to a SpacetimeDB module.
+
+You can configure how your module issues Identities and which Identities it trusts. A user's `Identity` is attached to every request they make, and you can use this to decide what they are allowed to do.
+
+Currently, SpacetimeDB supports only a limited selection of `Identity` providers. Our long-term goal is to provide integration with most third-party [OpenID Connect](https://openid.net/developers/how-connect-works/) providers.
+
+### Address
+
+An `Address` identifies both client connections and SpacetimeDB modules.
+
+A user has a single `Identity`, but may open multiple connections to your module. Each of these will receive a unique `Address`.
+
+Your module itself also has an `Address`. If your module lives on a shared SpacetimeDB host, like [https://testnet.spacetimedb.com](https://testnet.spacetimedb.com), this `Address` is used to distinguish it from other modules. Your client application will need to provide this `Address` when connecting to the host.
+
+
 ## FAQ
 
 1. What is SpacetimeDB?
-   It's a whole cloud platform within a database that's fast enough to run real-time games.
+   It's a cloud platform within a database that's fast enough to run real-time games.
 
 1. How do I use SpacetimeDB?
-   Install the `spacetime` command line tool, choose your favorite language, import the SpacetimeDB library, write your application, compile it to WebAssembly, and upload it to the SpacetimeDB cloud platform. Once it's uploaded you can call functions directly on your application and subscribe to changes in application state.
+   Install the `spacetime` command line tool, choose your favorite language, import the SpacetimeDB library, write your module, compile it to WebAssembly, and upload it to the SpacetimeDB cloud platform. Once it's uploaded you can call functions directly on your application and subscribe to changes in application state.
 
 1. How do I get/install SpacetimeDB?
    Just install our command line tool and then upload your application to the cloud.
@@ -102,20 +103,5 @@ SpacetimeDB was designed first and foremost as the backend for multiplayer Unity
 1. How do I create a new database with SpacetimeDB?
    Follow our [Quick Start](/docs/getting-started) guide!
 
-TL;DR in an empty directory:
-
-```bash
-spacetime init --lang=rust
-spacetime publish
-```
-
 5. How do I create a Unity game with SpacetimeDB?
    Follow our [Unity Project](/docs/unity-tutorial) guide!
-
-TL;DR in an empty directory:
-
-```bash
-spacetime init --lang=rust
-spacetime publish
-spacetime generate --out-dir <path-to-unity-project> --lang=csharp
-```
