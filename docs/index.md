@@ -34,13 +34,13 @@ In fact, it's so fast that we've been able to write the entire backend of our MM
 
 SpacetimeDB is optimized for maximum speed and minimum latency, rather than batch processing or analytical workloads. It is designed for real-time applications like games, chat, and collaboration tools.
 
-Speed and latency achieved by holding all of your application state in memory, while persisting data to a [write-ahead-log](https://en.wikipedia.org/wiki/Write-ahead_logging) which is used to recover data after system crashes.
+Speed and latency is achieved by holding all of your application state in memory, while persisting data to a [write-ahead-log](https://en.wikipedia.org/wiki/Write-ahead_logging) which is used to recover data after system crashes.
 
 ## State Mirroring
 
-SpacetimeDB can generate client code in a [variety of languages](#client-side-sdks). This code is like a library custom-designed to interface with your application. It provides easy-to-use interfaces for logging in and submitting requests to the server. It can also **automatically mirror state** from your module's database.
+SpacetimeDB can generate client code in a [variety of languages](#client-side-sdks). This creates a client library custom-designed to talk to your module. It provides easy-to-use interfaces for logging in and submitting requests. It can also **automatically mirror state** from your module's database.
 
-You write SQL requests specifying what information a client is interested in -- for instance, the terrain and items near a player's avatar. SpacetimeDB's built-in ORM will generate types in your client language for the relevant tables, and feed your client live updates whenever the database state changes. Don't worry about security, this is a **read-only** mirror -- the only way to change the database is to submit requests, which are validated on the server.
+You write SQL queries specifying what information a client is interested in -- for instance, the terrain and items near a player's avatar. SpacetimeDB's built-in ORM will generate types in your client language for the relevant tables, and feed your client live updates whenever the database state changes. Don't worry about security, this is a **read-only** mirror -- the only way to change the database is to submit requests, which are validated on the server.
 
 ## Language Support
 
