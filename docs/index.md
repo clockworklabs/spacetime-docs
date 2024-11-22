@@ -30,11 +30,11 @@ This means that you can write your entire application in a single language and d
 
 (This is similar to ["smart contracts"](https://en.wikipedia.org/wiki/Smart_contract), except that SpacetimeDB is a **database** and has nothing to do with blockchain. Because it isn't a blockchain, it can be dramatically faster than many "smart contract" systems.
 
-In fact, it's so fast that we've been able to write the entire backend of our MMORPG [BitCraft Online](https://bitcraftonline.com) as a Spacetime module. We don't have any other servers or services running. Everything in the game -- chat messages, items, resources, terrain, and player locations -- is stored and processed by the database. SpacetimeDB [automatically mirrors](#state-mirroring) relevant state to connected players in real-time.)
+In fact, it's so fast that we've been able to write the entire backend of our MMORPG [BitCraft Online](https://bitcraftonline.com) as a Spacetime module. Everything in the game -- chat messages, items, resources, terrain, and player locations -- is stored and processed by the database. SpacetimeDB [automatically mirrors](#state-mirroring) relevant state to connected players in real-time.)
 
 SpacetimeDB is optimized for maximum speed and minimum latency, rather than batch processing or analytical workloads. It is designed for real-time applications like games, chat, and collaboration tools.
 
-Speed and latency is achieved by holding all of your application state in memory, while persisting data to a [write-ahead-log](https://en.wikipedia.org/wiki/Write-ahead_logging) which is used to recover data after system crashes.
+Speed and latency is achieved by holding all of your application state in memory, while persisting data to a [commit log](https://en.wikipedia.org/wiki/Write-ahead_logging) which is used to recover data after restarts and system crashes.
 
 ## State Mirroring
 
@@ -50,19 +50,12 @@ Currently, Rust is the best-supported language for writing SpacetimeDB modules. 
 
 - [Rust](/docs/modules/rust) - [(Quickstart)](/docs/modules/rust/quickstart)
 - [C#](/docs/modules/c-sharp) - [(Quickstart)](/docs/modules/c-sharp/quickstart)
-- Python (Planned)
-- Typescript (Planned)
-- C++ (Planned)
-- Lua (Planned)
 
 ### Client-side SDKs
 
 - [Rust](/docs/sdks/rust) - [(Quickstart)](/docs/sdks/rust/quickstart)
 - [C#](/docs/sdks/c-sharp) - [(Quickstart)](/docs/sdks/c-sharp/quickstart)
 - [TypeScript](/docs/sdks/typescript) - [(Quickstart)](/docs/sdks/typescript/quickstart)
-- Python (Planned)
-- C++ (Planned)
-- Lua (Planned)
 
 ### Unity
 
@@ -87,6 +80,7 @@ A SpacetimeDB **table** is a database table. Tables are declared in a module's n
 ```rust
 #[spacetimedb::table(name = person, public)]
 pub struct Player {
+   #[primary_key]
    id: u64,
    name: String,
    age: u32,
@@ -94,7 +88,7 @@ pub struct Player {
 }
 ```
 
-The contents of a table can be read by [reducers](#reducer).
+The contents of a table can be read and updated by [reducers](#reducer).
 Tables marked `public` can also be read by [clients](#client).
 
 ### Reducer
@@ -115,36 +109,37 @@ And a C# [client](#client) can call that reducer:
 ```cs
 void Main() {
    // ...setup code, then...
-   Reducer.SetPlayerName(57, "Marceline");
+   Connection.Reducer.SetPlayerName(57, "Marceline");
 }
 ```
 
-These look mostly like regular function calls, but under the hood, they are cross-language RPC calls.
+These look mostly like regular function calls, but under the hood, the client sends a request over the internet, which the module processes and responds to.
 
 The `ReducerContext` passed into a reducer includes information about the caller's [identity](#identity) and [address](#address).
 It also allows accessing the database and scheduling future operations.
 
 ### Client
-A **client** is an application that connects to a [module](#module). Clients are written using the [client-side SDKs](#client-side-sdks).
+A **client** is an application that connects to a [module](#module). A client logs in using an [identity](#identity) and receives an [address](#address) to identify the connection. After that, it can call [reducers](#reducer) and query public [tables](#table).
 
-A client logs in using an [identity](#identity) and receives an [address](#address) to identify the connection.
+Clients are written using the [client-side SDKs](#client-side-sdks). These are regular software libraries. Unlike the [server-side libraries](#server-side-libraries), they don't require the use of any special build tools.
 
 ### Identity
-<!-- TODO: The following will need to be updated when we implement Tyler's Identity and Auth proposals. -->
 
-A SpacetimeDB `Identity` allows someone to log in to a SpacetimeDB module.
+A SpacetimeDB `Identity` allows someone to log in to a module.
 
-You can configure how your module issues Identities and which Identities it trusts. A user's `Identity` is attached to every [reducer call](#reducer), and you can use this to decide what they are allowed to do.
+Users receive an `Identity` by logging in through an [OpenID Connect](https://openid.net/developers/how-connect-works/) provider, such as Google or Facebook. Your module can choose which providers it trusts.
 
-Currently, SpacetimeDB supports only a limited selection of `Identity` providers. Our long-term goal is to provide integration with most third-party [OpenID Connect](https://openid.net/developers/how-connect-works/) providers.
+A user's `Identity` is attached to every [reducer call](#reducer) they make, and you can use this to decide what they are allowed to do.
+
+Modules themselves also have Identities.  If your module lives on a shared SpacetimeDB [host](#host), like https://testnet.spacetimedb.com, it will automatically be issued an `Identity` to distinguish it from other modules. Your client application will need to provide this `Identity` when connecting to the host.
 
 ### Address
 
-An `Address` identifies both client connections and SpacetimeDB modules.
+<!-- TODO: Rewrite this section after reworking `Address`es into `ConnectionID`s. -->
+
+An `Address` identifies client connections to a SpacetimeDB module.
 
 A user has a single [`Identity`](#identity), but may open multiple connections to your module. Each of these will receive a unique `Address`.
-
-Your module itself also has an `Address`. If your module lives on a shared SpacetimeDB [host](#host), like https://testnet.spacetimedb.com, this `Address` is used to distinguish it from other modules. Your client application will need to provide this `Address` when connecting to the host.
 
 ### Energy
 **Energy** is the currency used to pay for data storage and compute operations in a SpacetimeDB host.
