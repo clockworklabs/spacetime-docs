@@ -1,22 +1,86 @@
+<!-- Remark: this document should be mirrored to the rustdoc documentation for the library. -->
+
 # SpacetimeDB Rust Modules
 
-Rust clients of SpacetimeDB use the [Rust SpacetimeDB module library][module library] to write modules which interact with the SpacetimeDB database.
+SpacetimeDB allows using the Rust language to write server-side applications. These applications are called **modules** and have access to a built-in database.
 
-First, the `spacetimedb` library provides a number of macros for creating tables and Rust `struct`s corresponding to rows in those tables.
+Rust modules are written with the [Rust module library][module library]. They are built using [cargo](https://doc.rust-lang.org/cargo/), like any other Rust application, and deployed using the [`spacetime` CLI tool](/install). Rust modules can import any Rust [crate](https://crates.io/) that supports being compiled to WebAssembly.
 
-Then the client API allows interacting with the database inside special functions called reducers.
+This reference assumes you are familiar with the basics of Rust. If you aren't, check out Rust's [excellent documentation](https://www.rust-lang.org/learn).
 
-This guide assumes you are familiar with some basics of Rust. At the very least, you should be familiar with the idea of using attribute macros. An extremely common example is `derive` macros.
+## Overview
 
-Derive macros look at the type they are attached to and generate some related code. In this example, `#[derive(Debug)]` generates the formatting code needed to print out a `Location` for debugging purposes.
+SpacetimeDB modules have two ways to interact with the outside world. They can:
+
+- Declare [tables](#tables), which are exactly like tables in a SQL database.
+- Declare [reducers](#reducers), which are public functions that can be invoked by [clients](../../#client).
+
+These declarations are written using ordinary Rust code, annotated with special macros. Declarations can use any type deriving the [`SpacetimeType`](#spacetimetype) trait.
+
+Under the hood, SpacetimeDB modules import a [specific WebAssembly ABI](../../webassembly-abi/) and export a small number of special functions. This is automatically handled by the `table` and `reducer` macros. 
+
+Reducers have access to a special [`ReducerContext`](#reducercontext) argument. This argument allows reading and writing the database attached to a module. It also provides some additional functionality, like generating random numbers and scheduling future operations.
+
+The module library has built-in support for the [log crate](https://docs.rs/log/latest/log/index.html). All modules automatically install a suitable logger when they are first loaded by SpacetimeDB. Log macros can be used anywhere in module code, and the module's log output can be inspected using the `spacetime logs` command.
+
+## Tables
+
+Tables are declared using the [`#[table]` macro](https://docs.rs/spacetimedb/latest/spacetimedb/attr.table.html).
+
+
+## Reducers
+
+Reducers are declared using the [`#[reducer]` macro](https://docs.rs/spacetimedb/latest/spacetimedb/attr.reducer.html).
+
+### Life cycle annotations
+
+## `SpacetimeType`
+
+Any Rust type implementing the [`SpacetimeType` trait](https://docs.rs/spacetimedb/latest/spacetimedb/trait.SpacetimeType.html) can be used in table and reducer declarations. A derive macro is provided, and can be used on both structs and enums:
 
 ```rust
-#[derive(Debug)]
+use spacetimedb::SpacetimeType;
+
+#[derive(SpacetimeType)]
 struct Location {
     x: u32,
-    y: u32,
+    y: u32
+}
+
+#[derive(SpacetimeType)]
+enum FruitCrate {
+    Bananas { count: u32, freshness: u32 },
+    Plastic { count: u32 }
 }
 ```
+
+The fields of the struct/enum must also implement `SpacetimeType`.
+
+SpacetimeType is implemented for many of the primitive types in the standard library:
+
+- `bool`
+- `u8`, `u16`, `u32`, `u64`, `u128`
+- `i8`, `i16`, `i32`, `i64`, `i128`
+- `f32`, `f64`
+
+And common data structures:
+
+- `String` and `&str`, utf-8 string data
+- `()`, the unit type
+- `Option<T> where T: SpacetimeType`
+- `Vec<T> where T: SpacetimeType`
+
+(Storing collections in database tables is a form of [denormalization](https://en.wikipedia.org/wiki/Denormalization).)
+
+All `#[table(..)]` types automatically derive `SpacetimeType`.
+
+Types deriving `SpacetimeType` also automatically derive the [`Serialize`](https://docs.rs/spacetimedb/latest/spacetimedb/trait.Serialize.html) and [`Deserialize`](https://docs.rs/spacetimedb/latest/spacetimedb/trait.Deserialize.html) traits, as well as the [`std::Debug`](https://doc.rust-lang.org/std/fmt/trait.Debug.html) trait. (There are currently no trait bounds on `SpacetimeType` documenting this fact.)
+
+The `Serialize` and `Deserialize` traits are used to convert Rust data structures to other formats, suitable for storing on disk or passing over the network. `SpacetimeType` 
+
+## `ReducerContext`
+
+The `ReducerContext` 
 
 ## SpacetimeDB Macro basics
 
@@ -92,8 +156,6 @@ The `#[table(name = table_name)]` macro is applied to a Rust struct with named f
 By default, tables are considered **private**. This means that they are only readable by the table owner, and by server module code.
 The `#[table(name = table_name, public)]` macro makes a table public. **Public** tables are readable by all users, but can still only be modified by your server module code.
 
-_Coming soon: We plan to add much more robust access controls than just public or private. Stay tuned!_
-
 ```rust
 #[table(name = my_table, public)]
 struct MyTable {
@@ -103,24 +165,6 @@ struct MyTable {
 ```
 
 This attribute is applied to Rust structs in order to create corresponding tables in SpacetimeDB. Fields of the Rust struct correspond to columns of the database table.
-
-The fields of the struct have to be types that SpacetimeDB knows how to encode into the database. This is captured in Rust by the `SpacetimeType` trait.
-
-This is automatically defined for built in numeric types:
-
-- `bool`
-- `u8`, `u16`, `u32`, `u64`, `u128`
-- `i8`, `i16`, `i32`, `i64`, `i128`
-- `f32`, `f64`
-
-And common data structures:
-
-- `String` and `&str`, utf-8 string data
-- `()`, the unit type
-- `Option<T> where T: SpacetimeType`
-- `Vec<T> where T: SpacetimeType`
-
-All `#[table(..)]` types are `SpacetimeType`s, and accordingly, all of their fields have to be.
 
 ```rust
 #[table(name = another_table, public)]
