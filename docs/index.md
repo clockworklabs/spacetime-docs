@@ -77,8 +77,20 @@ Technically, a SpacetimeDB module is a [WebAssembly module](https://developer.mo
 ### Table
 A SpacetimeDB **table** is a database table. Tables are declared in a module's native language. For instance, in Rust, a table is declared like so:
 
+```csharp
+[SpacetimeDB.Table(Name = "players", Public = true)]
+public partial struct Player
+{
+    [SpacetimeDB.PrimaryKey]
+    uint playerId;
+    string name;
+    uint age;
+    Identity user;
+}
+```
+<!-- TODO: switchable language widget.
 ```rust
-#[spacetimedb::table(name = person, public)]
+#[spacetimedb::table(name = players, public)]
 pub struct Player {
    #[primary_key]
    id: u64,
@@ -87,6 +99,7 @@ pub struct Player {
    user: Identity,
 }
 ```
+-->
 
 The contents of a table can be read and updated by [reducers](#reducer).
 Tables marked `public` can also be read by [clients](#client).
@@ -97,12 +110,21 @@ Connected [clients](#client-side-sdks) can call reducers to interact with the mo
 This is a form of [remote procedure call](https://en.wikipedia.org/wiki/Remote_procedure_call).
 Reducers can be invoked across languages. For example, a Rust [module](#module) can export a reducer like so:
 
+```csharp
+[SpacetimeDB.Reducer]
+public static void SetPlayerName(ReducerContext ctx, uint playerId, string name)
+{
+    // ...
+}
+```
+<!-- TODO: switchable language widget.
 ```rust
 #[spacetimedb::reducer]
 pub fn set_player_name(ctx: &spacetimedb::ReducerContext, id: u64, name: String) -> Result<(), String> {
    // ...
 }
 ```
+-->
 
 And a C# [client](#client) can call that reducer:
 
