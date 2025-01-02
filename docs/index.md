@@ -28,30 +28,32 @@ This means that you can write your entire application in a single language and d
     </figcaption>
 </figure>
 
-(This is similar to ["smart contracts"](https://en.wikipedia.org/wiki/Smart_contract), except that SpacetimeDB is a **database** and has nothing to do with blockchain. Because it isn't a blockchain, it can be dramatically faster than many "smart contract" systems.
+This is similar to ["smart contracts"](https://en.wikipedia.org/wiki/Smart_contract), except that SpacetimeDB is a **database** and has nothing to do with blockchain. Because it isn't a blockchain, it can be dramatically faster than many "smart contract" systems.
 
-In fact, it's so fast that we've been able to write the entire backend of our MMORPG [BitCraft Online](https://bitcraftonline.com) as a Spacetime module. Everything in the game -- chat messages, items, resources, terrain, and player locations -- is stored and processed by the database. SpacetimeDB [automatically mirrors](#state-mirroring) relevant state to connected players in real-time.)
+In fact, it's so fast that we've been able to write the entire backend of our MMORPG [BitCraft Online](https://bitcraftonline.com) as a Spacetime module. Everything in the game -- chat messages, items, resources, terrain, and player locations -- is stored and processed by the database. SpacetimeDB [automatically mirrors](#state-mirroring) relevant state to connected players in real-time.
 
 SpacetimeDB is optimized for maximum speed and minimum latency, rather than batch processing or analytical workloads. It is designed for real-time applications like games, chat, and collaboration tools.
 
-Speed and latency is achieved by holding all of your application state in memory, while persisting data to a [commit log](https://en.wikipedia.org/wiki/Write-ahead_logging) which is used to recover data after restarts and system crashes.
+Speed and latency is achieved by holding all of your application state in memory, while persisting data to a commit log which is used to recover data after restarts and system crashes.
 
 ## State Mirroring
 
-SpacetimeDB can generate client code in a [variety of languages](#client-side-sdks). This creates a client library custom-designed to talk to your module. It provides easy-to-use interfaces for logging in and submitting requests. It can also **automatically mirror state** from your module's database.
+SpacetimeDB can generate client code in a [variety of languages](#client-side-sdks). This creates a client library custom-designed to talk to your module. It provides easy-to-use interfaces for connecting to a module and submitting requests. It can also **automatically mirror state** from your module's database.
 
-You write SQL queries specifying what information a client is interested in -- for instance, the terrain and items near a player's avatar. SpacetimeDB's built-in ORM will generate types in your client language for the relevant tables, and feed your client live updates whenever the database state changes. Don't worry about security, this is a **read-only** mirror -- the only way to change the database is to submit requests, which are validated on the server.
+You write SQL queries specifying what information a client is interested in -- for instance, the terrain and items near a player's avatar. SpacetimeDB will generate types in your client language for the relevant tables, and feed your client live updates whenever the database state changes. Note that this is a **read-only** mirror -- the only way to change the database is to submit requests, which are validated on the server.
 
 ## Language Support
 
-### Server-side Libraries
+### Module Libraries
 
-Currently, Rust is the best-supported language for writing SpacetimeDB modules. C# is also well-supported.
+SpacetimeDB modules are server-side applications that are deployed using the `spacetime` CLI tool.
 
 - [Rust](/docs/modules/rust) - [(Quickstart)](/docs/modules/rust/quickstart)
 - [C#](/docs/modules/c-sharp) - [(Quickstart)](/docs/modules/c-sharp/quickstart)
 
 ### Client-side SDKs
+
+SpacetimeDB clients are applications that connect to SpacetimeDB modules. The `spacetime` CLI tool supports automatically generating interface code that makes it easy to interact with a particular module.
 
 - [Rust](/docs/sdks/rust) - [(Quickstart)](/docs/sdks/rust/quickstart)
 - [C#](/docs/sdks/c-sharp) - [(Quickstart)](/docs/sdks/c-sharp/quickstart)
@@ -146,13 +148,13 @@ Clients are written using the [client-side SDKs](#client-side-sdks). These are r
 
 ### Identity
 
-A SpacetimeDB `Identity` allows someone to log in to a module.
+A SpacetimeDB `Identity` identifies someone interacting with a module. It is a long lived, public, globally valid identifier that will always refer to the same end user, even across different connections.
 
-Users receive an `Identity` by logging in through an [OpenID Connect](https://openid.net/developers/how-connect-works/) provider, such as Google or Facebook. Your module can choose which providers it trusts.
+If the end user authenticates through an [OpenID Connect](https://openid.net/developers/how-connect-works/) provider, such as Google or Facebook, their `Identity` will be tied to the account they use on that provider.
 
 A user's `Identity` is attached to every [reducer call](#reducer) they make, and you can use this to decide what they are allowed to do.
 
-Modules themselves also have Identities.  If your module lives on a shared SpacetimeDB [host](#host), like https://testnet.spacetimedb.com, it will automatically be issued an `Identity` to distinguish it from other modules. Your client application will need to provide this `Identity` when connecting to the host.
+Modules themselves also have Identities. When you `spacetime publish` a module, it will automatically be issued an `Identity` to distinguish it from other modules. Your client application will need to provide this `Identity` when connecting to the host.
 
 ### Address
 
@@ -165,7 +167,7 @@ A user has a single [`Identity`](#identity), but may open multiple connections t
 ### Energy
 **Energy** is the currency used to pay for data storage and compute operations in a SpacetimeDB host.
 
-Currently, energy tracking is relatively limited.
+<!-- TODO: Rewrite this section after finalizing energy SKUs. -->
 
 ## FAQ
 
