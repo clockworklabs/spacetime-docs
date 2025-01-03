@@ -16,7 +16,7 @@ To get started running your own standalone instance of SpacetimeDB check out our
 
 SpacetimeDB is a database that is also a server.
 
-SpacetimeDB is a full-featured relational database system that lets you run your application logic **inside** the database. You no longer need to deploy a separate web or game server. [Several programming languages](#server-side-libraries) are supported, including C# and Rust. You can still write authorization logic, just like you would in a traditional server.
+SpacetimeDB is a full-featured relational database system that lets you run your application logic **inside** the database. You no longer need to deploy a separate web or game server. [Several programming languages](#module-libraries) are supported, including C# and Rust. You can still write authorization logic, just like you would in a traditional server.
 
 This means that you can write your entire application in a single language and deploy it as a single binary. No more microservices, no more containers, no more Kubernetes, no more Docker, no more VMs, no more DevOps, no more infrastructure, no more ops, no more servers. An application deployed this way is called a **module**.
 
@@ -73,7 +73,7 @@ A SpacetimeDB **module** is an application that runs on a [host](#host).
 
 A module exports [tables](#table), which store data, and [reducers](#reducer), which allow [clients](#client) to make requests.
 
-Technically, a SpacetimeDB module is a [WebAssembly module](https://developer.mozilla.org/en-US/docs/WebAssembly) that imports a specific low-level [WebAssembly API](/webassembly-api) and exports a small number of special functions. However, the SpacetimeDB [server-side libraries](#server-side-libraries) hide these low-level details. As a developer, writing a module is mostly like writing any other C# or Rust application, except for the fact that a [special CLI tool](/install) is used to build and deploy the application.
+Technically, a SpacetimeDB module is a [WebAssembly module](https://developer.mozilla.org/en-US/docs/WebAssembly) that imports a specific low-level [WebAssembly ABI](/docs/webassembly-abi) and exports a small number of special functions. However, the SpacetimeDB [server-side libraries](#module-libraries) hide these low-level details. As a developer, writing a module is mostly like writing any other C# or Rust application, except for the fact that a [special CLI tool](/install) is used to build and deploy the application.
 
 ### Table
 A SpacetimeDB **table** is a database table. Tables are declared in a module's native language. For instance, in Rust, a table is declared like so:
@@ -144,7 +144,9 @@ It also allows accessing the database and scheduling future operations.
 ### Client
 A **client** is an application that connects to a [module](#module). A client logs in using an [identity](#identity) and receives an [address](#address) to identify the connection. After that, it can call [reducers](#reducer) and query public [tables](#table).
 
-Clients are written using the [client-side SDKs](#client-side-sdks). These are regular software libraries. Unlike the [server-side libraries](#server-side-libraries), they don't require the use of any special build tools.
+Clients are written using the [client-side SDKs](#client-side-sdks). The `spacetime` CLI tool allows automatically generating code that works with the client-side SDKs to talk to a particular module.
+
+Clients are regular software applications that module developers can choose how to deploy (through Steam, app stores, package managers, or any other software deployment method, depending on the needs of the application.)
 
 ### Identity
 
