@@ -150,15 +150,17 @@ Clients are written using the [client-side SDKs](#client-side-sdks). These are r
 
 A SpacetimeDB `Identity` identifies someone interacting with a module. It is a long lived, public, globally valid identifier that will always refer to the same end user, even across different connections.
 
-If the end user authenticates through an [OpenID Connect](https://openid.net/developers/how-connect-works/) provider, such as Google or Facebook, their `Identity` will be tied to the account they use on that provider.
-
 A user's `Identity` is attached to every [reducer call](#reducer) they make, and you can use this to decide what they are allowed to do.
 
-Modules themselves also have Identities. When you `spacetime publish` a module, it will automatically be issued an `Identity` to distinguish it from other modules. Your client application will need to provide this `Identity` when connecting to the host.
+Modules themselves also have Identities. When you `spacetime publish` a module, it will automatically be issued an `Identity` to distinguish it from other modules. Your client application will need to provide this `Identity` when connecting to the [host](#host).
+
+Identities are issued using the [OpenID Connect](https://openid.net/developers/how-connect-works/) specification. Typically, module authors are responsible for issuing Identities to their end users. OpenID Connect makes it easy to allow users to authenticate to these accounts through standard services like Google and Facebook. (The idea is that you issue user accounts -- `Identities` -- but it's easy to let users log in to those accounts through Google or Facebook.)
+
+<!-- TODO(1.0): link to a page on setting up your own identity provider and/or using our turnkey solution. -->
 
 ### Address
 
-<!-- TODO: Rewrite this section after reworking `Address`es into `ConnectionID`s. -->
+<!-- TODO(1.0): Rewrite this section after reworking `Address`es into `ConnectionID`s. -->
 
 An `Address` identifies client connections to a SpacetimeDB module.
 
@@ -167,7 +169,7 @@ A user has a single [`Identity`](#identity), but may open multiple connections t
 ### Energy
 **Energy** is the currency used to pay for data storage and compute operations in a SpacetimeDB host.
 
-<!-- TODO: Rewrite this section after finalizing energy SKUs. -->
+<!-- TODO(1.0): Rewrite this section after finalizing energy SKUs. -->
 
 ## FAQ
 
