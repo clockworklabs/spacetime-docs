@@ -66,7 +66,7 @@ SpacetimeDB was designed first and foremost as the backend for multiplayer Unity
 ## Key architectural concepts
 
 ### Host
-A SpacetimeDB **host** is a server that runs [databases](#database). You can run your own host, or use the SpacetimeDB maincloud. Many databases can run on a single host.
+A SpacetimeDB **host** is a server that hosts [databases](#database). You can run your own host, or use the SpacetimeDB maincloud. Many databases can run on a single host.
 
 ### Database
 A SpacetimeDB **database** is an application that runs on a [host](#host).
