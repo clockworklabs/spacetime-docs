@@ -102,6 +102,7 @@ Other key vocabulary:
 - **Identity**: A combination of an issuing OpenID Connect provider and an Identity Token issued by that provider. Globally unique and public.
     - Technically, "Identity" should be called "Identifier", but it is too late to change it.
     - A particular **end user** may have multiple Identities issued by different providers.
+    - Each **database** also has an **Identity**.
 
 ## Reference pages
 
