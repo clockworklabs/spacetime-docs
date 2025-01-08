@@ -111,7 +111,7 @@ Tables marked `public` can also be read by [clients](#client).
 A **reducer** is a function exported by a [database](#database).
 Connected [clients](#client-side-sdks) can call reducers to interact with the database.
 This is a form of [remote procedure call](https://en.wikipedia.org/wiki/Remote_procedure_call).
-A C# [module](#module) can export a reducer like so:
+A reducer can be written in C# like so:
 
 ```csharp
 [SpacetimeDB.Reducer]
