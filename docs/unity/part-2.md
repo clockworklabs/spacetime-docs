@@ -10,33 +10,33 @@ If you have not already installed the `spacetime` CLI, check out our [Getting St
 
 In your `blackholio` directory, run the following command to initialize the SpacetimeDB server module project with Rust as the language:
 
-:::rust
+:::server-rust
 Run the following command to initialize the SpacetimeDB server module project with Rust as the language:
 
 ```bash
 spacetime init --lang=rust server-rust
 ```
 
-This command creates a new folder named `server-rust` alongside your Unity project `client` directory and sets up the SpacetimeDB server project with Rust as the programming language.
+This command creates a new folder named `server-rust` alongside your Unity project `client-unity` directory and sets up the SpacetimeDB server project with Rust as the programming language.
 :::
-:::csharp
+:::server-csharp
 Run the following command to initialize the SpacetimeDB server module project with C# as the language:
 
 ```bash
 spacetime init --lang=csharp server-csharp
 ```
 
-This command creates a new folder named `server-csharp` alongside your Unity project `client` directory and sets up the SpacetimeDB server project with C# as the programming language.
+This command creates a new folder named `server-csharp` alongside your Unity project `client-unity` directory and sets up the SpacetimeDB server project with C# as the programming language.
 :::
 
 ### SpacetimeDB Tables
 
-:::rust
+:::server-rust
 In this section we'll be making some edits to the file `server-rust/src/lib.rs`. We recommend you open up this file in an IDE like VSCode or RustRover.
 
 **Important: Open the `server-rust/src/lib.rs` file and delete its contents. We will be writing it from scratch here.**
 :::
-:::csharp
+:::server-csharp
 In this section we'll be making some edits to the file `server-csharp/Lib.cs`. We recommend you open up this file in an IDE like VSCode or Rider.
 
 **Important: Open the `server-csharp/Lib.cs` file and delete its contents. We will be writing it from scratch here.**
@@ -44,7 +44,7 @@ In this section we'll be making some edits to the file `server-csharp/Lib.cs`. W
 
 First we need to add some imports at the top of the file. Some will remain unused for now.
 
-:::rust
+:::server-rust
 **Copy and paste into lib.rs:**
 
 ```rust
@@ -52,7 +52,7 @@ use std::time::Duration;
 use spacetimedb::{rand::Rng, Identity, SpacetimeType, ReducerContext, ScheduleAt, Table, Timestamp};
 ```
 :::
-:::csharp
+:::server-csharp
 **Copy and paste into Lib.cs:**
 
 ```csharp
@@ -67,7 +67,7 @@ public static partial class Module
 
 We are going to start by defining a SpacetimeDB *table*. A *table* in SpacetimeDB is a relational database table which stores rows, similar to something you might find in SQL. SpacetimeDB tables differ from normal relational database tables in that they are stored fully in memory, are blazing fast to access, and are defined in your module code, rather than in SQL.
 
-:::rust
+:::server-rust
 Each row in a SpacetimeDB table is associated with a `struct` type in Rust.
 
 Let's start by defining the `Config` table. This is a simple table which will store some metadata about our game's state. Add the following code to `lib.rs`.
@@ -85,7 +85,7 @@ pub struct Config {
 
 Let's break down this code. This defines a normal Rust `struct` with two fields: `id` and `world_size`. We have decorated the struct with the `spacetimedb::table` macro. This procedural Rust macro signals to SpacetimeDB that it should create a new SpacetimeDB table with the row type defined by the `Config` type's fields.
 :::
-:::csharp
+:::server-csharp
 Each row in a SpacetimeDB table is associated with a `struct` type in C#.
 
 Let's start by defining the `Config` table. This is a simple table which will store some metadata about our game's state. Add the following code inside the `Module` class in `Lib.cs`.
@@ -107,12 +107,12 @@ Let's break down this code. This defines a normal C# `struct` with two fields: `
 
 > NOTE: It is possible to have two different tables with different table names share the same type.
 
-:::rust
+:::server-rust
 The `spacetimedb::table` macro takes two parameters, a `name` which is the name of the table and what you will use to query the table in SQL, and a `public` visibility modifier which ensures that the rows of this table are visible to everyone.
 
 The `#[primary_key]` attribute, specifies that the `id` field should be used as the primary key of the table.
 :::
-:::csharp
+:::server-csharp
 The `Table` attribute with takes two parameters, a `Name` which is the name of the table and what you will use to query the table in SQL, and a `Public` visibility modifier which ensures that the rows of this table are visible to everyone.
 
 The `[PrimaryKey]` attribute, specifies that the `id` field should be used as the primary key of the table.
@@ -120,16 +120,16 @@ The `[PrimaryKey]` attribute, specifies that the `id` field should be used as th
 
 > NOTE: The primary key of a row defines the "identity" of the row. A change to a row which doesn't modify the primary key is considered an update, but if you change the primary key, then you have deleted the old row and inserted a new one.
 
-:::rust
+:::server-rust
 You can learn more the `table` macro in our [Rust module reference](/docs/modules/rust).
 :::
-:::csharp
+:::server-csharp
 You can learn more the `Table` attribute in our [C# module reference](/docs/modules/c-sharp).
 :::
 
 ### Creating Entities
 
-:::rust
+:::server-rust
 Next, we're going to define a new `SpacetimeType` called `DbVector2` which we're going to use to store positions. The difference between a `#[derive(SpacetimeType)]` and a `#[spacetimedb(table)]` is that tables actually store data, whereas the deriving `SpacetimeType` just allows you to create a new column of that type in a SpacetimeDB table. Therefore, `DbVector2` is only a type, and does not define a table.
 
 **Append to the bottom of lib.rs:**
@@ -176,7 +176,7 @@ pub struct Food {
 }
 ```
 :::
-:::csharp
+:::server-csharp
 Next, we're going to define a new `SpacetimeType` called `DbVector2` which we're going to use to store positions. The difference between a `[SpacetimeDB.Type]` and a `[SpacetimeDB.Table]` is that tables actually store data, whereas the deriving `SpacetimeType` just allows you to create a new column of that type in a SpacetimeDB table. Therefore, `DbVector2` is only a type, and does not define a table.
 
 **Append to the bottom of Lib.cs:**
@@ -243,7 +243,7 @@ The `Circle` table, however, represents an entity that is controlled by a player
 
 Next, let's create a table to store our player data.
 
-:::rust
+:::server-rust
 ```rust
 #[spacetimedb::table(name = player, public)]
 #[derive(Debug, Clone)]
@@ -259,7 +259,7 @@ pub struct Player {
 
 There's a few new concepts we should touch on. First of all, we are using the `#[unique]` attribute on the `player_id` field. This attribute adds a constraint to the table that ensures that only one row in the player table has a particular `player_id`.
 :::
-:::csharp
+:::server-csharp
 ```csharp
 [Table(Name = "player", Public = true)]
 					   
@@ -283,7 +283,7 @@ We also have an `identity` field which uses the `Identity` type. The `Identity` 
 
 Next, we write our very first reducer. A reducer is a module function which can be called by clients. Let's write a simple debug reducer to see how they work.
 
-:::rust
+:::server-rust
 ```rust
 #[spacetimedb::reducer]
 pub fn debug(ctx: &ReducerContext) -> Result<(), String> {
@@ -292,7 +292,7 @@ pub fn debug(ctx: &ReducerContext) -> Result<(), String> {
 }
 ```
 :::
-:::csharp
+:::server-csharp
 ```csharp
 [Reducer]
 public static void Debug(ReducerContext ctx)
@@ -330,10 +330,10 @@ This following log output indicates that SpacetimeDB is successfully running on 
 Starting SpacetimeDB listening on 127.0.0.1:3000
 ```
 
-:::rust
+:::server-rust
 Now that SpacetimeDB is running we can publish our module to the SpacetimeDB host. In a separate terminal window, navigate to the `blackholio/server-rust` directory.
 :::
-:::csharp
+:::server-csharp
 Now that SpacetimeDB is running we can publish our module to the SpacetimeDB host. In a separate terminal window, navigate to the `blackholio/server-csharp` directory.
 :::
 
@@ -350,14 +350,14 @@ Created new database with name: blackholio, identity: c200d2c69b4524292b91822afa
 
 > If you sign into `spacetime login` via GitHub, the token you get will be issued by `auth.spacetimedb.com`. This will also ensure that you can recover your identity in case you lose it. On the other hand, if you do `spacetime login --server-issued-login local`, you will get an identity which is issued directly by your local server. Do note, however, that `--server-issued-login` tokens are not recoverable if lost, and are only recognized by the server that issued them.
 
-:::rust
+:::server-rust
 Next, use the `spacetime` command to call our newly defined `debug` reducer:
 
 ```sh
 spacetime call blackholio debug
 ```
 :::
-:::csharp
+:::server-csharp
 Next, use the `spacetime` command to call our newly defined `Debug` reducer:
 
 ```sh
@@ -385,7 +385,7 @@ You should see something like the following output:
 
 ### Connecting our Client
 
-:::rust
+:::server-rust
 Next let's connect our client to our module. Let's start by modifying our `debug` reducer. Rename the reducer to be called `connect` and add `client_connected` in parentheses after `spacetimedb::reducer`. The end result should look like this:
 
 ```rust
@@ -404,7 +404,7 @@ The `client_connected` argument to the `spacetimedb::reducer` macro indicates to
 > - `client_connected` - Called when a user connects to the SpacetimeDB module. Their identity can be found in the `sender` value of the `ReducerContext`.
 > - `client_disconnected` - Called when a user disconnects from the SpacetimeDB module.
 :::
-:::csharp
+:::server-csharp
 Next let's connect our client to our module. Let's start by modifying our `Debug` reducer. Rename the reducer to be called `Connect` and add `ReducerKind.ClientConnected` in parentheses after `SpacetimeDB.Reducer`. The end result should look like this:
 
 ```csharp
@@ -434,26 +434,26 @@ spacetime publish --server local blackholio
 
 The `spacetime` CLI has built in functionality to let us generate C# types that correspond to our tables, types, and reducers that we can use from our Unity client.
 
-:::rust
+:::server-rust
 Let's generate our types for our module. In the `blackholio/server-rust` directory run the following command:
 :::
-:::csharp
+:::server-csharp
 Let's generate our types for our module. In the `blackholio/server-csharp` directory run the following command:
 :::
 
 ```sh
-spacetime generate --lang csharp --out-dir ../client/Assets/autogen # you can call this anything, I have chosen `autogen`
+spacetime generate --lang csharp --out-dir ../client-unity/Assets/autogen # you can call this anything, I have chosen `autogen`
 ```
 
-This will generate a set of files in the `client/Assets/autogen` directory which contain the code generated types and reducer functions that are defined in your module, but usable on the client.
+This will generate a set of files in the `client-unity/Assets/autogen` directory which contain the code generated types and reducer functions that are defined in your module, but usable on the client.
 
 ```sh
-ls ../client/Assets/autogen/*.cs
-../client/Assets/autogen/Circle.cs	../client/Assets/autogen/DbVector2.cs	../client/Assets/autogen/Food.cs
-../client/Assets/autogen/Config.cs	../client/Assets/autogen/Entity.cs	../client/Assets/autogen/Player.cs
+ls ../client-unity/Assets/autogen/*.cs
+../client-unity/Assets/autogen/Circle.cs	../client-unity/Assets/autogen/DbVector2.cs	../client-unity/Assets/autogen/Food.cs
+../client-unity/Assets/autogen/Config.cs	../client-unity/Assets/autogen/Entity.cs	../client-unity/Assets/autogen/Player.cs
 ```
 
-This will also generate a file in the `client/Assets/autogen/_Globals` directory with a type aware `DbConnection` class. We will use this class to connect to your module from Unity.
+This will also generate a file in the `client-unity/Assets/autogen/_Globals` directory with a type aware `DbConnection` class. We will use this class to connect to your module from Unity.
 
 > IMPORTANT! At this point there will be an error in your Unity project. Due to a [known issue](https://docs.unity3d.com/6000.0/Documentation/Manual/csharp-compiler.html) with Unity and C# 9 you need to insert the following code into your Unity project.
 >

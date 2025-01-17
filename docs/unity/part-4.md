@@ -8,7 +8,7 @@ This progressive tutorial is continued from [part 3](/docs/unity/part-3).
 
 At this point, we're very close to having a working game. All we have to do is modify our server to allow the player to move around, and to simulate the physics and collisions of the game.
 
-:::rust
+:::server-rust
 Let's start by building out a simple math library to help us do collision calculations. Create a new `math.rs` file in the `server-rust/src` directory and add the following contents. Let's also move the `DbVector2` type from `lib.rs` into this file.
 
 ```rust
@@ -165,7 +165,7 @@ pub fn update_player_input(ctx: &ReducerContext, direction: DbVector2) -> Result
 
 This is a simple reducer that takes the movement input from the client and applies them to all circles that that player controls. Note that it is not possible for a player to move another player's circles using this reducer, because the `ctx.sender` value is not set by the client. Instead `ctx.sender` is set by SpacetimeDB after it has authenticated that sender. You can rest assured that the caller has been authenticated as that player by the time this reducer is called.
 :::
-:::csharp
+:::server-csharp
 Let's start by building out a simple math library to help us do collision calculations. Create a new `Math.cs` file in the `csharp-server` directory and add the following contents. Let's also remove the `DbVector2` type from `Lib.cs`.
 
 ```csharp
@@ -215,7 +215,7 @@ This is a simple reducer that takes the movement input from the client and appli
 
 Finally, let's schedule a reducer to run every 50 milliseconds to move the player's circles around based on the most recently set player input.
 
-:::rust
+:::server-rust
 ```rust
 #[spacetimedb::table(name = move_all_players_timer, scheduled(move_all_players))]
 pub struct MoveAllPlayersTimer {
@@ -259,7 +259,7 @@ pub fn move_all_players(ctx: &ReducerContext, _timer: MoveAllPlayersTimer) -> Re
 }
 ```
 :::
-:::csharp
+:::server-csharp
 ```csharp
 [Table(Name = "move_all_players_timer", Scheduled = nameof(MoveAllPlayers), ScheduledAt = "scheduled_at")]
 public partial struct MoveAllPlayersTimer
@@ -299,7 +299,7 @@ This reducer is very similar to a standard game "tick" or "frame" that you might
 
 In this reducer, we're just looping through all the circles in the game and updating their position based on their direction, speed, and mass. Just basic physics.
 
-:::rust
+:::server-rust
 Add the following to your `init` reducer to schedule the `move_all_players` reducer to run every 50 milliseconds.
 
 ```rust
@@ -311,7 +311,7 @@ Add the following to your `init` reducer to schedule the `move_all_players` redu
         })?;
 ```
 :::
-:::csharp
+:::server-csharp
 Add the following to your `Init` reducer to schedule the `MoveAllPlayers` reducer to run every 50 milliseconds.
 
 ```csharp
@@ -387,7 +387,7 @@ Let's try it out! Press play and roam freely around the arena! Now we're cooking
 
 Well this is pretty fun, but wouldn't it be better if we could eat food and grow our circle? Surely, that's going to be a pain, right?
 
-:::rust
+:::server-rust
 Wrong. With SpacetimeDB it's extremely easy. All we have to do is add an `is_overlapping` helper function which does some basic math based on mass radii, and modify our `move_all_player` reducer to loop through every entity in the arena for every circle, checking each for overlaps. This may not be the most efficient way to do collision checking (building a quad tree or doing [spatial hashing](https://conkerjo.wordpress.com/2009/06/13/spatial-hashing-implementation-for-fast-2d-collisions/) might be better), but SpacetimeDB is very fast so for this number of entities it'll be a breeze for SpacetimeDB.
 
 Sometimes simple is best! Add the following code to your `lib.rs` file.
@@ -467,7 +467,7 @@ pub fn move_all_players(ctx: &ReducerContext, _timer: MoveAllPlayersTimer) -> Re
 }
 ```
 :::
-:::csharp
+:::server-csharp
 Wrong. With SpacetimeDB it's extremely easy. All we have to do is add an `IsOverlapping` helper function which does some basic math based on mass radii, and modify our `MoveAllPlayers` reducer to loop through every entity in the arena for every circle, checking each for overlaps. This may not be the most efficient way to do collision checking (building a quad tree or doing [spatial hashing](https://conkerjo.wordpress.com/2009/06/13/spatial-hashing-implementation-for-fast-2d-collisions/) might be better), but SpacetimeDB is very fast so for this number of entities it'll be a breeze for SpacetimeDB.
 
 Sometimes simple is best! Add the following code to the `Module` class of your `Lib.cs` file.
@@ -563,10 +563,10 @@ Notice that the food automatically respawns as you vaccuum them up. This is beca
 
 # Conclusion
 
-:::rust
+:::server-rust
 So far you've learned how to configure a new Unity project to work with SpacetimeDB, how to develop, build, and publish a SpacetimeDB server module. Within the module, you've learned how to create tables, update tables, and write reducers. You've learned about special reducers like `client_connected` and `init` and how to created scheduled reducers. You learned how we can used scheduled reducers to implement a physics simulation right within your module.
 :::
-:::csharp
+:::server-csharp
 So far you've learned how to configure a new Unity project to work with SpacetimeDB, how to develop, build, and publish a SpacetimeDB server module. Within the module, you've learned how to create tables, update tables, and write reducers. You've learned about special reducers like `ClientConnected` and `Init` and how to created scheduled reducers. You learned how we can used scheduled reducers to implement a physics simulation right within your module.
 :::
 

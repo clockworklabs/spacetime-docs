@@ -6,7 +6,7 @@ This progressive tutorial is continued from [part 2](/docs/unity/part-2).
 
 ### Spawning Food
 
-:::rust
+:::server-rust
 Let's start by spawning food into the map. The first thing we need to do is create a new, special reducer called the `init` reducer. SpacetimeDB calls the `init` reducer automatically when first publish your module, and also after any time you run with `publish --delete-data`. It gives you an opportunity to initialize the state of your module before any clients connect.
 
 Add this new reducer above our `connect` reducer.
@@ -77,7 +77,7 @@ pub fn spawn_food(ctx: &ReducerContext) -> Result<(), String> {
 }
 ```
 :::
-:::csharp
+:::server-csharp
 Let's start by spawning food into the map. The first thing we need to do is create a new, special reducer called the `Init` reducer. SpacetimeDB calls the `Init` reducer automatically when you first publish your module, and also after any time you run with `publish --delete-data`. It gives you an opportunity to initialize the state of your module before any clients connect.
 
 Add this new reducer above our `Connect` reducer.
@@ -144,7 +144,7 @@ public static uint Range(this Random rng, uint min, uint max) => (uint)rng.NextI
 
 In this reducer, we are using the `world_size` we configured along with the `ReducerContext`'s random number generator `.rng()` function to place 600 food uniformly randomly throughout the map. We've also chosen the `mass` of the food to be a random number between 2 and 4 inclusive.
 
-:::csharp
+:::server-csharp
 We also added two helper functions so we can get a random range as either a `uint` or a `float`.
 
 :::
@@ -152,7 +152,7 @@ Although, we've written the reducer to spawn food, no food will actually be spaw
 
 We would like for this function to be called periodically to "top up" the amount of food on the map so that it never falls very far below our target amount of food. SpacetimeDB has built in functionality for exactly this. With SpacetimeDB you can schedule your module to call itself in the future or repeatedly with reducers.
 
-:::rust
+:::server-rust
 In order to schedule a reducer to be called we have to create a new table which specifies when an how a reducer should be called. Add this new table to the top of the file, below your imports.
 
 ```rust
@@ -167,7 +167,7 @@ pub struct SpawnFoodTimer {
 
 Note the `scheduled(spawn_food)` parameter in the table macro. This tells SpacetimeDB that the rows in this table specify a schedule for when the `spawn_food` reducer should be called. Each scheduled table requires a `scheduled_id` and a `scheduled_at` field so that SpacetimeDB can call your reducer, however you can also add your own fields to these rows as well.
 :::
-:::csharp
+:::server-csharp
 In order to schedule a reducer to be called we have to create a new table which specifies when an how a reducer should be called. Add this new table to the top of the `Module` class.
 
 ```csharp
@@ -187,7 +187,7 @@ You can create, delete, or change a schedule by inserting, deleting, or updating
 
 You will see an error telling you that the `spawn_food` reducer needs to take two arguments, but currently only takes one. This is because the schedule row must be passed in to all scheduled reducers. Modify your `spawn_food` reducer to take the scheduled row as an argument.
 
-:::rust
+:::server-rust
 ```rust
 #[spacetimedb::reducer]
 pub fn spawn_food(ctx: &ReducerContext, _timer: SpawnFoodTimer) -> Result<(), String> {
@@ -195,7 +195,7 @@ pub fn spawn_food(ctx: &ReducerContext, _timer: SpawnFoodTimer) -> Result<(), St
 }
 ```
 :::
-:::csharp
+:::server-csharp
 ```csharp
 [Reducer]
 public static void SpawnFood(ReducerContext ctx, SpawnFoodTimer _timer)
@@ -207,7 +207,7 @@ public static void SpawnFood(ReducerContext ctx, SpawnFoodTimer _timer)
 
 In our case we aren't interested in the data on the row, so we name the argument `_timer`.
 
-:::rust
+:::server-rust
 Let's modify our `init` reducer to schedule our `spawn_food` reducer to be called every 500 milliseconds.
 
 ```rust
@@ -228,7 +228,7 @@ pub fn init(ctx: &ReducerContext) -> Result<(), String> {
 
 > You can use `ScheduleAt::Interval` to schedule a reducer call at an interval like we're doing here. SpacetimeDB will continue to call the reducer at this interval until you remove the row. You can also use `ScheduleAt::Time()` to specify a specific at which to call a reducer once. SpacetimeDB will remove that row automatically after the reducer has been called.
 :::
-:::csharp
+:::server-csharp
 Let's modify our `Init` reducer to schedule our `SpawnFood` reducer to be called every 500 milliseconds.
 
 ```csharp
@@ -257,12 +257,12 @@ Let's continue building out our server module by modifying it to log in a player
 
 Let's add a second table to our `Player` struct. Modify the `Player` struct by adding this above the struct:
 
-:::rust
+:::server-rust
 ```rust
 #[spacetimedb::table(name = logged_out_player)]
 ```
 :::
-:::csharp
+:::server-csharp
 ```csharp
 [Table(Name = "logged_out_player")]
 ```
@@ -270,7 +270,7 @@ Let's add a second table to our `Player` struct. Modify the `Player` struct by a
 
 Your struct should now look like this:
 
-:::rust
+:::server-rust
 ```rust
 #[spacetimedb::table(name = player, public)]
 #[spacetimedb::table(name = logged_out_player)]
@@ -285,7 +285,7 @@ pub struct Player {
 }
 ```
 :::
-:::csharp
+:::server-csharp
 ```csharp
 [Table(Name = "player", Public = true)]
 [Table(Name = "logged_out_player")]
@@ -306,7 +306,7 @@ This line creates an additional tabled called `logged_out_player` whose rows sha
 >
 > If your client isn't syncing rows from the server, check that your table is not accidentally marked private.
 
-:::rust
+:::server-rust
 Next, modify your `connect` reducer and add a new `disconnect` reducer below it:
 
 ```rust
@@ -339,7 +339,7 @@ pub fn disconnect(ctx: &ReducerContext) -> Result<(), String> {
 }
 ```
 :::
-:::csharp
+:::server-csharp
 Next, modify your `Connect` reducer and add a new `Disconnect` reducer below it:
 
 ```csharp
@@ -387,7 +387,7 @@ When a player disconnects, we will transfer their player row from the `player` t
 
 Now that we've got our food spawning and our players set up, let's create a match and spawn player circle entities into it. The first thing we should do before spawning a player into a match is give them a name. 
 
-:::rust
+:::server-rust
 Add the following to the bottom of your file.
 
 ```rust
@@ -452,7 +452,7 @@ fn spawn_circle_at(
 
 The `enter_game` reducer takes one argument, the player's `name`. We can use this name to display as a label for the player in the match, by storing the name on the player's row. We are also spawning some circles for the player to control now that they are entering the game. To do this, we choose a random position within the bounds of the arena and create a new entity and corresponding circle row.
 :::
-:::csharp
+:::server-csharp
 Add the following to the end of the `Module` class.
 
 ```csharp
@@ -509,7 +509,7 @@ The `EnterGame` reducer takes one argument, the player's `name`. We can use this
 
 Let's also modify our `disconnect` reducer to remove the circles from the arena when the player disconnects from the server.
 
-:::rust
+:::server-rust
 ```rust
 #[spacetimedb::reducer(client_disconnected)]
 pub fn disconnect(ctx: &ReducerContext) -> Result<(), String> {
@@ -533,7 +533,7 @@ pub fn disconnect(ctx: &ReducerContext) -> Result<(), String> {
 }
 ```
 :::
-:::csharp
+:::server-csharp
 ```csharp
 [Reducer(ReducerKind.ClientDisconnected)]
 public static void Disconnect(ReducerContext ctx)
@@ -1166,15 +1166,15 @@ Lastly modify the `GameManager.SetupArea` method to set the `WorldSize` on the `
 
 ### Entering the Game
 
-:::rust
+:::server-rust
 At this point, you may need to regenerate your bindings the following command from the `server-rust` directory.
 :::
-:::csharp
+:::server-csharp
 At this point, you may need to regenerate your bindings the following command from the `server-csharp` directory.
 :::
 
 ```sh
-spacetime generate --lang csharp --out-dir ../client/Assets/autogen
+spacetime generate --lang csharp --out-dir ../client-unity/Assets/autogen
 ```
 
 > **BUG WORKAROUND NOTE**: As of `1.0.0-rc3` you will now have a compilation error in Unity. There is currently a bug in the C# code generation that requires you to delete `autogen/LoggedOutPlayer.cs` after running this command.
