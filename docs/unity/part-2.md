@@ -351,7 +351,6 @@ Created new database with name: blackholio, identity: c200d2c69b4524292b91822afa
 > If you sign into `spacetime login` via GitHub, the token you get will be issued by `auth.spacetimedb.com`. This will also ensure that you can recover your identity in case you lose it. On the other hand, if you do `spacetime login --server-issued-login local`, you will get an identity which is issued directly by your local server. Do note, however, that `--server-issued-login` tokens are not recoverable if lost, and are only recognized by the server that issued them.
 
 :::server-rust
-Next, use the `spacetime` command to call our newly defined `debug` reducer:
 
 ```sh
 spacetime call blackholio debug
