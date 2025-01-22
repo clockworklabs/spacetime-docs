@@ -587,7 +587,7 @@ There's still plenty more we can do to build this into a proper game though. For
 - Nice shaders
 - Space theme!
 
-Fortunately, we've done that for you! If you'd like to check out the completed tutorial game you can download it on GitHub:
+Fortunately, we've done that for you! If you'd like to check out the completed tutorial game, with these additional features, you can download it on GitHub:
 
 https://github.com/ClockworkLabs/Blackholio
 
