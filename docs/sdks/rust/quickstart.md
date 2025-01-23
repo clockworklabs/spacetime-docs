@@ -18,18 +18,20 @@ Within it, create a `client` crate, our client application, which users run loca
 cargo new client
 ```
 
-## Depend on `spacetimedb-sdk` and `hex`
+## Depend on `spacetimedb-sdk`, `hex` and `anyhow`
 
 `client/Cargo.toml` should be initialized without any dependencies. We'll need two:
 
 - [`spacetimedb-sdk`](https://crates.io/crates/spacetimedb-sdk), which defines client-side interfaces for interacting with a remote SpacetimeDB module.
 - [`hex`](https://crates.io/crates/hex), which we'll use to print unnamed users' identities as hexadecimal strings.
+- [`anyhow`](https://crates.io/crates/anyhow), which we'll use to print unnamed users' identities as hexadecimal strings.
 
 Below the `[dependencies]` line in `client/Cargo.toml`, add:
 
 ```toml
-spacetimedb-sdk = "0.12"
+spacetimedb-sdk = { git = "https://github.com/clockworklabs/SpacetimeDB" }
 hex = "0.4"
+anyhow = "1.0"
 ```
 
 Make sure you depend on the same version of `spacetimedb-sdk` as is reported by the SpacetimeDB CLI tool's `spacetime version`!
@@ -38,12 +40,7 @@ Make sure you depend on the same version of `spacetimedb-sdk` as is reported by 
 
 `client/src/main.rs` should be initialized with a trivial "Hello world" program. Clear it out so we can write our chat client.
 
-In your `quickstart-chat` directory, run:
-
-```bash
-rm client/src/main.rs
-touch client/src/main.rs
-```
+**Important: Open the `client/src/main.rs` file and delete its contents. We will be writing it from scratch here.**
 
 ## Generate your module types
 
@@ -60,6 +57,8 @@ Take a look inside `client/src/module_bindings`. The CLI should have generated a
 
 ```
 module_bindings
+├── identity_connected_reducer.rs
+├── identity_disconnected_reducer.rs
 ├── message_table.rs
 ├── message_type.rs
 ├── mod.rs
@@ -85,24 +84,36 @@ We'll need additional imports from `spacetimedb_sdk` for interacting with the da
 To `client/src/main.rs`, add:
 
 ```rust
-use spacetimedb_sdk::{anyhow, DbContext, Event, Identity, Status, Table, TableWithPrimaryKey};
-use spacetimedb_sdk::credentials::File;
+use spacetimedb_sdk::{credentials, DbContext, Event, Identity, ReducerEvent, Status, Table, TableWithPrimaryKey};
 ```
 
 ## Define the main function
 
 Our `main` function will do the following:
 1. Connect to the database. This will also start a new thread for handling network messages.
-2. Handle user input from the command line.
+2. Register the Callbacks, allowing us to respond to events in the database.
+3. Subscribe to the table data.
+4. Starts a thread which will process messages received from the server and call the appropriate callbacks when they're received.
+5. Handle user input from the command line.
+6. After the user triggers and exit, disconnect from the database.
 
 We'll see the implementation of these functions a bit later, but for now add to `client/src/main.rs`:
 
 ```rust
+/// Our main function
 fn main() {
-    // Connect to the database
+    // Connects to the database
     let conn = connect_to_db();
-    // Handle CLI input
+    // Registers callbacks for reducers
+    register_callbacks(&conn);
+    // Subscribes to the data we care about
+    subscribe_to_tables(&conn);
+    // Starts a thread to communicate with the database
+    conn.run_threaded();
+    // Handles CLI input
     user_input_loop(&conn);
+    // Once the user exits the input loop, this disconnects the client
+    conn.disconnect().unwrap();
 }
 ```
 
@@ -134,9 +145,6 @@ fn register_callbacks(conn: &DbConnection) {
     // When a new message is received, print it.
     conn.db.message().on_insert(on_message_inserted);
 
-    // When we receive the message backlog, print it in timestamp order.
-    conn.subscription_builder().on_applied(on_sub_applied);
-
     // When we fail to set our name, print a warning.
     conn.reducers.on_set_name(on_name_set);
 
@@ -157,20 +165,16 @@ Each user has a `Credentials`, which consists of two parts:
 To `client/src/main.rs`, add:
 
 ```rust
+/// Save credentials to a file
+fn creds_store() -> credentials::File {
+    credentials::File::new("quickstart-chat")
+}
+
 /// Our `on_connect` callback: save our credentials to a file.
-fn on_connected(conn: &DbConnection, ident: Identity, token: &str) {
-    let file = File::new(CREDS_NAME);
-    if let Err(e) = file.save(ident, token) {
+fn on_connected(_conn: &DbConnection, _identity: Identity, token: &str) {
+    if let Err(e) = creds_store().save(token) {
         eprintln!("Failed to save credentials: {:?}", e);
     }
-
-    println!("Connected to SpacetimeDB.");
-    println!("Use /name to set your username, otherwise enter your message!");
-
-    // Subscribe to the data we care about
-    subscribe_to_tables(&conn);
-    // Register callbacks for reducers
-    register_callbacks(&conn);
 }
 ```
 
@@ -183,15 +187,19 @@ We need to handle connection errors and disconnections by printing appropriate m
 To `client/src/main.rs`, add:
 
 ```rust
-/// Our `on_connect_error` callback: print the error, then exit the process.
+/// Our `on_connect_error` callback: print a note.
 fn on_connect_error(err: &anyhow::Error) {
-    eprintln!("Connection error: {:?}", err);
+    panic!("Error while connecting: {err}");
 }
 
 /// Our `on_disconnect` callback: print a note, then exit the process.
-fn on_disconnected(_conn: &DbConnection, _err: Option<&anyhow::Error>) {
-    eprintln!("Disconnected!");
-    std::process::exit(0)
+fn on_disconnected(_conn: &DbConnection, err: Option<&anyhow::Error>) {
+    if let Some(err) = err {
+        panic!("Disconnected abnormally: {err}")
+    } else {
+        println!("Disconnected normally.");
+        std::process::exit(0)
+    }
 }
 ```
 
@@ -224,13 +232,13 @@ fn on_user_inserted(_ctx: &EventContext, user: &User) {
 fn user_name_or_identity(user: &User) -> String {
     user.name
         .clone()
-        .unwrap_or_else(|| user.identity.to_hex().to_string())
+        .unwrap_or_else(|| user.identity.to_abbreviated_hex().to_string())
 }
 ```
 
 ### Notify about updated users
 
-Because we declared a `#[primary_key]` column in our `User` table, we can also register on-update callbacks. These run whenever a row is replaced by a row with the same primary key, like our module's `ctx.db.user().identity().update(..) calls. We register these callbacks using the `on_update` method of the trait `TableWithPrimaryKey`, which is automatically implemented by `spacetime generate` for any table with a `#[primary_key]` column.
+Because we declared a `#[primary_key]` column in our `User` table, we can also register on-update callbacks. These run whenever a row is replaced by a row with the same primary key, like our module's `ctx.db.user().identity().update(..)` calls. We register these callbacks using the `on_update` method of the trait `TableWithPrimaryKey`, which is automatically implemented by `spacetime generate` for any table with a `#[primary_key]` column.
 
 `on_update` callbacks take three arguments: the old row, the new row, and an `Option<&ReducerEvent>`.
 
@@ -247,7 +255,7 @@ To `client/src/main.rs`, add:
 ```rust
 /// Our `User::on_update` callback:
 /// print a notification about name and status changes.
-fn on_user_updated(old: &User, new: &User, _: Option<&ReducerEvent>) {
+fn on_user_updated(_ctx: &EventContext, old: &User, new: &User) {
     if old.name != new.name {
         println!(
             "User {} renamed to {}.",
@@ -266,7 +274,7 @@ fn on_user_updated(old: &User, new: &User, _: Option<&ReducerEvent>) {
 
 ## Print messages
 
-When we receive a new message, we'll print it to standard output, along with the name of the user who sent it. Keep in mind that we only want to do this for new messages, i.e. those inserted by a `send_message` reducer invocation. We have to handle the backlog we receive when our subscription is initialized separately, to ensure they're printed in the correct order. To that effect, our `on_message_inserted` callback will check if the ctx.event type is an `Event::Reducer`, and only print in that case.
+When we receive a new message, we'll print it to standard output, along with the name of the user who sent it. Keep in mind that we only want to do this for new messages, i.e. those inserted by a `send_message` reducer invocation. We have to handle the backlog we receive when our subscription is initialized separately, to ensure they're printed in the correct order. To that effect, our `on_message_inserted` callback will check if the `ctx.event` type wasn't caused by a subscription update by comparing it to `Event::SubscribeApplied`, and only print if it's not a subscription update.
 
 To find the `User` based on the message's `sender` identity, we'll use `ctx.db.user().identity().find(..)`, which behaves like the same function on the server.
 
@@ -279,13 +287,17 @@ To `client/src/main.rs`, add:
 ```rust
 /// Our `Message::on_insert` callback: print new messages.
 fn on_message_inserted(ctx: &EventContext, message: &Message) {
-    if let Event::Reducer(_) = ctx.event {
-        print_message(ctx, message)
+    if !matches!(ctx.event, Event::SubscribeApplied) {
+        print_message(ctx, message);
     }
 }
 
 fn print_message(ctx: &EventContext, message: &Message) {
-    let sender = ctx.db.user().identity().find(&message.sender.clone())
+    let sender = ctx
+        .db
+        .user()
+        .identity()
+        .find(&message.sender)
         .map(|u| user_name_or_identity(&u))
         .unwrap_or_else(|| "unknown".to_string());
     println!("{}: {}", sender, message.text);
@@ -296,7 +308,6 @@ fn print_message(ctx: &EventContext, message: &Message) {
 
 Messages we receive live will come in order, but when we connect, we'll receive all the past messages at once. We can't just print these in the order we receive them; the logs would be all shuffled around, and would make no sense. Instead, when we receive the log of past messages, we'll sort them by their sent timestamps and print them in order.
 
-
 We'll handle this in our function `print_messages_in_order`, which we registered as an `on_subscription_applied` callback. `print_messages_in_order` iterates over all the `Message`s we've received, sorts them, and then prints them. `Message::iter()` is defined on the trait `TableType`, and returns an iterator over all the messages in the client's cache. Rust iterators can't be sorted in-place, so we'll collect it to a `Vec`, then use the `sort_by_key` method to sort by timestamp.
 
 To `client/src/main.rs`, add:
@@ -304,7 +315,8 @@ To `client/src/main.rs`, add:
 ```rust
 /// Our `on_subscription_applied` callback:
 /// sort all past messages and print them in timestamp order.
-fn on_sub_applied(ctx: &EventContext) {
+#[allow(unused)]
+fn print_messages_in_order(ctx: &EventContext) {
     let mut messages = ctx.db.message().iter().collect::<Vec<_>>();
     messages.sort_by_key(|m| m.sent);
     for message in messages {
@@ -334,19 +346,25 @@ To `client/src/main.rs`, add:
 ```rust
 /// Our `on_set_name` callback: print a warning if the reducer failed.
 fn on_name_set(ctx: &EventContext, name: &String) {
-    if let Event::Reducer(reducer) = &ctx.event {
-        if let Status::Failed(err) = reducer.status.clone() {
-            eprintln!("Failed to change name to {:?}: {}", name, err);
-        }
+    if let Event::Reducer(
+        ReducerEvent {
+            status: Status::Failed(err),
+            ..
+        }) = &ctx.event
+    {
+        eprintln!("Failed to change name to {:?}: {}", name, err);
     }
 }
 
 /// Our `on_send_message` callback: print a warning if the reducer failed.
 fn on_message_sent(ctx: &EventContext, text: &String) {
-    if let Event::Reducer(reducer) = &ctx.event {
-        if let Status::Failed(err) = reducer.status.clone() {
-            eprintln!("Failed to send message {:?}: {}", text, err);
-        }
+    if let Event::Reducer(
+        ReducerEvent {
+            status: Status::Failed(err),
+            ..
+        }) = &ctx.event
+    {
+        eprintln!("Failed to send message {:?}: {}", text, err);
     }
 }
 ```
@@ -364,22 +382,17 @@ const SPACETIMEDB_URI: &str = "http://localhost:3000";
 /// The module name we chose when we published our module.
 const DB_NAME: &str = "<module-name>";
 
-/// You should change this value to a unique name based on your application.
-const CREDS_NAME: &str = "rust-sdk-quickstart";
-
 /// Load credentials from a file and connect to the database.
 fn connect_to_db() -> DbConnection {
-    let credentials = File::new(CREDS_NAME);
-    let conn = DbConnection::builder()
+    DbConnection::builder()
         .on_connect(on_connected)
         .on_connect_error(on_connect_error)
         .on_disconnect(on_disconnected)
-        .with_uri(SPACETIMEDB_URI)
+        .with_token(creds_store().load().expect("Error loading credentials"))
         .with_module_name(DB_NAME)
-        .with_credentials(credentials.load().unwrap())
-        .build().expect("Failed to connect");
-    conn.run_threaded();
-    conn
+        .with_uri(SPACETIMEDB_URI)
+        .build()
+        .expect("Failed to connect")
 }
 ```
 
@@ -392,10 +405,9 @@ To `client/src/main.rs`, add:
 ```rust
 /// Register subscriptions for all rows of both tables.
 fn subscribe_to_tables(conn: &DbConnection) {
-    conn.subscription_builder().subscribe([
-        "SELECT * FROM user;",
-        "SELECT * FROM message;",
-    ]);
+    conn.subscription_builder()
+        .on_applied(print_messages_in_order)
+        .subscribe(["SELECT * FROM user;", "SELECT * FROM message;"]);
 }
 ```
 

@@ -112,7 +112,7 @@ To `server/src/lib.rs`, add:
 pub fn set_name(ctx: &ReducerContext, name: String) -> Result<(), String> {
     let name = validate_name(name)?;
     if let Some(user) = ctx.db.user().identity().find(ctx.sender) {
-        ctx.db.user().identity().update(User { name: Some(name), ..user })
+        ctx.db.user().identity().update(User { name: Some(name), ..user });
         Ok(())
     } else {
         Err("Cannot set name for unknown user".to_string())
@@ -192,7 +192,6 @@ To `server/src/lib.rs`, add the definition of the connect reducer:
 
 ```rust
 #[reducer(client_connected)]
-// Called when a client connects to the SpacetimeDB
 pub fn client_connected(ctx: &ReducerContext) {
     if let Some(user) = ctx.db.user().identity().find(ctx.sender) {
         // If this is a returning user, i.e. we already have a `User` with this `Identity`,
@@ -207,14 +206,15 @@ pub fn client_connected(ctx: &ReducerContext) {
             online: true,
         });
     }
-}```
+}
+```
 
 Similarly, whenever a client disconnects, the module will run the `#[reducer(client_disconnected)]` reducer if it's defined. By convention, it's named `client_disconnected`. We'll use it to un-set the `online` status of the `User` for the disconnected client.
 
 ```rust
 #[reducer(client_disconnected)]
 // Called when a client disconnects from SpacetimeDB
-pub fn identity_disconnected(ctx: &ReducerContext) {
+pub fn client_disconnected(ctx: &ReducerContext) {
     if let Some(user) = ctx.db.user().identity().find(ctx.sender) {
         ctx.db.user().identity().update(User { online: false, ..user });
     } else {
