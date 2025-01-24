@@ -103,9 +103,9 @@ public partial struct Config
 ```
 
 Let's break down this code. This defines a normal C# `struct` with two fields: `id` and `world_size`. We have added the `[Table(Name = "config", Public = true)]` attribute the struct. This attribute signals to SpacetimeDB that it should create a new SpacetimeDB table with the row type defined by the `Config` type's fields.
-:::
 
-> NOTE: It is possible to have two different tables with different table names share the same type.
+> Although we're using `lower_snake_case` for our column names to have consistent column names across languages in this tutorial, you can also use `camelCase` or `PascalCase` if you prefer. See [#2168](https://github.com/clockworklabs/SpacetimeDB/issues/2168) for more information.
+:::
 
 :::server-rust
 The `spacetimedb::table` macro takes two parameters, a `name` which is the name of the table and what you will use to query the table in SQL, and a `public` visibility modifier which ensures that the rows of this table are visible to everyone.
