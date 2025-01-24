@@ -240,7 +240,7 @@ public static void Init(ReducerContext ctx)
     ctx.Db.spawn_food_timer.Insert(new SpawnFoodTimer
     {
         scheduled_at = new ScheduleAt.Interval(TimeSpan.FromMilliseconds(500))
-    });	  
+    });
 }
 ```
 
@@ -549,7 +549,7 @@ public static void Disconnect(ReducerContext ctx)
     // Remove any circles from the arena
     foreach (var circle in ctx.Db.circle.player_id.Filter(player.player_id))
     {
-        var entity = ctx.Db.entity.entity_id.Find(circle.entity_id) ?? throw new Exception("Could not find circle");								  
+        var entity = ctx.Db.entity.entity_id.Find(circle.entity_id) ?? throw new Exception("Could not find circle");
         ctx.Db.entity.entity_id.Delete(entity.entity_id);
         ctx.Db.circle.entity_id.Delete(entity.entity_id);
     }

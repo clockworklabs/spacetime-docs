@@ -280,7 +280,7 @@ public static void MoveAllPlayers(ReducerContext ctx, MoveAllPlayersTimer timer)
 
     var circle_directions = ctx.Db.circle.Iter().Select(c => (c.entity_id, c.direction * c.speed)).ToDictionary();
 
-    //Handle player input
+    // Handle player input
     foreach (var circle in ctx.Db.circle.Iter())
     {
         var circle_entity = ctx.Db.entity.entity_id.Find(circle.entity_id) ?? throw new Exception("Circle has no entity");
@@ -390,7 +390,7 @@ Well this is pretty fun, but wouldn't it be better if we could eat food and grow
 :::server-rust
 Wrong. With SpacetimeDB it's extremely easy. All we have to do is add an `is_overlapping` helper function which does some basic math based on mass radii, and modify our `move_all_player` reducer to loop through every entity in the arena for every circle, checking each for overlaps. This may not be the most efficient way to do collision checking (building a quad tree or doing [spatial hashing](https://conkerjo.wordpress.com/2009/06/13/spatial-hashing-implementation-for-fast-2d-collisions/) might be better), but SpacetimeDB is very fast so for this number of entities it'll be a breeze for SpacetimeDB.
 
-Sometimes simple is best! Add the following code to your `lib.rs` file.
+Sometimes simple is best! Add the following code to your `lib.rs` file and make sure to replace the existing `move_all_players` reducer.
 
 ```rust
 const MINIMUM_SAFE_MASS_RATIO: f32 = 0.85;
@@ -470,7 +470,7 @@ pub fn move_all_players(ctx: &ReducerContext, _timer: MoveAllPlayersTimer) -> Re
 :::server-csharp
 Wrong. With SpacetimeDB it's extremely easy. All we have to do is add an `IsOverlapping` helper function which does some basic math based on mass radii, and modify our `MoveAllPlayers` reducer to loop through every entity in the arena for every circle, checking each for overlaps. This may not be the most efficient way to do collision checking (building a quad tree or doing [spatial hashing](https://conkerjo.wordpress.com/2009/06/13/spatial-hashing-implementation-for-fast-2d-collisions/) might be better), but SpacetimeDB is very fast so for this number of entities it'll be a breeze for SpacetimeDB.
 
-Sometimes simple is best! Add the following code to the `Module` class of your `Lib.cs` file.
+Sometimes simple is best! Add the following code to the `Module` class of your `Lib.cs` file and make sure to replace the existing `MoveAllPlayers` reducer.
 
 ```csharp
 const float MINIMUM_SAFE_MASS_RATIO = 0.85f;
@@ -495,10 +495,9 @@ public static bool IsOverlapping(Entity a, Entity b)
 [Reducer]
 public static void MoveAllPlayers(ReducerContext ctx, MoveAllPlayersTimer timer)
 {
-    //var span = new SpacetimeDB.LogStopwatch("tick");
     var world_size = (ctx.Db.config.id.Find(0) ?? throw new Exception("Config not found")).world_size;
 
-    //Handle player input
+    // Handle player input
     foreach (var circle in ctx.Db.circle.Iter())
     {
         var circle_entity = ctx.Db.entity.entity_id.Find(circle.entity_id) ?? throw new Exception("Circle has no entity");
