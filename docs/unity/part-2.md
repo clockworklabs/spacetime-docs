@@ -287,6 +287,9 @@ pub fn debug(ctx: &ReducerContext) -> Result<(), String> {
 ```
 :::
 :::server-csharp
+
+Add this function to the `Module` class in `Lib.cs`:
+
 ```csharp
 [Reducer]
 public static void Debug(ReducerContext ctx)
