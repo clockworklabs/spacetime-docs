@@ -33,7 +33,7 @@ pnpm install @clockworklabs/spacetimedb-sdk@1.0.0-rc1.0
 
 > If you are using another package manager like `yarn` or `npm`, the same steps should work with the appropriate commands for those tools.
 
-If you like, you can now run `pnpm run dev` to see the vite template app running at `http://localhost:5173`.
+You can now `pnpm run dev` to see the Vite template app running at `http://localhost:5173`.
 
 ## Basic layout
 
