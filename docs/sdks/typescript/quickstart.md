@@ -5,7 +5,7 @@ In this guide, you'll learn how to use TypeScript to create a SpacetimeDB client
 **Before you get started on this guide**, you should complete one of the quickstart guides for creating a SpacetimeDB server module listed below.
 
 - [Rust](/docs/modules/rust/quickstart)
-- [C#](/docs/modules/csharp/quickstart)
+- [C#](/docs/modules/c-sharp/quickstart)
 
 By the end of this introduciton, you will have created a basic single page web app for the module created in the above module quickstart guides.
 
@@ -47,8 +47,8 @@ The app we're going to create is a basic chat application. We are going to start
 Replace the entire contents of `client/src/App.tsx` with the following:
 
 ```tsx
-import React, { useEffect, useState } from "react";
-import "./App.css";
+import React, { useEffect, useState } from 'react';
+import './App.css';
 
 export type PrettyMessage = {
   senderName: string;
@@ -56,28 +56,29 @@ export type PrettyMessage = {
 };
 
 function App() {
-  const [newName, setNewName] = useState("");
+  const [newName, setNewName] = useState('');
   const [settingName, setSettingName] = useState(false);
-  const [name, setName] = useState("");
-  const [systemMessage, setSystemMessage] = useState("");
-  const [newMessage, setNewMessage] = useState("");
+  const [systemMessage, setSystemMessage] = useState('');
+  const [newMessage, setNewMessage] = useState('');
 
   const prettyMessages: PrettyMessage[] = [];
+
+  const name = '';
 
   const onSubmitNewName = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSettingName(false);
-    // Fill in app logic here
+    conn.reducers.setName(newName);
   };
 
-  const onSubmitMessage = (e: React.FormEvent<HTMLFormElement>) => {
+  const onMessageSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setNewMessage("");
-    // Fill in app logic here
+    setNewMessage('');
+    conn.reducers.sendMessage(newMessage);
   };
 
   return (
-    <div className="app">
+    <div className="App">
       <div className="profile">
         <h1>Profile</h1>
         {!settingName ? (
@@ -96,9 +97,8 @@ function App() {
           <form onSubmit={onSubmitNewName}>
             <input
               type="text"
-              style={{ marginBottom: "1rem" }}
               value={newName}
-              onChange={(e) => setNewName(e.target.value)}
+              onChange={e => setNewName(e.target.value)}
             />
             <button type="submit">Submit</button>
           </form>
@@ -118,7 +118,7 @@ function App() {
           ))}
         </div>
       </div>
-      <div className="system" style={{ whiteSpace: "pre-wrap" }}>
+      <div className="system" style={{ whiteSpace: 'pre-wrap' }}>
         <h1>System</h1>
         <div>
           <p>{systemMessage}</p>
@@ -126,18 +126,18 @@ function App() {
       </div>
       <div className="new-message">
         <form
-          onSubmit={onSubmitMessage}
+          onSubmit={onMessageSubmit}
           style={{
-            display: "flex",
-            flexDirection: "column",
-            width: "50%",
-            margin: "0 auto",
+            display: 'flex',
+            flexDirection: 'column',
+            width: '50%',
+            margin: '0 auto',
           }}
         >
           <h3>New Message</h3>
           <textarea
             value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
+            onChange={e => setNewMessage(e.target.value)}
           ></textarea>
           <button type="submit">Send</button>
         </form>
@@ -150,6 +150,208 @@ export default App;
 ```
 
 We have configured the `onSubmitNewName` and `onSubmitMessage` callbacks to be called when the user clicks the submit button in the profile and new message sections, respectively. For now, they do nothing when called, but later we'll add some logic to call SpacetimeDB reducers when these callbacks are called.
+
+Let's also make it pretty. Replace the contents of `client/src/App.css` with the following:
+
+```css
+.App {
+  display: grid;
+  /* 
+    3 rows: 
+      1) Profile
+      2) Main content (left = message, right = system)
+      3) New message
+  */
+  grid-template-rows: auto 1fr auto;
+  /* 2 columns: left for chat, right for system */
+  grid-template-columns: 2fr 1fr;
+
+  height: 100vh; /* fill viewport height */
+  width: clamp(300px, 100%, 1200px);
+  margin: 0 auto;
+}
+
+/* ----- Profile (Row 1, spans both columns) ----- */
+.profile {
+  grid-column: 1 / 3;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--theme-color);
+}
+
+.profile h1 {
+  margin-right: auto; /* pushes name/edit form to the right */
+}
+
+.profile form {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 300px;
+}
+
+.profile form input {
+  background-color: var(--textbox-color);
+}
+
+/* ----- Chat Messages (Row 2, Col 1) ----- */
+.message {
+  grid-row: 2 / 3;
+  grid-column: 1 / 2;
+  
+  /* Ensure this section scrolls if content is long */
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.message h1 {
+  margin-right: 0.5rem;
+}
+
+/* ----- System Panel (Row 2, Col 2) ----- */
+.system {
+  grid-row: 2 / 3;
+  grid-column: 2 / 3;
+
+  /* Also scroll independently if needed */
+  overflow-y: auto;
+  padding: 1rem;
+  border-left: 1px solid var(--theme-color);
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+
+/* ----- New Message (Row 3, spans columns 1-2) ----- */
+.new-message {
+  grid-column: 1 / 3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  border-top: 1px solid var(--theme-color);
+}
+
+.new-message form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+.new-message form h3 {
+  margin-bottom: 0.25rem;
+}
+
+/* Distinct background for the textarea */
+.new-message form textarea {
+  font-family: monospace;
+  font-weight: 400;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 80px;
+  background-color: var(--textbox-color);
+  color: inherit;
+
+  /* Subtle shadow for visibility */
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.12),
+    0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+@media (prefers-color-scheme: dark) {
+  .new-message form textarea {
+    box-shadow: 0 0 0 1px #17492b;
+  }
+}
+```
+
+Next we need to replace the global styles in `client/src/index.css` as well:
+
+```css
+/* ----- CSS Reset & Global Settings ----- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ----- Color Variables ----- */
+:root {
+  --theme-color: #3dc373;
+  --theme-color-contrast: #08180e;
+  --textbox-color: #edfef4;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --theme-color: #4cf490;
+    --theme-color-contrast: #132219;
+    --textbox-color: #0f311d;
+  }
+}
+
+/* ----- Page Setup ----- */
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* ----- Buttons ----- */
+button {
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 0.375rem;
+  background-color: var(--theme-color);
+  color: var(--theme-color-contrast);
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  font-family: monospace;
+}
+
+/* ----- Inputs & Textareas ----- */
+input,
+textarea {
+  border: none;
+  border-radius: 0.375rem;
+  caret-color: var(--theme-color);
+  font-family: monospace;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  padding: 0.5rem 0.75rem;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--theme-color);
+}
+```
 
 Now when you run `pnpm run dev` and open `http://localhost:5173`, you should see a basic chat app that does not yet send or receive messages.
 
@@ -185,7 +387,7 @@ module_bindings
 With `spacetime generate` we have generated TypeScript types derived from the types you specified in your module, which we can conveniently use in our client. The main entry to the SpacetimeDB API is via the `DBConnection` which was generated into the `module_bindings` folder. Let's import it and a few other types into our `client/src/App.tsx`.
 
 ```tsx
-import { DBConnection } from './module_bindings';
+import { DBConnection, EventContext, Message, User } from './module_bindings';
 import { Identity } from '@clockworklabs/spacetimedb-sdk';
 ```
 
@@ -193,75 +395,63 @@ import { Identity } from '@clockworklabs/spacetimedb-sdk';
 
 Now that we've imported the `DBConnection` type we can use it to connect our app to our module.
 
-Add the following `App` function, just below `const [newMessage, setNewMessage] = useState("");`:
+Add the following to your `App` function, just below `const [newMessage, setNewMessage] = useState("");`:
 
 ```tsx
   const [connected, setConnected] = useState<boolean>(false);
   const [identity, setIdentity] = useState<Identity | null>(null);
+  const [conn, setConn] = useState<DBConnection | null>(null);
 
-  const [conn] = useState(DBConnection.builder()
-      .withUri('ws://localhost:3000')
-      .withModuleName('quickstart-chat')
-      .onConnect((conn, identity, token) => {
-        setIdentity(identity);
-        setConnected(true);
+  useEffect(() => {
+    const onConnect = (
+      conn: DBConnection,
+      identity: Identity,
+      token: string
+    ) => {
+      setIdentity(identity);
+      setConnected(true);
+      localStorage.setItem('auth_token', token);
+      console.log(
+        'Connected to SpacetimeDB with identity:',
+        identity.toHexString()
+      );
+      conn
+        .subscriptionBuilder()
+        .onApplied(() => {
+          console.log('SDK client cache initialized.');
+        })
+        .subscribe(['SELECT * FROM message', 'SELECT * FROM user']);
+    };
 
-        console.log("Connected to SpacetimeDB with identity:", identity.toHexString());
+    const onDisconnect = () => {
+      console.log('Disconnected from SpacetimeDB');
+      setConnected(false);
+    };
 
-        // Subscribe to the `message` table.
-        conn.subscriptionBuilder().onApplied(() => {
-          console.log("SDK client cache initialized.");
-        }).subscribe(['SELECT * FROM message']);
-      })
-      .onConnectError((_conn, err) => {
-        console.error("Error connecting to SpacetimeDB:", err);
-      })
-      .onDisconnect(() => {
-        console.log("Disconnected from SpacetimeDB");
-        setConnected(false);
-      })
-      .build()
-  );
+    const onConnectError = (_conn: DBConnection, err: Error) => {
+      console.log('Error connecting to SpacetimeDB:', err);
+    };
+
+    setConn(
+      DBConnection.builder()
+        .withUri('ws://localhost:3000')
+        .withModuleName('quickstart-chat')
+        .withToken(localStorage.getItem('auth_token') || '')
+        .onConnect(onConnect)
+        .onDisconnect(onDisconnect)
+        .onConnectError(onConnectError)
+        .build()
+    );
+  }, []);
 ```
 
-Here we are configuring our SpacetimeDB connection by specifying the server URI, module name, and an `onConnect` callback. When `onConnect` is called after connecting, we store the connection state, our `Identity`, and our SpacetimeDB credentials in our React state. If there is an error connecting, we print that error to the console as well.
+Here we are configuring our SpacetimeDB connection by specifying the server URI, module name, and a few callbacks including the `onConnect` callback. When `onConnect` is called after connecting, we store the connection state, our `Identity`, and our SpacetimeDB credentials in our React state. If there is an error connecting, we print that error to the console as well.
+
+We are also using `localStorage` to store our SpacetimeDB credentials. This way, we can reconnect to SpacetimeDB with the same `Identity` and token if we refresh the page. The first time we connect, we won't have any credentials stored, so we pass `undefined` to the `withToken` method, this will cause SpacetimeDB to generate new credentials for us.
 
 If you chose a different name for your module, replace `quickstart-chat` with that name, or republish your module as `quickstart-chat`.
 
-In this case, we are not connecting to SpacetimeDB with pre-existing credentials so SpacetimeDB is assigning us a new `Identity` and token on connection. In order to connect to SpacetimeDB as the same user after refreshing, let's store the credentials in `localStorage` and pass them in when connecting. Modify your code with the following:
-
-```tsx
-  const [connected, setConnected] = useState<boolean>(false);
-  const [identity, setIdentity] = useState<Identity | null>(null);
-
-  const [conn] = useState(DBConnection.builder()
-      .withUri('ws://localhost:3000')
-      .withModuleName('quickstart-chat')
-      .withToken(localStorage.getItem('auth_token') || undefined)
-      .onConnect((conn, identity, token) => {
-        setIdentity(identity);
-        setConnected(true);
-        localStorage.setItem('auth_token', token);
-
-        console.log("Connected to SpacetimeDB with identity:", identity.toHexString());
-
-        // Subscribe to the `message` table.
-        conn.subscriptionBuilder().onApplied(() => {
-          console.log("SDK client cache initialized.");
-        }).subscribe(['SELECT * FROM message']);
-      })
-      .onConnectError((_conn, err) => {
-        console.error("Error connecting to SpacetimeDB:", err);
-      })
-      .onDisconnect(() => {
-        console.log("Disconnected from SpacetimeDB");
-        setConnected(false);
-      })
-      .build()
-  );
-```
-
-In the `onConnect` function we are also subscribing to the `message` table. When we subscribe, SpacetimeDB will run our subscription queries and store the result in a local "SDK client cache". This cache will be updated in real-time as the data in the table changes on the server. The `onApplied` callback is called after SpacetimeDB has synchronized our subscribed data with the client cache.
+In the `onConnect` function we are also subscribing to the `message` and `user` tables. When we subscribe, SpacetimeDB will run our subscription queries and store the result in a local "SDK client cache". This cache will be updated in real-time as the data in the table changes on the server. The `onApplied` callback is called after SpacetimeDB has synchronized our subscribed data with the client cache.
 
 ### Accessing the Data
 
@@ -270,17 +460,25 @@ Once SpacetimeDB is connected, we can easily access the data inside of the clien
 Let's create custom React hooks for the `message` and `user` tables. Add the following code above your `App` component:
 
 ```tsx
-function useMessages(conn: DBConnection): Message[] {
+function useMessages(conn: DBConnection | null): Message[] {
   const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
+    if (!conn) return;
     const onInsert = (_ctx: EventContext, message: Message) => {
-      setMessages((prev) => [...prev, message]);
+      setMessages(prev => [...prev, message]);
     };
     conn.db.message.onInsert(onInsert);
 
     const onDelete = (_ctx: EventContext, message: Message) => {
-      setMessages((prev) => prev.filter((m) => m.text !== message.text && m.sent !== message.sent && m.sender !== message.sender));
+      setMessages(prev =>
+        prev.filter(
+          m =>
+            m.text !== message.text &&
+            m.sent !== message.sent &&
+            m.sender !== message.sender
+        )
+      );
     };
     conn.db.message.onDelete(onDelete);
 
@@ -293,17 +491,18 @@ function useMessages(conn: DBConnection): Message[] {
   return messages;
 }
 
-function useUsers(conn: DBConnection): Map<string, User> {
+function useUsers(conn: DBConnection | null): Map<string, User> {
   const [users, setUsers] = useState<Map<string, User>>(new Map());
 
   useEffect(() => {
+    if (!conn) return;
     const onInsert = (_ctx: EventContext, user: User) => {
-      setUsers((prev) => new Map(prev.set(user.identity.toHexString(), user)));
+      setUsers(prev => new Map(prev.set(user.identity.toHexString(), user)));
     };
     conn.db.user.onInsert(onInsert);
 
     const onUpdate = (_ctx: EventContext, oldUser: User, newUser: User) => {
-      setUsers((prev) => {
+      setUsers(prev => {
         prev.delete(oldUser.identity.toHexString());
         return new Map(prev.set(newUser.identity.toHexString(), newUser));
       });
@@ -311,7 +510,7 @@ function useUsers(conn: DBConnection): Map<string, User> {
     conn.db.user.onUpdate(onUpdate);
 
     const onDelete = (_ctx: EventContext, user: User) => {
-      setUsers((prev) => {
+      setUsers(prev => {
         prev.delete(user.identity.toHexString());
         return new Map(prev);
       });
@@ -333,21 +532,48 @@ These custom React hooks update the React state anytime a row in our tables chan
 
 > In principle, it should be possible to automatically generate these hooks based on your module's schema, or use [`useSyncExternalStore`](https://react.dev/reference/react/useSyncExternalStore). For simplicity, rather than creating them mechanically, we're just going to do it manually.
 
-Let's now prettify our messages in our render function by sorting them by their `sent` timestamp, and joining the username of the sender to the message by looking up the user by their `Identity` in the `user` table. Replace `const prettyMessages: PrettyMessage[] = []` with the below.
+Next add let's add these hooks to our `App` component just below our connection setup:
 
 ```tsx
   const messages = useMessages(conn);
   const users = useUsers(conn);
+```
 
-  const prettyMessages: PrettyMessage[] = messages 
-    .sort((a, b) => a.sent > b.sent ? 1 : -1)
-    .map((message) => ({
-      senderName: users.get(message.sender)?.name || message.sender.toHexString().substring(0, 8),
+Let's now prettify our messages in our render function by sorting them by their `sent` timestamp, and joining the username of the sender to the message by looking up the user by their `Identity` in the `user` table. Replace `const prettyMessages: PrettyMessage[] = [];` with the following:
+
+```tsx
+  const prettyMessages: PrettyMessage[] = messages
+    .sort((a, b) => (a.sent > b.sent ? 1 : -1))
+    .map(message => ({
+      senderName:
+        users.get(message.sender.toHexString())?.name ||
+        message.sender.toHexString().substring(0, 8),
       text: message.text,
     }));
 ```
 
 That's all we have to do to hook up our SpacetimeDB state to our React state. SpacetimeDB will make sure that any change on the server gets pushed down to our application and rerendered on screen in real-time.
+
+Let's also update our render function to show a loading message while we're connecting to SpacetimeDB. Add this just below our `prettyMessages` declaration:
+
+```tsx
+  if (!conn || !connected || !identity) {
+    return (
+      <div className="App">
+        <h1>Connecting...</h1>
+      </div>
+    );
+  }
+```
+
+Finally, let's also compute the name of the user from the `Identity` in our `name` variable. Replace `const name = '';` with the following:
+
+```tsx
+  const name =
+    users.get(identity?.toHexString())?.name ||
+    identity?.toHexString().substring(0, 8) ||
+    'unknown';
+```
 
 ### Calling Reducers
 
@@ -404,14 +630,17 @@ Our `user` table includes all users not just online users, so we want to take ca
     if (!conn) return;
     conn.db.user.onInsert((_ctx, user) => {
       if (user.online) {
-        setSystemMessage(prev => prev.join(`${user.name} has connected.`, \n));
+        const name = user.name || user.identity.toHexString().substring(0, 8);
+        setSystemMessage(prev => prev + `\n${name} has connected.`);
       }
     });
     conn.db.user.onUpdate((_ctx, oldUser, newUser) => {
+      const name =
+        newUser.name || newUser.identity.toHexString().substring(0, 8);
       if (oldUser.online === false && newUser.online === true) {
-        setSystemMessage(`${newUser.name} has connected.`);
+        setSystemMessage(prev => prev + `\n${name} has connected.`);
       } else if (oldUser.online === true && newUser.online === false) {
-        setSystemMessage(`${oldUser.name} has disconnected.`);
+        setSystemMessage(prev => prev + `\n${name} has disconnected.`);
       }
     });
   }, [conn]);
