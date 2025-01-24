@@ -17,7 +17,7 @@ Enter the directory `quickstart-chat` you created in the [Rust Module Quickstart
 cd quickstart-chat
 ```
 
-Within it, create a `client` react app:
+Within it, create a `client` React app:
 
 ```bash
 pnpm create vite@latest client -- --template react-ts
