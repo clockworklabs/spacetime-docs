@@ -84,6 +84,10 @@ pub struct Config {
 ```
 
 Let's break down this code. This defines a normal Rust `struct` with two fields: `id` and `world_size`. We have decorated the struct with the `spacetimedb::table` macro. This procedural Rust macro signals to SpacetimeDB that it should create a new SpacetimeDB table with the row type defined by the `Config` type's fields.
+
+The `spacetimedb::table` macro takes two parameters, a `name` which is the name of the table and what you will use to query the table in SQL, and a `public` visibility modifier which ensures that the rows of this table are visible to everyone.
+
+The `#[primary_key]` attribute, specifies that the `id` field should be used as the primary key of the table.
 :::
 :::server-csharp
 Each row in a SpacetimeDB table is associated with a `struct` type in C#.
@@ -105,14 +109,7 @@ public partial struct Config
 Let's break down this code. This defines a normal C# `struct` with two fields: `id` and `world_size`. We have added the `[Table(Name = "config", Public = true)]` attribute the struct. This attribute signals to SpacetimeDB that it should create a new SpacetimeDB table with the row type defined by the `Config` type's fields.
 
 > Although we're using `lower_snake_case` for our column names to have consistent column names across languages in this tutorial, you can also use `camelCase` or `PascalCase` if you prefer. See [#2168](https://github.com/clockworklabs/SpacetimeDB/issues/2168) for more information.
-:::
-
-:::server-rust
-The `spacetimedb::table` macro takes two parameters, a `name` which is the name of the table and what you will use to query the table in SQL, and a `public` visibility modifier which ensures that the rows of this table are visible to everyone.
-
-The `#[primary_key]` attribute, specifies that the `id` field should be used as the primary key of the table.
-:::
-:::server-csharp
+ 
 The `Table` attribute with takes two parameters, a `Name` which is the name of the table and what you will use to query the table in SQL, and a `Public` visibility modifier which ensures that the rows of this table are visible to everyone.
 
 The `[PrimaryKey]` attribute, specifies that the `id` field should be used as the primary key of the table.
