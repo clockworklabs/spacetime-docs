@@ -201,7 +201,6 @@ Let's create a few tables to represent entities in our game by adding the follow
 
 ```csharp
 [Table(Name = "entity", Public = true)]
-					   
 public partial struct Entity
 {
 	[PrimaryKey, AutoInc] 
@@ -219,7 +218,7 @@ public partial struct Circle
     public uint player_id;
     public DbVector2 direction;
     public float speed;
-    public long last_split_time;
+    public ulong last_split_time;
 }
 
 [Table(Name = "food", Public = true)]
@@ -262,13 +261,11 @@ There's a few new concepts we should touch on. First of all, we are using the `#
 :::server-csharp
 ```csharp
 [Table(Name = "player", Public = true)]
-					   
 public partial struct Player
 {
 	[PrimaryKey]
 	public Identity identity;
 	[Unique, AutoInc]
-			   
 	public uint player_id;
 	public string name;
 }

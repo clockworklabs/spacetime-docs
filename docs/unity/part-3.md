@@ -171,7 +171,7 @@ Note the `scheduled(spawn_food)` parameter in the table macro. This tells Spacet
 In order to schedule a reducer to be called we have to create a new table which specifies when an how a reducer should be called. Add this new table to the top of the `Module` class.
 
 ```csharp
-[Table(Name = "spawn_food_timer", Scheduled = nameof(SpawnFood), ScheduledAt = "scheduled_at")]
+[Table(Name = "spawn_food_timer", Scheduled = nameof(SpawnFood), ScheduledAt = nameof(scheduled_at))]
 public partial struct SpawnFoodTimer
 {
     [PrimaryKey, AutoInc]
@@ -237,14 +237,10 @@ public static void Init(ReducerContext ctx)
 {
     Log.Info($"Initializing...");
     ctx.Db.config.Insert(new Config { world_size = 1000 });
-			  
-						 
-		
     ctx.Db.spawn_food_timer.Insert(new SpawnFoodTimer
     {
         scheduled_at = new ScheduleAt.Interval(TimeSpan.FromMilliseconds(500))
-    });
-		  
+    });	  
 }
 ```
 
@@ -314,7 +310,10 @@ Next, modify your `connect` reducer and add a new `disconnect` reducer below it:
 pub fn connect(ctx: &ReducerContext) -> Result<(), String> {
     if let Some(player) = ctx.db.logged_out_player().identity().find(&ctx.sender) {
         ctx.db.player().insert(player.clone());
-        ctx.db.logged_out_player().delete(player);
+        ctx.db
+            .logged_out_player()
+            .identity()
+            .delete(&player.identity);
     } else {
         ctx.db.player().try_insert(Player {
             identity: ctx.sender,
@@ -333,8 +332,16 @@ pub fn disconnect(ctx: &ReducerContext) -> Result<(), String> {
         .identity()
         .find(&ctx.sender)
         .ok_or("Player not found")?;
+    let player_id = player.player_id;
     ctx.db.logged_out_player().insert(player);
     ctx.db.player().identity().delete(&ctx.sender);
+
+    // Remove any circles from the arena
+    for circle in ctx.db.circle().player_id().filter(&player_id) {
+        ctx.db.entity().entity_id().delete(&circle.entity_id);
+        ctx.db.circle().entity_id().delete(&circle.entity_id);
+    }
+
     Ok(())
 }
 ```
@@ -350,7 +357,7 @@ public static void Connect(ReducerContext ctx)
     if (player != null)
     {
         ctx.Db.player.Insert(player.Value);
-        ctx.Db.logged_out_player.Delete(player.Value);
+        ctx.Db.logged_out_player.identity.Delete(player.Value.identity);
     }
     else
     {
@@ -367,7 +374,7 @@ public static void Disconnect(ReducerContext ctx)
 {
     var player = ctx.Db.player.identity.Find(ctx.CallerIdentity) ?? throw new Exception("Player not found");
     ctx.Db.logged_out_player.Insert(player);
-    ctx.Db.player.Delete(player);
+    ctx.Db.player.identity.Delete(player.identity);
 }
 ```
 :::
@@ -498,7 +505,7 @@ public static Entity SpawnCircleAt(ReducerContext ctx, uint player_id, uint mass
         player_id = player_id,
         direction = new DbVector2(0, 1),
         speed = 0f,
-        last_split_time = timestamp.ToUnixTimeMilliseconds(),
+        last_split_time = (ulong)timestamp.ToUnixTimeMilliseconds(),
     });
     return entity;
 }
@@ -547,7 +554,7 @@ public static void Disconnect(ReducerContext ctx)
         ctx.Db.circle.entity_id.Delete(entity.entity_id);
     }
     ctx.Db.logged_out_player.Insert(player);
-    ctx.Db.player.Delete(player);
+    ctx.Db.player.identity.Delete(player.identity);
 }
 ```
 :::

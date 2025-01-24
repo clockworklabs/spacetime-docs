@@ -261,7 +261,7 @@ pub fn move_all_players(ctx: &ReducerContext, _timer: MoveAllPlayersTimer) -> Re
 :::
 :::server-csharp
 ```csharp
-[Table(Name = "move_all_players_timer", Scheduled = nameof(MoveAllPlayers), ScheduledAt = "scheduled_at")]
+[Table(Name = "move_all_players_timer", Scheduled = nameof(MoveAllPlayers), ScheduledAt = nameof(scheduled_at))]
 public partial struct MoveAllPlayersTimer
 {
     [PrimaryKey, AutoInc]
@@ -303,12 +303,12 @@ In this reducer, we're just looping through all the circles in the game and upda
 Add the following to your `init` reducer to schedule the `move_all_players` reducer to run every 50 milliseconds.
 
 ```rust
-    ctx.db
-        .move_all_players_timer()
-        .try_insert(MoveAllPlayersTimer {
-            scheduled_id: 0,
-            scheduled_at: ScheduleAt::Interval(Duration::from_millis(50).as_micros() as u64),
-        })?;
+ctx.db
+    .move_all_players_timer()
+    .try_insert(MoveAllPlayersTimer {
+        scheduled_id: 0,
+        scheduled_at: ScheduleAt::Interval(Duration::from_millis(50).as_micros() as u64),
+    })?;
 ```
 :::
 :::server-csharp
@@ -332,7 +332,7 @@ spacetime publish --server local blackholio --delete-data
 Regenerate your server bindings with:
 
 ```sh
-spacetime generate --lang csharp --out-dir ../client/Assets/autogen
+spacetime generate --lang csharp --out-dir ../client-unity/Assets/autogen
 ```
 
 > **BUG WORKAROUND NOTE**: You may have to delete LoggedOutPlayer.cs again.
@@ -473,7 +473,7 @@ Wrong. With SpacetimeDB it's extremely easy. All we have to do is add an `IsOver
 Sometimes simple is best! Add the following code to the `Module` class of your `Lib.cs` file.
 
 ```csharp
- const float MINIMUM_SAFE_MASS_RATIO = 0.85f;
+const float MINIMUM_SAFE_MASS_RATIO = 0.85f;
 
 public static bool IsOverlapping(Entity a, Entity b)
 {
@@ -507,7 +507,6 @@ public static void MoveAllPlayers(ReducerContext ctx, MoveAllPlayersTimer timer)
         var new_pos = circle_entity.position + direction * MassToMaxMoveSpeed(circle_entity.mass);
         circle_entity.position.x = Math.Clamp(new_pos.x, circle_radius, world_size - circle_radius);
         circle_entity.position.y = Math.Clamp(new_pos.y, circle_radius, world_size - circle_radius);
-        
 
         // Check collisions
         foreach (var entity in ctx.Db.entity.Iter())
