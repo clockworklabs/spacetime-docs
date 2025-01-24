@@ -7,7 +7,7 @@ In this guide, you'll learn how to use TypeScript to create a SpacetimeDB client
 - [Rust](/docs/modules/rust/quickstart)
 - [C#](/docs/modules/c-sharp/quickstart)
 
-By the end of this introduciton, you will have created a basic single page web app for the module created in the above module quickstart guides.
+By the end of this introduciton, you will have created a basic single page web app which connects to the `quickstart-chat` module created in the above module quickstart guides.
 
 ## Project structure
 
