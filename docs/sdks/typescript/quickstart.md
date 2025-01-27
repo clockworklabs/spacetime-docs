@@ -366,7 +366,7 @@ mkdir -p client/src/module_bindings
 spacetime generate --lang typescript --out-dir client/src/module_bindings --project-path server
 ```
 
-> This command assumes you've already created a server module in `quickstart-chat/server`. If you haven't, go follow either the [Rust](/docs/modules/rust/quickstart) or [C#](/docs/modules/c-sharp/quickstart) module quickstart, then come back here.
+> This command assumes you've already created a server module in `quickstart-chat/server`. If you haven't completed one of the server module quickstart guides, you can follow either the [Rust](/docs/modules/rust/quickstart) or [C#](/docs/modules/c-sharp/quickstart) module quickstart to create one and then return here.
 
 Take a look inside `client/src/module_bindings`. The CLI should have generated several files:
 
