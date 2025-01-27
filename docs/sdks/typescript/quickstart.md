@@ -393,7 +393,7 @@ import { Identity } from '@clockworklabs/spacetimedb-sdk';
 
 ## Create your SpacetimeDB client
 
-Now that we've imported the `DBConnection` type we can use it to connect our app to our module.
+Now that we've imported the `DBConnection` type, we can use it to connect our app to our module.
 
 Add the following to your `App` function, just below `const [newMessage, setNewMessage] = useState("");`:
 
