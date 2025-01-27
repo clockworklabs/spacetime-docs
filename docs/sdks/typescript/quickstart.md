@@ -384,7 +384,7 @@ module_bindings
 └── user_type.ts
 ```
 
-With `spacetime generate` we have generated TypeScript types derived from the types you specified in your module, which we can conveniently use in our client. The main entry to the SpacetimeDB API is via the `DBConnection` which was generated into the `module_bindings` folder. Let's import it and a few other types into our `client/src/App.tsx`.
+With `spacetime generate` we have generated TypeScript types derived from the types you specified in your module, which we can conveniently use in our client. We've placed these in the `module_bindings` folder. The main entry to the SpacetimeDB API is the `DBConnection`, a type which manages a connection to a remote database. Let's import it and a few other types into our `client/src/App.tsx`.
 
 ```tsx
 import { DBConnection, EventContext, Message, User } from './module_bindings';
