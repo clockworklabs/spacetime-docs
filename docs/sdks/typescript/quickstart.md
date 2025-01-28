@@ -1,8 +1,8 @@
 # TypeScript Client SDK Quickstart
 
-In this guide, you'll learn how to use TypeScript to create a SpacetimeDB client application. While we currently support TypeScript as a client language, we do not yet support writing SpacetimeDB server modules in TypeScript.
+In this guide, you'll learn how to use TypeScript to create a SpacetimeDB client application.
 
-**Before you get started on this guide**, you should complete one of the quickstart guides for creating a SpacetimeDB server module listed below.
+Please note that TypeScript is supported as a client language only. **Before you get started on this guide**, you should complete one of the quickstart guides for creating a SpacetimeDB server module listed below.
 
 - [Rust](/docs/modules/rust/quickstart)
 - [C#](/docs/modules/c-sharp/quickstart)
@@ -68,13 +68,13 @@ function App() {
   const onSubmitNewName = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSettingName(false);
-    conn.reducers.setName(newName);
+    // TODO: Call `setName` reducer
   };
 
   const onMessageSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setNewMessage('');
-    conn.reducers.sendMessage(newMessage);
+    // TODO: Call `sendMessage` reducer
   };
 
   return (
