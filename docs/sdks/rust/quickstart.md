@@ -29,7 +29,7 @@ cargo new client
 Below the `[dependencies]` line in `client/Cargo.toml`, add:
 
 ```toml
-spacetimedb-sdk = "1.0.0-rc3.1"
+spacetimedb-sdk = { git = "https://github.com/clockworklabs/SpacetimeDB" }
 hex = "0.4"
 anyhow = "1.0"
 ```
