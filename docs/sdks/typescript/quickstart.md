@@ -455,7 +455,7 @@ In the `onConnect` function we are also subscribing to the `message` and `user` 
 
 ### Accessing the Data
 
-Once SpacetimeDB is connected, we can easily access the data inside of the client cache using our connection. The `conn.db` field allows you to access all of the tables of your database. Those tables will contain all data which you have subscribed to in your subscription configuration.
+Once SpacetimeDB is connected, we can easily access the data in the client cache using our `DBConnection`. The `conn.db` field allows you to access all of the tables of your database. Those tables will contain all data requested by your subscription configuration.
 
 Let's create custom React hooks for the `message` and `user` tables. Add the following code above your `App` component:
 
@@ -623,7 +623,7 @@ Note that these callbacks can fire in two contexts:
 - After a reducer runs, when the client's cache is updated about changes to subscribed rows.
 - After calling `subscribe`, when the client's cache is initialized with all existing matching rows.
 
-Our `user` table includes all users not just online users, so we want to take care to only show a notification when new users join. Let's add a `useEffect` which subscribes a callback when a `user` is inserted into the table and a callback when a `user` is updated.
+Our `user` table includes all users not just online users, so we want to take care to only show a notification when new users join. Let's add a `useEffect` which subscribes a callback when a `user` is inserted into the table and a callback when a `user` is updated. Add the following to your `App` component just below the other `useEffect`.
 
 ```tsx
   useEffect(() => {
