@@ -451,7 +451,7 @@ We are also using `localStorage` to store our SpacetimeDB credentials. This way,
 
 If you chose a different name for your module, replace `quickstart-chat` with that name, or republish your module as `quickstart-chat`.
 
-In the `onConnect` function we are also subscribing to the `message` and `user` tables. When we subscribe, SpacetimeDB will run our subscription queries and store the result in a local "SDK client cache". This cache will be updated in real-time as the data in the table changes on the server. The `onApplied` callback is called after SpacetimeDB has synchronized our subscribed data with the client cache.
+In the `onConnect` function we are also subscribing to the `message` and `user` tables. When we subscribe, SpacetimeDB will run our subscription queries and store the result in a local "client cache". This cache will be updated in real-time as the data in the table changes on the server. The `onApplied` callback is called after SpacetimeDB has synchronized our subscribed data with the client cache.
 
 ### Accessing the Data
 
