@@ -57,8 +57,8 @@ Take a look inside `client/src/module_bindings`. The CLI should have generated a
 
 ```
 module_bindings
-├── identity_connected_reducer.rs
-├── identity_disconnected_reducer.rs
+├── client_connected_reducer.rs
+├── client_disconnected_reducer.rs
 ├── message_table.rs
 ├── message_type.rs
 ├── mod.rs
@@ -221,8 +221,7 @@ Whenever we want to print a user, if they have set a name, we'll use that. If th
 To `client/src/main.rs`, add:
 
 ```rust
-/// Our `User::on_insert` callback:
-/// if the user is online, print a notification.
+/// Our `User::on_insert` callback: if the user is online, print a notification.
 fn on_user_inserted(_ctx: &EventContext, user: &User) {
     if user.online {
         println!("User {} connected.", user_name_or_identity(user));

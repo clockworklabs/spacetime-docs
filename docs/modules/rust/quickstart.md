@@ -107,12 +107,15 @@ It's also possible to call `set_name` via the SpacetimeDB CLI's `spacetime call`
 To `server/src/lib.rs`, add:
 
 ```rust
-#[reducer]
 /// Clients invoke this reducer to set their user names.
+#[reducer]
 pub fn set_name(ctx: &ReducerContext, name: String) -> Result<(), String> {
     let name = validate_name(name)?;
     if let Some(user) = ctx.db.user().identity().find(ctx.sender) {
-        ctx.db.user().identity().update(User { name: Some(name), ..user });
+        ctx.db.user().identity().update(User {
+            name: Some(name),
+            ..user
+        });
         Ok(())
     } else {
         Err("Cannot set name for unknown user".to_string())
@@ -148,11 +151,10 @@ We define a reducer `send_message`, which clients will call to send messages. It
 To `server/src/lib.rs`, add:
 
 ```rust
-#[reducer]
 /// Clients invoke this reducer to send messages.
+#[reducer]
 pub fn send_message(ctx: &ReducerContext, text: String) -> Result<(), String> {
     let text = validate_message(text)?;
-    log::info!("{}", text);
     ctx.db.message().insert(Message {
         sender: ctx.sender,
         text,
@@ -212,8 +214,8 @@ pub fn client_connected(ctx: &ReducerContext) {
 Similarly, whenever a client disconnects, the module will run the `#[reducer(client_disconnected)]` reducer if it's defined. By convention, it's named `client_disconnected`. We'll use it to un-set the `online` status of the `User` for the disconnected client.
 
 ```rust
+/// Called when a client disconnects from SpacetimeDB
 #[reducer(client_disconnected)]
-// Called when a client disconnects from SpacetimeDB
 pub fn client_disconnected(ctx: &ReducerContext) {
     if let Some(user) = ctx.db.user().identity().find(ctx.sender) {
         ctx.db.user().identity().update(User { online: false, ..user });
@@ -278,4 +280,4 @@ You can find the full code for this module [in the SpacetimeDB module examples](
 
 You've just set up your first database in SpacetimeDB! The next step would be to create a client module that interacts with this module. You can use any of SpacetimDB's supported client languages to do this. Take a look at the quickstart guide for your client language of choice: [Rust](/docs/sdks/rust/quickstart), [C#](/docs/sdks/c-sharp/quickstart), or [TypeScript](/docs/sdks/typescript/quickstart).
 
-If you are planning to use SpacetimeDB with the Unity game engine, you can skip right to the [Unity Comprehensive Tutorial](/docs/unity/part-1) or check out our example game, [BitcraftMini](/docs/unity/part-3).
+If you are planning to use SpacetimeDB with the Unity game engine, you can skip right to the [Unity Comprehensive Tutorial](/docs/unity/part-1).
