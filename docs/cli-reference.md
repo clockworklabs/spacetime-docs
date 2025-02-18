@@ -43,35 +43,19 @@ This document contains the help content for the `spacetime` command-line program
 * `publish` — Create and update a SpacetimeDB database
 * `delete` — Deletes a SpacetimeDB database
 * `logs` — Prints logs from a SpacetimeDB database
-* `call` — Invokes a reducer function in a database.
-
-WARNING: This command is UNSTABLE and subject to breaking changes.
-* `describe` — Describe the structure of a database or entities within it.
-
-WARNING: This command is UNSTABLE and subject to breaking changes.
-* `energy` — Invokes commands related to database budgets.
-
-WARNING: This command is UNSTABLE and subject to breaking changes.
-* `sql` — Runs a SQL query on the database.
-
-WARNING: This command is UNSTABLE and subject to breaking changes.
+* `call` — Invokes a reducer function in a database. WARNING: This command is UNSTABLE and subject to breaking changes.
+* `describe` — Describe the structure of a database or entities within it. WARNING: This command is UNSTABLE and subject to breaking changes.
+* `energy` — Invokes commands related to database budgets. WARNING: This command is UNSTABLE and subject to breaking changes.
+* `sql` — Runs a SQL query on the database. WARNING: This command is UNSTABLE and subject to breaking changes.
 * `rename` — Rename a database
 * `generate` — Generate client files for a spacetime module.
-* `list` — Lists the databases attached to an identity.
-
-WARNING: This command is UNSTABLE and subject to breaking changes.
+* `list` — Lists the databases attached to an identity. WARNING: This command is UNSTABLE and subject to breaking changes.
 * `login` — Manage your login to the SpacetimeDB CLI
 * `logout` — 
-* `init` — Initializes a new spacetime project.
-
-WARNING: This command is UNSTABLE and subject to breaking changes.
+* `init` — Initializes a new spacetime project. WARNING: This command is UNSTABLE and subject to breaking changes.
 * `build` — Builds a spacetime module.
-* `server` — Manage the connection to the SpacetimeDB server.
-
-WARNING: This command is UNSTABLE and subject to breaking changes.
-* `subscribe` — Subscribe to SQL queries on the database.
-
-WARNING: This command is UNSTABLE and subject to breaking changes.
+* `server` — Manage the connection to the SpacetimeDB server. WARNING: This command is UNSTABLE and subject to breaking changes.
+* `subscribe` — Subscribe to SQL queries on the database. WARNING: This command is UNSTABLE and subject to breaking changes.
 * `start` — Start a local SpacetimeDB instance
 * `version` — Manage installed spacetime versions
 
@@ -160,9 +144,7 @@ Run `spacetime help logs` for more detailed information.
 
 ## spacetime call
 
-Invokes a reducer function in a database.
-
-WARNING: This command is UNSTABLE and subject to breaking changes.
+Invokes a reducer function in a database. WARNING: This command is UNSTABLE and subject to breaking changes.
 
 **Usage:** `spacetime call [OPTIONS] <database> <reducer_name> [arguments]...`
 
@@ -185,9 +167,7 @@ Run `spacetime help call` for more detailed information.
 
 ## spacetime describe
 
-Describe the structure of a database or entities within it.
-
-WARNING: This command is UNSTABLE and subject to breaking changes.
+Describe the structure of a database or entities within it. WARNING: This command is UNSTABLE and subject to breaking changes.
 
 **Usage:** `spacetime describe [OPTIONS] --json <database> [entity_type] [entity_name]`
 
@@ -214,9 +194,7 @@ Run `spacetime help describe` for more detailed information.
 
 ## spacetime energy
 
-Invokes commands related to database budgets.
-
-WARNING: This command is UNSTABLE and subject to breaking changes.
+Invokes commands related to database budgets. WARNING: This command is UNSTABLE and subject to breaking changes.
 
 **Usage:** `spacetime energy
        energy <COMMAND>`
@@ -243,9 +221,7 @@ Show current energy balance for an identity
 
 ## spacetime sql
 
-Runs a SQL query on the database.
-
-WARNING: This command is UNSTABLE and subject to breaking changes.
+Runs a SQL query on the database. WARNING: This command is UNSTABLE and subject to breaking changes.
 
 **Usage:** `spacetime sql [OPTIONS] <database> <query>`
 
@@ -315,9 +291,7 @@ Run `spacetime help publish` for more detailed information.
 
 ## spacetime list
 
-Lists the databases attached to an identity.
-
-WARNING: This command is UNSTABLE and subject to breaking changes.
+Lists the databases attached to an identity. WARNING: This command is UNSTABLE and subject to breaking changes.
 
 **Usage:** `spacetime list [OPTIONS]`
 
@@ -375,9 +349,7 @@ Show the current login info
 
 ## spacetime init
 
-Initializes a new spacetime project.
-
-WARNING: This command is UNSTABLE and subject to breaking changes.
+Initializes a new spacetime project. WARNING: This command is UNSTABLE and subject to breaking changes.
 
 **Usage:** `spacetime init --lang <lang> [project-path]`
 
@@ -416,9 +388,7 @@ Builds a spacetime module.
 
 ## spacetime server
 
-Manage the connection to the SpacetimeDB server.
-
-WARNING: This command is UNSTABLE and subject to breaking changes.
+Manage the connection to the SpacetimeDB server. WARNING: This command is UNSTABLE and subject to breaking changes.
 
 **Usage:** `spacetime server
        server <COMMAND>`
@@ -552,9 +522,7 @@ Deletes all data from all local databases
 
 ## spacetime subscribe
 
-Subscribe to SQL queries on the database.
-
-WARNING: This command is UNSTABLE and subject to breaking changes.
+Subscribe to SQL queries on the database. WARNING: This command is UNSTABLE and subject to breaking changes.
 
 **Usage:** `spacetime subscribe [OPTIONS] <database> <query>...`
 
@@ -618,3 +586,4 @@ Run `spacetime version --help` to see all options.
     This document was generated automatically by
     <a href="https://crates.io/crates/clap-markdown"><code>clap-markdown</code></a>.
 </i></small>
+
