@@ -34,7 +34,7 @@ This document contains the help content for the `spacetime` command-line program
 * [`spacetime start`↴](#spacetime-start)
 * [`spacetime version`↴](#spacetime-version)
 
-## <pre><code>spacetime</code><pre>
+## <pre><code>spacetime</code></pre>
 
 **Usage:** `spacetime [OPTIONS] <COMMAND>`
 
@@ -82,7 +82,7 @@ WARNING: This command is UNSTABLE and subject to breaking changes.
 
 
 
-## <pre><code>spacetime publish</code><pre>
+## <pre><code>spacetime publish</code></pre>
 
 Create and update a SpacetimeDB database
 
@@ -110,7 +110,7 @@ Run `spacetime help publish` for more detailed information.
 
 
 
-## <pre><code>spacetime delete</code><pre>
+## <pre><code>spacetime delete</code></pre>
 
 Deletes a SpacetimeDB database
 
@@ -130,7 +130,7 @@ Run `spacetime help delete` for more detailed information.
 
 
 
-## <pre><code>spacetime logs</code><pre>
+## <pre><code>spacetime logs</code></pre>
 
 Prints logs from a SpacetimeDB database
 
@@ -158,7 +158,7 @@ Run `spacetime help logs` for more detailed information.
 
 
 
-## <pre><code>spacetime call</code><pre>
+## <pre><code>spacetime call</code></pre>
 
 Invokes a reducer function in a database.
 
@@ -183,7 +183,7 @@ Run `spacetime help call` for more detailed information.
 
 
 
-## <pre><code>spacetime describe</code><pre>
+## <pre><code>spacetime describe</code></pre>
 
 Describe the structure of a database or entities within it.
 
@@ -212,7 +212,7 @@ Run `spacetime help describe` for more detailed information.
 
 
 
-## <pre><code>spacetime energy</code><pre>
+## <pre><code>spacetime energy</code></pre>
 
 Invokes commands related to database budgets.
 
@@ -227,7 +227,7 @@ WARNING: This command is UNSTABLE and subject to breaking changes.
 
 
 
-## <pre><code>spacetime energy balance</code><pre>
+## <pre><code>spacetime energy balance</code></pre>
 
 Show current energy balance for an identity
 
@@ -241,7 +241,7 @@ Show current energy balance for an identity
 
 
 
-## <pre><code>spacetime sql</code><pre>
+## <pre><code>spacetime sql</code></pre>
 
 Runs a SQL query on the database.
 
@@ -263,7 +263,7 @@ WARNING: This command is UNSTABLE and subject to breaking changes.
 
 
 
-## <pre><code>spacetime rename</code><pre>
+## <pre><code>spacetime rename</code></pre>
 
 Rename a database
 
@@ -284,7 +284,7 @@ Run `spacetime rename --help` for more detailed information.
 
 
 
-## <pre><code>spacetime generate</code><pre>
+## <pre><code>spacetime generate</code></pre>
 
 Generate client files for a spacetime module.
 
@@ -313,7 +313,7 @@ Run `spacetime help publish` for more detailed information.
 
 
 
-## <pre><code>spacetime list</code><pre>
+## <pre><code>spacetime list</code></pre>
 
 Lists the databases attached to an identity.
 
@@ -328,7 +328,7 @@ WARNING: This command is UNSTABLE and subject to breaking changes.
 
 
 
-## <pre><code>spacetime login</code><pre>
+## <pre><code>spacetime login</code></pre>
 
 Manage your login to the SpacetimeDB CLI
 
@@ -349,7 +349,7 @@ Manage your login to the SpacetimeDB CLI
 
 
 
-## <pre><code>spacetime login show</code><pre>
+## <pre><code>spacetime login show</code></pre>
 
 Show the current login info
 
@@ -361,7 +361,7 @@ Show the current login info
 
 
 
-## <pre><code>spacetime logout</code><pre>
+## <pre><code>spacetime logout</code></pre>
 
 **Usage:** `spacetime logout [OPTIONS]`
 
@@ -373,7 +373,7 @@ Show the current login info
 
 
 
-## <pre><code>spacetime init</code><pre>
+## <pre><code>spacetime init</code></pre>
 
 Initializes a new spacetime project.
 
@@ -396,7 +396,7 @@ WARNING: This command is UNSTABLE and subject to breaking changes.
 
 
 
-## <pre><code>spacetime build</code><pre>
+## <pre><code>spacetime build</code></pre>
 
 Builds a spacetime module.
 
@@ -414,7 +414,7 @@ Builds a spacetime module.
 
 
 
-## <pre><code>spacetime server</code><pre>
+## <pre><code>spacetime server</code></pre>
 
 Manage the connection to the SpacetimeDB server.
 
@@ -436,7 +436,7 @@ WARNING: This command is UNSTABLE and subject to breaking changes.
 
 
 
-## <pre><code>spacetime server list</code><pre>
+## <pre><code>spacetime server list</code></pre>
 
 List stored server configurations
 
@@ -444,7 +444,7 @@ List stored server configurations
 
 
 
-## <pre><code>spacetime server set-default</code><pre>
+## <pre><code>spacetime server set-default</code></pre>
 
 Set the default server for future operations
 
@@ -456,7 +456,7 @@ Set the default server for future operations
 
 
 
-## <pre><code>spacetime server add</code><pre>
+## <pre><code>spacetime server add</code></pre>
 
 Add a new server configuration
 
@@ -474,7 +474,7 @@ Add a new server configuration
 
 
 
-## <pre><code>spacetime server remove</code><pre>
+## <pre><code>spacetime server remove</code></pre>
 
 Remove a saved server configuration
 
@@ -490,7 +490,7 @@ Remove a saved server configuration
 
 
 
-## <pre><code>spacetime server fingerprint</code><pre>
+## <pre><code>spacetime server fingerprint</code></pre>
 
 Show or update a saved server's fingerprint
 
@@ -506,7 +506,7 @@ Show or update a saved server's fingerprint
 
 
 
-## <pre><code>spacetime server ping</code><pre>
+## <pre><code>spacetime server ping</code></pre>
 
 Checks to see if a SpacetimeDB host is online
 
@@ -518,7 +518,7 @@ Checks to see if a SpacetimeDB host is online
 
 
 
-## <pre><code>spacetime server edit</code><pre>
+## <pre><code>spacetime server edit</code></pre>
 
 Update a saved server's nickname, host name or protocol
 
@@ -537,7 +537,7 @@ Update a saved server's nickname, host name or protocol
 
 
 
-## <pre><code>spacetime server clear</code><pre>
+## <pre><code>spacetime server clear</code></pre>
 
 Deletes all data from all local databases
 
@@ -550,7 +550,7 @@ Deletes all data from all local databases
 
 
 
-## <pre><code>spacetime subscribe</code><pre>
+## <pre><code>spacetime subscribe</code></pre>
 
 Subscribe to SQL queries on the database.
 
@@ -575,7 +575,7 @@ WARNING: This command is UNSTABLE and subject to breaking changes.
 
 
 
-## <pre><code>spacetime start</code><pre>
+## <pre><code>spacetime start</code></pre>
 
 Start a local SpacetimeDB instance
 
@@ -598,7 +598,7 @@ Run `spacetime start --help` to see all options.
 
 
 
-## <pre><code>spacetime version</code><pre>
+## <pre><code>spacetime version</code></pre>
 
 Manage installed spacetime versions
 
