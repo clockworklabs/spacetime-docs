@@ -38,7 +38,7 @@ This document contains the help content for the `spacetime` command-line program
 
 **Usage:** `spacetime [OPTIONS] <COMMAND>`
 
-###### Subcommands:
+###### <b>Subcommands:</b>
 
 * `publish` — Create and update a SpacetimeDB database
 * `delete` — Deletes a SpacetimeDB database
@@ -75,7 +75,7 @@ WARNING: This command is UNSTABLE and subject to breaking changes.
 * `start` — Start a local SpacetimeDB instance
 * `version` — Manage installed spacetime versions
 
-###### Options:
+###### <b>Options:</b>
 
 * `--root-dir <ROOT_DIR>` — The root directory to store all spacetime files in.
 * `--config-path <CONFIG_PATH>` — The path to the cli.toml config file
@@ -90,11 +90,11 @@ Create and update a SpacetimeDB database
 
 Run `spacetime help publish` for more detailed information.
 
-###### Arguments:
+###### <b>Arguments:</b>
 
 * `<NAME|IDENTITY>` — A valid domain or identity for this database
 
-###### Options:
+###### <b>Options:</b>
 
 * `-c`, `--delete-data` — When publishing to an existing database identity, first DESTROY all data associated with the module
 * `--build-options <BUILD_OPTIONS>` — Options to pass to the build command, for example --build-options='--skip-println-checks'
@@ -119,11 +119,11 @@ Deletes a SpacetimeDB database
 Run `spacetime help delete` for more detailed information.
 
 
-###### Arguments:
+###### <b>Arguments:</b>
 
 * `<DATABASE>` — The name or identity of the database to delete
 
-###### Options:
+###### <b>Options:</b>
 
 * `-s`, `--server <SERVER>` — The nickname, host name or URL of the server hosting the database
 * `-y`, `--yes` — Run non-interactively wherever possible. This will answer "yes" to almost all prompts, but will sometimes answer "no" to preserve non-interactivity (e.g. when prompting whether to log in with spacetimedb.com).
@@ -139,11 +139,11 @@ Prints logs from a SpacetimeDB database
 Run `spacetime help logs` for more detailed information.
 
 
-###### Arguments:
+###### <b>Arguments:</b>
 
 * `<DATABASE>` — The name or identity of the database to print logs from
 
-###### Options:
+###### <b>Options:</b>
 
 * `-s`, `--server <SERVER>` — The nickname, host name or URL of the server hosting the database
 * `-n`, `--num-lines <NUM_LINES>` — The number of lines to print from the start of the log of this database. If no num lines is provided, all lines will be returned.
@@ -169,13 +169,13 @@ WARNING: This command is UNSTABLE and subject to breaking changes.
 Run `spacetime help call` for more detailed information.
 
 
-###### Arguments:
+###### <b>Arguments:</b>
 
 * `<DATABASE>` — The database name or identity to use to invoke the call
 * `<REDUCER_NAME>` — The name of the reducer to call
 * `<ARGUMENTS>` — arguments formatted as JSON
 
-###### Options:
+###### <b>Options:</b>
 
 * `-s`, `--server <SERVER>` — The nickname, host name or URL of the server hosting the database
 * `--anonymous` — Perform this action with an anonymous identity
@@ -194,7 +194,7 @@ WARNING: This command is UNSTABLE and subject to breaking changes.
 Run `spacetime help describe` for more detailed information.
 
 
-###### Arguments:
+###### <b>Arguments:</b>
 
 * `<DATABASE>` — The name or identity of the database to describe
 * `<ENTITY_TYPE>` — Whether to describe a reducer or table
@@ -203,7 +203,7 @@ Run `spacetime help describe` for more detailed information.
 
 * `<ENTITY_NAME>` — The name of the entity to describe
 
-###### Options:
+###### <b>Options:</b>
 
 * `--json` — Output the schema in JSON format. Currently required; in the future, omitting this will give human-readable output.
 * `--anonymous` — Perform this action with an anonymous identity
@@ -221,7 +221,7 @@ WARNING: This command is UNSTABLE and subject to breaking changes.
 **Usage:** `spacetime energy
        energy <COMMAND>`
 
-###### Subcommands:
+###### <b>Subcommands:</b>
 
 * `balance` — Show current energy balance for an identity
 
@@ -233,7 +233,7 @@ Show current energy balance for an identity
 
 **Usage:** `spacetime energy balance [OPTIONS]`
 
-###### Options:
+###### <b>Options:</b>
 
 * `-i`, `--identity <IDENTITY>` — The identity to check the balance for. If no identity is provided, the default one will be used.
 * `-s`, `--server <SERVER>` — The nickname, host name or URL of the server from which to request balance information
@@ -249,12 +249,12 @@ WARNING: This command is UNSTABLE and subject to breaking changes.
 
 **Usage:** `spacetime sql [OPTIONS] <database> <query>`
 
-###### Arguments:
+###### <b>Arguments:</b>
 
 * `<DATABASE>` — The name or identity of the database you would like to query
 * `<QUERY>` — The SQL query to execute
 
-###### Options:
+###### <b>Options:</b>
 
 * `--interactive` — Instead of using a query, run an interactive command prompt for `SQL` expressions
 * `--anonymous` — Perform this action with an anonymous identity
@@ -272,11 +272,11 @@ Rename a database
 Run `spacetime rename --help` for more detailed information.
 
 
-###### Arguments:
+###### <b>Arguments:</b>
 
 * `<DATABASE-IDENTITY>` — The database identity to rename
 
-###### Options:
+###### <b>Options:</b>
 
 * `--to <NEW-NAME>` — The new name you would like to assign
 * `-s`, `--server <SERVER>` — The nickname, host name or URL of the server on which to set the name
@@ -292,7 +292,7 @@ Generate client files for a spacetime module.
 
 Run `spacetime help publish` for more detailed information.
 
-###### Options:
+###### <b>Options:</b>
 
 * `-b`, `--bin-path <WASM_FILE>` — The system path (absolute or relative) to the compiled wasm binary we should inspect
 * `-p`, `--project-path <PROJECT_PATH>` — The system path (absolute or relative) to the project you would like to inspect
@@ -321,7 +321,7 @@ WARNING: This command is UNSTABLE and subject to breaking changes.
 
 **Usage:** `spacetime list [OPTIONS]`
 
-###### Options:
+###### <b>Options:</b>
 
 * `-s`, `--server <SERVER>` — The nickname, host name or URL of the server from which to list databases
 * `-y`, `--yes` — Run non-interactively wherever possible. This will answer "yes" to almost all prompts, but will sometimes answer "no" to preserve non-interactivity (e.g. when prompting whether to log in with spacetimedb.com).
@@ -335,11 +335,11 @@ Manage your login to the SpacetimeDB CLI
 **Usage:** `spacetime login [OPTIONS]
        login <COMMAND>`
 
-###### Subcommands:
+###### <b>Subcommands:</b>
 
 * `show` — Show the current login info
 
-###### Options:
+###### <b>Options:</b>
 
 * `--auth-host <AUTH-HOST>` — Fetch login token from a different host
 
@@ -355,7 +355,7 @@ Show the current login info
 
 **Usage:** `spacetime login show [OPTIONS]`
 
-###### Options:
+###### <b>Options:</b>
 
 * `--token` — Also show the auth token
 
@@ -365,7 +365,7 @@ Show the current login info
 
 **Usage:** `spacetime logout [OPTIONS]`
 
-###### Options:
+###### <b>Options:</b>
 
 * `--auth-host <AUTH-HOST>` — Log out from a custom auth server
 
@@ -381,13 +381,13 @@ WARNING: This command is UNSTABLE and subject to breaking changes.
 
 **Usage:** `spacetime init --lang <lang> [project-path]`
 
-###### Arguments:
+###### <b>Arguments:</b>
 
 * `<PROJECT-PATH>` — The path where we will create the spacetime project
 
   Default value: `.`
 
-###### Options:
+###### <b>Options:</b>
 
 * `-l`, `--lang <LANG>` — The spacetime module language.
 
@@ -402,7 +402,7 @@ Builds a spacetime module.
 
 **Usage:** `spacetime build [OPTIONS]`
 
-###### Options:
+###### <b>Options:</b>
 
 * `-p`, `--project-path <PROJECT_PATH>` — The system path (absolute or relative) to the project you would like to build
 
@@ -423,7 +423,7 @@ WARNING: This command is UNSTABLE and subject to breaking changes.
 **Usage:** `spacetime server
        server <COMMAND>`
 
-###### Subcommands:
+###### <b>Subcommands:</b>
 
 * `list` — List stored server configurations
 * `set-default` — Set the default server for future operations
@@ -450,7 +450,7 @@ Set the default server for future operations
 
 **Usage:** `spacetime server set-default <server>`
 
-###### Arguments:
+###### <b>Arguments:</b>
 
 * `<SERVER>` — The nickname, host name or URL of the new default server
 
@@ -462,11 +462,11 @@ Add a new server configuration
 
 **Usage:** `spacetime server add [OPTIONS] --url <url> <name>`
 
-###### Arguments:
+###### <b>Arguments:</b>
 
 * `<NAME>` — Nickname for this server
 
-###### Options:
+###### <b>Options:</b>
 
 * `--url <URL>` — The URL of the server to add
 * `-d`, `--default` — Make the new server the default server for future operations
@@ -480,11 +480,11 @@ Remove a saved server configuration
 
 **Usage:** `spacetime server remove [OPTIONS] <server>`
 
-###### Arguments:
+###### <b>Arguments:</b>
 
 * `<SERVER>` — The nickname, host name or URL of the server to remove
 
-###### Options:
+###### <b>Options:</b>
 
 * `-y`, `--yes` — Run non-interactively wherever possible. This will answer "yes" to almost all prompts, but will sometimes answer "no" to preserve non-interactivity (e.g. when prompting whether to log in with spacetimedb.com).
 
@@ -496,11 +496,11 @@ Show or update a saved server's fingerprint
 
 **Usage:** `spacetime server fingerprint [OPTIONS] <server>`
 
-###### Arguments:
+###### <b>Arguments:</b>
 
 * `<SERVER>` — The nickname, host name or URL of the server
 
-###### Options:
+###### <b>Options:</b>
 
 * `-y`, `--yes` — Run non-interactively wherever possible. This will answer "yes" to almost all prompts, but will sometimes answer "no" to preserve non-interactivity (e.g. when prompting whether to log in with spacetimedb.com).
 
@@ -512,7 +512,7 @@ Checks to see if a SpacetimeDB host is online
 
 **Usage:** `spacetime server ping <server>`
 
-###### Arguments:
+###### <b>Arguments:</b>
 
 * `<SERVER>` — The nickname, host name or URL of the server to ping
 
@@ -524,11 +524,11 @@ Update a saved server's nickname, host name or protocol
 
 **Usage:** `spacetime server edit [OPTIONS] <server>`
 
-###### Arguments:
+###### <b>Arguments:</b>
 
 * `<SERVER>` — The nickname, host name or URL of the server
 
-###### Options:
+###### <b>Options:</b>
 
 * `--new-name <NICKNAME>` — A new nickname to assign the server configuration
 * `--url <URL>` — A new URL to assign the server configuration
@@ -543,7 +543,7 @@ Deletes all data from all local databases
 
 **Usage:** `spacetime server clear [OPTIONS]`
 
-###### Options:
+###### <b>Options:</b>
 
 * `--data-dir <DATA_DIR>` — The path to the server data directory to clear [default: that of the selected spacetime instance]
 * `-y`, `--yes` — Run non-interactively wherever possible. This will answer "yes" to almost all prompts, but will sometimes answer "no" to preserve non-interactivity (e.g. when prompting whether to log in with spacetimedb.com).
@@ -558,12 +558,12 @@ WARNING: This command is UNSTABLE and subject to breaking changes.
 
 **Usage:** `spacetime subscribe [OPTIONS] <database> <query>...`
 
-###### Arguments:
+###### <b>Arguments:</b>
 
 * `<DATABASE>` — The name or identity of the database you would like to query
 * `<QUERY>` — The SQL query to execute
 
-###### Options:
+###### <b>Options:</b>
 
 * `-n`, `--num-updates <NUM-UPDATES>` — The number of subscription updates to receive before exiting
 * `-t`, `--timeout <TIMEOUT>` — The timeout, in seconds, after which to disconnect and stop receiving subscription messages. If `-n` is specified, it will stop after whichever
@@ -583,11 +583,11 @@ Run `spacetime start --help` to see all options.
 
 **Usage:** `spacetime start [OPTIONS] [args]...`
 
-###### Arguments:
+###### <b>Arguments:</b>
 
 * `<ARGS>` — The args to pass to `spacetimedb-{edition} start`
 
-###### Options:
+###### <b>Options:</b>
 
 * `--edition <EDITION>` — The edition of SpacetimeDB to start up
 
@@ -606,7 +606,7 @@ Run `spacetime version --help` to see all options.
 
 **Usage:** `spacetime version [ARGS]...`
 
-###### Arguments:
+###### <b>Arguments:</b>
 
 * `<ARGS>` — The args to pass to spacetimedb-update
 
