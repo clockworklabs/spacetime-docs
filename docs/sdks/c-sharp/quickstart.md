@@ -66,11 +66,8 @@ We will also need to create some global variables that will be explained when we
 // our local client SpacetimeDB identity
 Identity? local_identity = null;
 
-// declare a thread safe queue to store commands in format (command, args)
-ConcurrentQueue<(string,string)> input_queue = new ConcurrentQueue<(string, string)>();
-
-// declare a threadsafe cancel token to cancel the process loop
-CancellationTokenSource cancel_token = new CancellationTokenSource();
+// declare a thread safe queue to store commands
+var input_queue = new ConcurrentQueue<(string Command, string Args)>();
 ```
 
 ## Define Main function
@@ -89,47 +86,78 @@ void Main()
 {
     AuthToken.Init(".spacetime_csharp_quickstart");
 
-    RegisterCallbacks();
-
-    // spawn a thread to call process updates and process commands
-    var thread = new Thread(ProcessThread);
+    // Builds and connects to the database
+    DbConnection? conn = null;
+    conn = ConnectToDB();
+    // Registers callbacks for reducers
+    RegisterCallbacks(conn);
+    // Declare a threadsafe cancel token to cancel the process loop
+    var cancellationTokenSource = new CancellationTokenSource();
+    // Spawn a thread to call process updates and process commands
+    var thread = new Thread(() => ProcessThread(conn, cancellationTokenSource.Token));
     thread.Start();
-
+    // Handles CLI input
     InputLoop();
-
-    // this signals the ProcessThread to stop
-    cancel_token.Cancel();
+    // This signals the ProcessThread to stop
+    cancellationTokenSource.Cancel();
     thread.Join();
+}
+```
+
+## Connect to database
+
+Before we connect, we'll store the SpacetimeDB host name and our module name in constants `HOST` and `DB_NAME`.
+
+Next we build our connection to the database, and while we are doing so, we can register several of our callbacks. We'll provide the connection builder the following:
+1. The URI of the server running the SpacetimeDB server module. If it's running on the same computer as, we can set `HOST` to be `"http://localhost:3000"`
+2. The name of the module we are looking to communicate with on the server. Replace `<module-name>` with the name you chose when publishing your module during the module quickstart.
+3. The connection builder takes an auth token, which is `null` for a new connection, or a stored string for a returning user. We are going to use the optional AuthToken module which uses local storage to store the auth token. If you want to use your own way to associate an auth token with a user, you can pass in your own auth token here.
+4. We register a callback for `OnConnect`, where we will call `Subscribe` to tell the module what tables we care about.
+5. We register a callback for `OnConnectError`, which will be called if there are any errors during a connection attempt.
+6. We register a callback for `OnDisconnect`, which will be called when the client disconnects from the server.
+7. And finally we call `Build` to build our DbConnection.
+
+```csharp
+const string HOST = "http://localhost:3000";
+const string DBNAME = "<module-name>";
+
+/// Load credentials from a file and connect to the database.
+DbConnection ConnectToDB()
+{
+    DbConnection? conn = null;
+    conn = DbConnection.Builder()
+        .WithUri(HOST)
+        .WithModuleName(DBNAME)
+        .WithToken(AuthToken.Token)
+        .OnConnect(OnConnected)
+        .OnConnectError(OnConnectError)
+        .OnDisconnect(OnDisconnect)
+        .Build();
+    return conn;
 }
 ```
 
 ## Register callbacks
 
-We need to handle several sorts of events:
+Now we need to handle several sorts of events with Tables and Reducers:
 
-1. `onConnect`: When we connect, we will call `Subscribe` to tell the module what tables we care about.
-2. `onIdentityReceived`: When we receive our credentials, we'll use the `AuthToken` module to save our token so that the next time we connect, we can re-authenticate as the same user.
-3. `onSubscriptionApplied`: When we get the onSubscriptionApplied callback, that means our local client cache has been fully populated. At this time we'll print the user menu.
-4. `User.OnInsert`: When a new user joins, we'll print a message introducing them.
-5. `User.OnUpdate`: When a user is updated, we'll print their new name, or declare their new online status.
-6. `Message.OnInsert`: When we receive a new message, we'll print it.
-7. `Reducer.OnSetNameEvent`: If the server rejects our attempt to set our name, we'll print an error.
-8. `Reducer.OnSendMessageEvent`: If the server rejects a message we send, we'll print an error.
+1. `User.OnInsert`: When a new user joins, we'll print a message introducing them.
+2. `User.OnUpdate`: When a user is updated, we'll print their new name, or declare their new online status.
+3. `Message.OnInsert`: When we receive a new message, we'll print it.
+4. `Reducer.OnSetName`: If the server rejects our attempt to set our name, we'll print an error.
+5. `Reducer.OnSendMessage`: If the server rejects a message we send, we'll print an error.
 
 ```csharp
-void RegisterCallbacks()
+/// Register all the callbacks our app will use to respond to database events.
+void RegisterCallbacks(DbConnection conn)
 {
-    SpacetimeDBClient.instance.onConnect += OnConnect;
-    SpacetimeDBClient.instance.onIdentityReceived += OnIdentityReceived;
-    SpacetimeDBClient.instance.onSubscriptionApplied += OnSubscriptionApplied;
+    conn.Db.User.OnInsert += User_OnInsert;
+    conn.Db.User.OnUpdate += User_OnUpdate;
 
-    User.OnInsert += User_OnInsert;
-    User.OnUpdate += User_OnUpdate;
+    conn.Db.Message.OnInsert += Message_OnInsert;
 
-    Message.OnInsert += Message_OnInsert;
-
-    Reducer.OnSetNameEvent += Reducer_OnSetNameEvent;
-    Reducer.OnSendMessageEvent += Reducer_OnSendMessageEvent;
+    conn.Reducers.OnSetName += Reducer_OnSetNameEvent;
+    conn.Reducers.OnSendMessage += Reducer_OnSendMessageEvent;
 }
 ```
 
@@ -144,14 +172,14 @@ These callbacks can fire in two contexts:
 
 This second case means that, even though the module only ever inserts online users, the client's `User.OnInsert` callbacks may be invoked with users who are offline. We'll only notify about online users.
 
-`OnInsert` and `OnDelete` callbacks take two arguments: the altered row, and a `ReducerEvent`. This will be `null` for rows inserted when initializing the cache for a subscription. `ReducerEvent` is an enum autogenerated by `spacetime generate` with a variant for each reducer defined by the module. For now, we can ignore this argument.
+`OnInsert` and `OnDelete` callbacks take two arguments: the altered row, and a `EventContext`. This will be `null` for rows inserted when initializing the cache for a subscription. The `EventContext.Event` is an enum autogenerated by `spacetime generate` with a variant for each reducer defined by the module. For now, we can ignore this argument.
 
 Whenever we want to print a user, if they have set a name, we'll use that. If they haven't set a name, we'll instead print the first 8 bytes of their identity, encoded as hexadecimal. We'll define a function `UserNameOrIdentity` to handle this.
 
 ```csharp
-string UserNameOrIdentity(User user) => user.Name ?? user.Identity.ToString()!.Substring(0, 8);
+string UserNameOrIdentity(User user) => user.Name ?? user.Identity.ToString();//[..8];
 
-void User_OnInsert(User insertedValue, ReducerEvent? dbEvent)
+void User_OnInsert(EventContext ctx, User insertedValue)
 {
     if (insertedValue.Online)
     {
@@ -162,9 +190,9 @@ void User_OnInsert(User insertedValue, ReducerEvent? dbEvent)
 
 ### Notify about updated users
 
-Because we declared a primary key column in our `User` table, we can also register on-update callbacks. These run whenever a row is replaced by a row with the same primary key, like our module's `User::update_by_identity` calls. We register these callbacks using the `OnUpdate` method, which is automatically implemented by `spacetime generate` for any table with a primary key column.
+Because we declared a primary key column in our `User` table, we can also register on-update callbacks. These run whenever a row is replaced by a row with the same primary key, like our module's `User.Identity.Update` calls. We register these callbacks using the `OnUpdate` method, which is automatically implemented by `spacetime generate` for any table with a primary key column.
 
-`OnUpdate` callbacks take three arguments: the old row, the new row, and a `ReducerEvent`.
+`OnUpdate` callbacks take three arguments: the old row, the new row, and a `EventContext`.
 
 In our module, users can be updated for three reasons:
 
@@ -175,23 +203,22 @@ In our module, users can be updated for three reasons:
 We'll print an appropriate message in each of these cases.
 
 ```csharp
-void User_OnUpdate(User oldValue, User newValue, ReducerEvent dbEvent)
+void User_OnUpdate(EventContext ctx, User oldValue, User newValue)
 {
     if (oldValue.Name != newValue.Name)
     {
         Console.WriteLine($"{UserNameOrIdentity(oldValue)} renamed to {newValue.Name}");
     }
-
-    if (oldValue.Online == newValue.Online)
-        return;
-
-    if (newValue.Online)
+    if (oldValue.Online != newValue.Online)
     {
-        Console.WriteLine($"{UserNameOrIdentity(newValue)} connected.");
-    }
-    else
-    {
-        Console.WriteLine($"{UserNameOrIdentity(newValue)} disconnected.");
+        if (newValue.Online)
+        {
+            Console.WriteLine($"{UserNameOrIdentity(newValue)} connected.");
+        }
+        else
+        {
+            Console.WriteLine($"{UserNameOrIdentity(newValue)} disconnected.");
+        }
     }
 }
 ```
@@ -200,14 +227,14 @@ void User_OnUpdate(User oldValue, User newValue, ReducerEvent dbEvent)
 
 When we receive a new message, we'll print it to standard output, along with the name of the user who sent it. Keep in mind that we only want to do this for new messages, i.e. those inserted by a `SendMessage` reducer invocation. We have to handle the backlog we receive when our subscription is initialized separately, to ensure they're printed in the correct order. To that effect, our `OnInsert` callback will check if its `ReducerEvent` argument is not `null`, and only print in that case.
 
-To find the `User` based on the message's `Sender` identity, we'll use `User::FindByIdentity`, which behaves like the same function on the server.
+To find the `User` based on the message's `Sender` identity, we'll use `User.Identity.Find`, which behaves like the same function on the server.
 
 We'll print the user's name or identity in the same way as we did when notifying about `User` table events, but here we have to handle the case where we don't find a matching `User` row. This can happen when the module owner sends a message using the CLI's `spacetime call`. In this case, we'll print `unknown`.
 
 ```csharp
-void PrintMessage(Message message)
+void PrintMessage(RemoteTables tables, Message message)
 {
-    var sender = User.FindByIdentity(message.Sender);
+    var sender = tables.User.Identity.Find(message.Sender);
     var senderName = "unknown";
     if (sender != null)
     {
@@ -217,11 +244,11 @@ void PrintMessage(Message message)
     Console.WriteLine($"{senderName}: {message.Text}");
 }
 
-void Message_OnInsert(Message insertedValue, ReducerEvent? dbEvent)
+void Message_OnInsert(EventContext ctx, Message insertedValue)
 {
-    if (dbEvent != null)
+    if (ctx.Event is not Event<Reducer>.SubscribeApplied)
     {
-        PrintMessage(insertedValue);
+        PrintMessage(ctx.Db, insertedValue);
     }
 }
 ```
@@ -232,9 +259,9 @@ We can also register callbacks to run each time a reducer is invoked. We registe
 
 Each reducer callback takes one fixed argument:
 
-The ReducerEvent that triggered the callback. It contains several fields. The ones we care about are:
+The `ReducerEventContext` of the callback which contains an `Event` that contains several fields. The ones we care about are:
 
-1. The `Identity` of the client that called the reducer.
+1. The `CallerIdentity` is the `Identity` of the client that called the reducer.
 2. The `Status` of the reducer run, one of `Committed`, `Failed` or `OutOfEnergy`.
 3. The error message, if any, that the reducer returned.
 
@@ -252,15 +279,12 @@ We already handle successful `SetName` invocations using our `User.OnUpdate` cal
 We'll test both that our identity matches the sender and that the status is `Failed`, even though the latter implies the former, for demonstration purposes.
 
 ```csharp
-void Reducer_OnSetNameEvent(ReducerEvent reducerEvent, string name)
+void Reducer_OnSetNameEvent(ReducerEventContext ctx, string name)
 {
-    bool localIdentityFailedToChangeName =
-        reducerEvent.Identity == local_identity &&
-        reducerEvent.Status == ClientApi.Event.Types.Status.Failed;
-
-    if (localIdentityFailedToChangeName)
+    var e = ctx.Event;
+    if (e.CallerIdentity == local_identity && e.Status is Status.Failed(var error))
     {
-        Console.Write($"Failed to change name to {name}");
+        Console.Write($"Failed to change name to {name}: {error}");
     }
 }
 ```
@@ -270,42 +294,60 @@ void Reducer_OnSetNameEvent(ReducerEvent reducerEvent, string name)
 We handle warnings on rejected messages the same way as rejected names, though the types and the error message are different.
 
 ```csharp
-void Reducer_OnSendMessageEvent(ReducerEvent reducerEvent, string text)
+void Reducer_OnSendMessageEvent(ReducerEventContext ctx, string text)
 {
-    bool localIdentityFailedToSendMessage =
-        reducerEvent.Identity == local_identity &&
-        reducerEvent.Status == ClientApi.Event.Types.Status.Failed;
-
-    if (localIdentityFailedToSendMessage)
+    var e = ctx.Event;
+    if (e.CallerIdentity == local_identity && e.Status is Status.Failed(var error))
     {
-        Console.Write($"Failed to send message {text}");
+        Console.Write($"Failed to send message {text}: {error}");
     }
 }
 ```
 
 ## Connect callback
 
-Once we are connected, we can send our subscription to the SpacetimeDB module. SpacetimeDB is set up so that each client subscribes via SQL queries to some subset of the database, and is notified about changes only to that subset. For complex apps with large databases, judicious subscriptions can save each client significant network bandwidth, memory and computation compared. For example, in [BitCraft](https://bitcraftonline.com), each player's client subscribes only to the entities in the "chunk" of the world where that player currently resides, rather than the entire game world. Our app is much simpler than BitCraft, so we'll just subscribe to the whole database.
+Once we are connected, we'll use the `AuthToken` module to save our token to local storage, so that we can re-authenticate as the same user the next time we connect. We'll also store the identity in a global variable `local_identity` so that we can use it to check if we are the sender of a message or name change. This callback also notifies us of our client's `Address`, an opaque identifier SpacetimeDB modules can use to distinguish connections by the same `Identity`, but we won't use it in our app.
+
+Then we can send our subscription to the SpacetimeDB module. SpacetimeDB is set up so that each client subscribes via SQL queries to some subset of the database, and is notified about changes only to that subset. For complex apps with large databases, judicious subscriptions can save each client significant network bandwidth, memory and computation compared. For example, in [BitCraft](https://bitcraftonline.com), each player's client subscribes only to the entities in the "chunk" of the world where that player currently resides, rather than the entire game world. Our app is much simpler than BitCraft, so we'll just subscribe to the whole database using `SubscribeToAllTables`.
 
 ```csharp
-void OnConnect()
-{
-    SpacetimeDBClient.instance.Subscribe(new List<string>
-    {
-        "SELECT * FROM User", "SELECT * FROM Message"
-    });
-}
-```
-
-## OnIdentityReceived callback
-
-This callback is executed when we receive our credentials from the SpacetimeDB module. We'll use the `AuthToken` module to save our token to local storage, so that we can re-authenticate as the same user the next time we connect. We'll also store the identity in a global variable `local_identity` so that we can use it to check if we are the sender of a message or name change. This callback also notifies us of our client's `Address`, an opaque identifier SpacetimeDB modules can use to distinguish connections by the same `Identity`, but we won't use it in our app.
-
-```csharp
-void OnIdentityReceived(string authToken, Identity identity, Address _address)
+void OnConnected(DbConnection conn, Identity identity, string authToken)
 {
     local_identity = identity;
     AuthToken.SaveToken(authToken);
+
+    conn.SubscriptionBuilder()
+        .OnApplied(OnSubscriptionApplied)
+        .SubscribeToAllTables();
+}
+```
+
+You can also subscribe to specific tables using SQL syntax, e.g. `SELECT * FROM my_table`. Our [SQL documentation](/docs/sql) enumerates the operations that are accepted in our SQL syntax.
+
+## Connect Error callback
+
+Should we get an error during connection, we'll be given an `Exception` which contains the details about the exception. To keep things simple, we'll just write the exception to the console.
+
+```csharp
+void OnConnectError(Exception e)
+{
+    Console.Write($"Error while connecting: {e}");
+}
+```
+
+## Disconnect callback
+
+When Disconnecting, the callback contains the connection details and if an error occurs, it will also contain an `Exception`. If we get an error, we'll write the error to the console, if not, we'll just write that we disconnected.
+
+```csharp
+void OnDisconnect(DbConnection conn, Exception? e)
+{
+    if (e != null)
+    {
+        Console.Write($"Disconnected abnormally: {e}");
+    } else {
+        Console.Write($"Disconnected normally.");
+    }
 }
 ```
 
@@ -314,54 +356,48 @@ void OnIdentityReceived(string authToken, Identity identity, Address _address)
 Once our subscription is applied, we'll print all the previously sent messages. We'll define a function `PrintMessagesInOrder` to do this. `PrintMessagesInOrder` calls the automatically generated `Iter` function on our `Message` table, which returns an iterator over all rows in the table. We'll use the `OrderBy` method on the iterator to sort the messages by their `Sent` timestamp.
 
 ```csharp
-void PrintMessagesInOrder()
+void PrintMessagesInOrder(RemoteTables tables)
 {
-    foreach (Message message in Message.Iter().OrderBy(item => item.Sent))
+    foreach (Message message in tables.Message.Iter().OrderBy(item => item.Sent))
     {
-        PrintMessage(message);
+        PrintMessage(tables, message);
     }
 }
 
-void OnSubscriptionApplied()
+void OnSubscriptionApplied(SubscriptionEventContext ctx)
 {
     Console.WriteLine("Connected");
-    PrintMessagesInOrder();
+    PrintMessagesInOrder(ctx.Db);
 }
 ```
-
-<!-- FIXME: isn't OnSubscriptionApplied invoked every time the subscription results change? -->
 
 ## Process thread
 
 Since the input loop will be blocking, we'll run our processing code in a separate thread. This thread will:
 
-1. Connect to the module. We'll store the SpacetimeDB host name and our module name in constants `HOST` and `DB_NAME`. We will also store if SSL is enabled in a constant called `SSL_ENABLED`. This only needs to be `true` if we are using `SpacetimeDB Cloud`. Replace `<module-name>` with the name you chose when publishing your module during the module quickstart.
+1. Loop until the thread is signaled to exit, calling `Update` on the SpacetimeDBClient to process any updates received from the module, and `ProcessCommand` to process any commands received from the input loop.
 
-`Connect` takes an auth token, which is `null` for a new connection, or a stored string for a returning user. We are going to use the optional AuthToken module which uses local storage to store the auth token. If you want to use your own way to associate an auth token with a user, you can pass in your own auth token here.
-
-2. Loop until the thread is signaled to exit, calling `Update` on the SpacetimeDBClient to process any updates received from the module, and `ProcessCommand` to process any commands received from the input loop.
-
-3. Finally, Close the connection to the module.
+2. Finally, Close the connection to the module.
 
 ```csharp
-const string HOST = "http://localhost:3000";
-const string DBNAME = "module";
-
-void ProcessThread()
+void ProcessThread(DbConnection conn, CancellationToken ct)
 {
-    SpacetimeDBClient.instance.Connect(AuthToken.Token, HOST, DBNAME);
-
-    // loop until cancellation token
-    while (!cancel_token.IsCancellationRequested)
+    try
     {
-        SpacetimeDBClient.instance.Update();
+        // loop until cancellation token
+        while (!ct.IsCancellationRequested)
+        {
+            conn.FrameTick();
 
-        ProcessCommands();
+            ProcessCommands(conn.Reducers);
 
-        Thread.Sleep(100);
+            Thread.Sleep(100);
+        }
     }
-
-    SpacetimeDBClient.instance.Close();
+    finally
+    {
+        conn.Disconnect();
+    }
 }
 ```
 
@@ -388,7 +424,7 @@ void InputLoop()
 
         if (input.StartsWith("/name "))
         {
-            input_queue.Enqueue(("name", input.Substring(6)));
+            input_queue.Enqueue(("name", input[6..]));
             continue;
         }
         else
@@ -398,18 +434,18 @@ void InputLoop()
     }
 }
 
-void ProcessCommands()
+void ProcessCommands(RemoteReducers reducers)
 {
     // process input queue commands
     while (input_queue.TryDequeue(out var command))
     {
-        switch (command.Item1)
+        switch (command.Command)
         {
             case "message":
-                Reducer.SendMessage(command.Item2);
+                reducers.SendMessage(command.Args);
                 break;
             case "name":
-                Reducer.SetName(command.Item2);
+                reducers.SetName(command.Args);
                 break;
         }
     }
@@ -432,4 +468,10 @@ dotnet run --project client
 
 ## What's next?
 
-Congratulations! You've built a simple chat app using SpacetimeDB. You can look at the C# SDK Reference for more information about the client SDK. If you are interested in developing in the Unity game engine, check out our Unity3d Comprehensive Tutorial and BitcraftMini game example.
+Congratulations! You've built a simple chat app using SpacetimeDB.
+
+You can find the full code for this client [in the C# SDK's examples](https://github.com/clockworklabs/com.clockworklabs.spacetimedbsdk/tree/master/examples~/quickstart/client).
+
+Check out the [C# SDK Reference](/docs/sdks/c-sharp) for a more comprehensive view of the SpacetimeDB Rust SDK.
+
+If you are interested in developing in the Unity game engine, check out our [Unity Comprehensive Tutorial](/docs/unity) and [Blackholio](https://github.com/ClockworkLabs/Blackholio) game example.
