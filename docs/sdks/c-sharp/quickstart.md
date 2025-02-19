@@ -110,7 +110,7 @@ Before we connect, we'll store the SpacetimeDB host name and our module name in 
 
 Next we build our connection to the database, and while we are doing so, we can register several of our callbacks. We'll provide the connection builder the following:
 1. The URI of the server running the SpacetimeDB server module. If it's running on the same computer as, we can set `HOST` to be `"http://localhost:3000"`
-2. The name of the module we are looking to communicate with on the server. Replace `<module-name>` with the name you chose when publishing your module during the module quickstart.
+2. The name of the module we are looking to communicate with on the server. Replace `<module-name>` with `quickstart-chat` or the name you chose when publishing your module during the module quickstart.
 3. The connection builder takes an auth token, which is `null` for a new connection, or a stored string for a returning user. We are going to use the optional AuthToken module which uses local storage to store the auth token. If you want to use your own way to associate an auth token with a user, you can pass in your own auth token here.
 4. We register a callback for `OnConnect`, where we will call `Subscribe` to tell the module what tables we care about.
 5. We register a callback for `OnConnectError`, which will be called if there are any errors during a connection attempt.
