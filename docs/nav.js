@@ -47,6 +47,7 @@ const nav = {
         page('BSATN', 'bsatn', 'bsatn.md'),
         section('SQL'),
         page('SQL Reference', 'sql', 'sql/index.md'),
+        page('Appendix', 'appendix', 'appendix.md'),
     ],
 };
 export default nav;

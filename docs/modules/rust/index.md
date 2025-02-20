@@ -348,6 +348,8 @@ struct Autoinc {
 }
 ```
 
+**Note**: The `auto_inc` number generator is not transactional. See the [SEQUENCE] section for more details.
+
 These attributes can be combined, to create an automatically assigned ID usable for filtering.
 
 ```rust
@@ -523,3 +525,4 @@ fn delete_id(ctx: &ReducerContext, id: u64) {
 [macro library]: https://github.com/clockworklabs/SpacetimeDB/tree/master/crates/bindings-macro
 [module library]: https://github.com/clockworklabs/SpacetimeDB/tree/master/crates/lib
 [demo]: /#demo
+[SEQUENCE]: /docs/appendix#sequence
