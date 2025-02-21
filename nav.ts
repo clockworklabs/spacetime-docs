@@ -96,6 +96,7 @@ const nav: Nav = {
 
     section('SQL'),
     page('SQL Reference', 'sql', 'sql/index.md'),
+    page('Appendix', 'appendix', 'appendix.md'),
   ],
 };
 
