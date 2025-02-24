@@ -337,7 +337,7 @@ void OnConnectError(Exception e)
 
 ## Disconnect callback
 
-When Disconnecting, the callback contains the connection details and if an error occurs, it will also contain an `Exception`. If we get an error, we'll write the error to the console, if not, we'll just write that we disconnected.
+When disconnecting, the callback contains the connection details and if an error occurs, it will also contain an `Exception`. If we get an error, we'll write the error to the console, if not, we'll just write that we disconnected.
 
 ```csharp
 void OnDisconnect(DbConnection conn, Exception? e)
