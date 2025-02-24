@@ -472,6 +472,6 @@ Congratulations! You've built a simple chat app using SpacetimeDB.
 
 You can find the full code for this client [in the C# SDK's examples](https://github.com/clockworklabs/com.clockworklabs.spacetimedbsdk/tree/master/examples~/quickstart/client).
 
-Check out the [C# SDK Reference](/docs/sdks/c-sharp) for a more comprehensive view of the SpacetimeDB Rust SDK.
+Check out the [C# client SDK Reference](/docs/sdks/c-sharp) for a more comprehensive view of the SpacetimeDB C# client SDK.
 
 If you are interested in developing in the Unity game engine, check out our [Unity Comprehensive Tutorial](/docs/unity) and [Blackholio](https://github.com/ClockworkLabs/Blackholio) game example.
