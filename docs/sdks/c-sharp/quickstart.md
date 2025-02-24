@@ -259,7 +259,7 @@ We can also register callbacks to run each time a reducer is invoked. We registe
 
 Each reducer callback takes one fixed argument:
 
-The `ReducerEventContext` of the callback which contains an `Event` that contains several fields. The ones we care about are:
+The `ReducerEventContext` of the callback, which contains an `Event` that contains several fields. The ones we care about are:
 
 1. The `CallerIdentity` is the `Identity` of the client that called the reducer.
 2. The `Status` of the reducer run, one of `Committed`, `Failed` or `OutOfEnergy`.
