@@ -110,7 +110,7 @@ public partial class Message
 
 We want to allow users to set their names, because `Identity` is not a terribly user-friendly identifier. To that effect, we define a reducer `SetName` which clients can invoke to set their `User.Name`. It will validate the caller's chosen name, using a function `ValidateName` which we'll define next, then look up the `User` record for the caller and update it to store the validated name. If the name fails the validation, the reducer will fail.
 
-Each reducer may accept as its first argument a `ReducerContext`, which includes contextual data such as the `Sender` which contains the Identity of the client that called the reducer, and the `Timestamp` when it was invoked. For now, we only need the `Sender`.
+Each reducer must accept as its first argument a `ReducerContext`, which includes contextual data such as the `Sender` which contains the Identity of the client that called the reducer, and the `Timestamp` when it was invoked. For now, we only need the `Sender`.
 
 It's also possible to call `SetName` via the SpacetimeDB CLI's `spacetime call` command without a connection, in which case no `User` record will exist for the caller. We'll return an error in this case, but you could alter the reducer to insert a `User` row for the module owner. You'll have to decide whether the module owner is always online or always offline, though.
 
