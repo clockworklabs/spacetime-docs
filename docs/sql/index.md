@@ -484,9 +484,9 @@ SELECT * FROM "Balance$"
 When designing your schema or crafting your queries,
 consider the following best practices to ensure optimal performance:
 
-- **Define Unique Constraints:**  
-    If a column's values are guaranteed to be unique,
-    define a unique constraint on that column.
+- **Define Primary Key and Unique Constraints:**  
+    If a column is a primary key or its values are guaranteed to be unique,
+    define a primary key or unique constraint on that column.
     The query planner can further optimize joins if it knows the join values to be unique.
 
 - **Index Filtered Columns:**  
@@ -520,13 +520,89 @@ WHERE product.name = {product_name}
 In order to conform with the best practices for optimizing performance and scalability:
 
 - An index should be defined on `Inventory.name` because we are filtering on that column.
-- Unique constraints should be defined on `Inventory.id` and `Customers.id` since they are join columns.
+- `Inventory.id` and `Customers.id` should be defined as primary keys.
 - Additionally non-unique indexes should be defined on `Orders.product_id` and `Orders.customer_id`.
 - `Inventory` should appear first in the `FROM` clause because it is the only table mentioned in the `WHERE` clause.
 - `Orders` should come next because it joins directly with `Inventory`.
 - `Customers` should come next because it joins directly with `Orders`.
 
-As such, the query should be rewritten as follows:
+:::server-rust
+```rust
+#[table(
+    name = Inventory,
+    index(name = product_name, btree = [name]),
+    public
+)]
+struct Inventory {
+    #[primary_key]
+    id: u64,
+    name: String,
+    ..
+}
+
+#[table(
+    name = Customers,
+    public
+)]
+struct Customers {
+    #[primary_key]
+    id: u64,
+    first_name: String,
+    last_name: String,
+    ..
+}
+
+#[table(
+    name = Orders,
+    public
+)]
+struct Orders {
+    #[primary_key]
+    id: u64,
+    #[unique]
+    product_id: u64,
+    #[unique]
+    customer_id: u64,
+    ..
+}
+```
+:::
+:::server-csharp
+```cs
+[SpacetimeDB.Table(Name = "Inventory")]
+[SpacetimeDB.Index(Name = "product_name", BTree = ["name"])]
+public partial struct Inventory
+{
+    [SpacetimeDB.PrimaryKey]
+    public long id;
+    public string name;
+    ..
+}
+
+[SpacetimeDB.Table(Name = "Customers")]
+public partial struct Customers
+{
+    [SpacetimeDB.PrimaryKey]
+    public long id;
+    public string first_name;
+    public string last_name;
+    ..
+}
+
+[SpacetimeDB.Table(Name = "Orders")]
+public partial struct Orders
+{
+    [SpacetimeDB.PrimaryKey]
+    public long id;
+    [SpacetimeDB.Unique]
+    public long product_id;
+    [SpacetimeDB.Unique]
+    public long customer_id;
+    ..
+}
+```
+:::
+
 ```sql
 -- Find all customers who ordered a particular product and when they ordered it
 SELECT c.first_name, c.last_name, o.date
