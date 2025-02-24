@@ -261,7 +261,7 @@ Each reducer callback takes one fixed argument:
 
 The `ReducerEventContext` of the callback, which contains an `Event` that contains several fields. The ones we care about are:
 
-1. The `CallerIdentity` is the `Identity` of the client that called the reducer.
+1. The `CallerIdentity`, the `Identity` of the client that called the reducer.
 2. The `Status` of the reducer run, one of `Committed`, `Failed` or `OutOfEnergy`.
 3. The error message, if any, that the reducer returned.
 
