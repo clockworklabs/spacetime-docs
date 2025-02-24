@@ -200,7 +200,14 @@ SELECT * FROM Inventory;
 
 -- Select the names and prices of the items in my inventory
 SELECT item_name, price FROM Inventory
+```
 
+It also allows for counting the number of input rows via the `COUNT` function.
+`COUNT` always returns a single row, even if the input is empty.
+
+##### Example
+
+```sql
 -- Count the items in my inventory
 SELECT COUNT(*) AS n FROM Inventory
 ```
@@ -230,9 +237,9 @@ See [Subscriptions](#where).
 
 #### LIMIT clause
 
-Limits the number of rows returned by a query.
-
-It does not order rows in any way.
+Limits the number of rows a query returns by specifying an upper bound.
+The `LIMIT` may return fewer rows if the query itself returns fewer rows.
+`LIMIT` does not order or transform its input in any way.
 
 ##### Examples
 
