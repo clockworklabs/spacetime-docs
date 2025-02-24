@@ -479,6 +479,63 @@ SELECT * FROM "Order"
 SELECT * FROM "Balance$"
 ```
 
+## Best Practices for Performance and Scalability
+
+When designing your schema or crafting your queries,
+consider the following best practices to ensure optimal performance:
+
+- **Define Unique Constraints:**  
+    If a column's values are guaranteed to be unique,
+    define a unique constraint on that column.
+    The query planner can further optimize joins if it knows the join values to be unique.
+
+- **Index Filtered Columns:**  
+    Define indexes on columns frequently used in a `WHERE` clause.
+    Indexes reduce the number of rows scanned by the query engine.
+
+- **Index Join Columns:**  
+    Define indexes on columns whose values are frequently used as join keys.
+    These are columns that are used in the `ON` condition of a `JOIN`.
+    Again, this reduces the number of rows that must be scanned to answer a query.
+    It is also critical for the performance of subscription updates --
+    so much so that it is a compiler-enforced requirement,
+    as mentioned in the [subscription](#from) section.
+
+- **Optimize Join Order:**  
+    Place tables with the most selective filters first in your `FROM` clause.
+    This minimizes intermediate result sizes and improves query efficiency.
+
+### Example
+
+Take the following query that was used in a previous example:
+```sql
+-- Find all customers who ordered a particular product and when they ordered it
+SELECT customer.first_name, customer.last_name, o.date
+FROM Customers customer
+JOIN Orders o ON customer.id = o.customer_id
+JOIN Inventory product ON o.product_id = product.id
+WHERE product.name = {product_name}
+```
+
+In order to conform with the best practices for optimizing performance and scalability:
+
+- An index should be defined on `Inventory.name` because we are filtering on that column.
+- Unique constraints should be defined on `Inventory.id` and `Customers.id` since they are join columns.
+- Additionally non-unique indexes should be defined on `Orders.product_id` and `Orders.customer_id`.
+- `Inventory` should appear first in the `FROM` clause because it is the only table mentioned in the `WHERE` clause.
+- `Orders` should come next because it joins directly with `Inventory`.
+- `Customers` should come next because it joins directly with `Orders`.
+
+As such, the query should be rewritten as follows:
+```sql
+-- Find all customers who ordered a particular product and when they ordered it
+SELECT c.first_name, c.last_name, o.date
+FROM Inventory product
+JOIN Orders o ON product.id = o.product_id
+JOIN Customers c ON c.id = o.customer_id
+WHERE product.name = {product_name};
+```
+
 ## Appendix
 
 Common production rules that have been used throughout this document.
