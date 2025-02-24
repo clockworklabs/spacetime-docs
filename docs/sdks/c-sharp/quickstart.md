@@ -177,7 +177,7 @@ This second case means that, even though the module only ever inserts online use
 Whenever we want to print a user, if they have set a name, we'll use that. If they haven't set a name, we'll instead print the first 8 bytes of their identity, encoded as hexadecimal. We'll define a function `UserNameOrIdentity` to handle this.
 
 ```csharp
-string UserNameOrIdentity(User user) => user.Name ?? user.Identity.ToString();//[..8];
+string UserNameOrIdentity(User user) => user.Name ?? user.Identity.ToString()[..8];
 
 void User_OnInsert(EventContext ctx, User insertedValue)
 {
@@ -263,7 +263,7 @@ The `ReducerEventContext` of the callback, which contains an `Event` that contai
 
 1. The `CallerIdentity`, the `Identity` of the client that called the reducer.
 2. The `Status` of the reducer run, one of `Committed`, `Failed` or `OutOfEnergy`.
-3. The error message, if any, that the reducer returned.
+3. If we get a `Status.Failed`, an error message is nested inside that we'll want to write to the console.
 
 It also takes a variable amount of additional arguments that match the reducer's arguments.
 
@@ -373,11 +373,11 @@ void OnSubscriptionApplied(SubscriptionEventContext ctx)
 
 ## Process thread
 
-Since the input loop will be blocking, we'll run our processing code in a separate thread. This thread will:
+Since the input loop will be blocking, we'll run our processing code in a separate thread.
 
-1. Loop until the thread is signaled to exit, calling `Update` on the SpacetimeDBClient to process any updates received from the module, and `ProcessCommand` to process any commands received from the input loop.
+This thread will loop until the thread is signaled to exit, calling the update function `FrameTick` on the `DbConnection` to process any updates received from the module, and `ProcessCommand` to process any commands received from the input loop.
 
-2. Finally, close the connection to the module.
+Afterward, close the connection to the module.
 
 ```csharp
 void ProcessThread(DbConnection conn, CancellationToken ct)

@@ -57,13 +57,13 @@ spacetime init --lang csharp server
 2. Open `server/Lib.cs`, a trivial module.
 3. Clear it out, so we can write a new module that's still pretty simple: a bare-bones chat server.
 
+To start, we'll need to add `SpacetimeDB` to our using statements. This will give us access to everything we need to author our SpacetimeDB server module.
+
 To the top of `server/Lib.cs`, add some imports we'll be using:
 
 ```csharp
 using SpacetimeDB;
 ```
-
-- `SpacetimeDB` contains the special attributes we'll use to define tables and reducers in our module and the raw API bindings SpacetimeDB uses to communicate with the database.
 
 We also need to create our static module class which all of the module code will live in. In `server/Lib.cs`, add:
 
@@ -273,11 +273,7 @@ From the `quickstart-chat` directory, run:
 spacetime publish --project-path server <module-name>
 ```
 
-Note: If `wasm-opt` is installed, `spacetime publish` will automatically optimize the Web Assembly output of the module. `wasm-opt` can be installed by running:
-
-```bash
-cargo install wasm-opt
-```
+Note: If the WebAssembly optimizer `wasm-opt` is installed, `spacetime publish` will automatically optimize the Web Assembly output of the published module. Instruction for installing the `wasm-opt` binary can be found in [Rust's wasm-opt documentation](https://docs.rs/wasm-opt/latest/wasm_opt/).
 
 ## Call Reducers
 
