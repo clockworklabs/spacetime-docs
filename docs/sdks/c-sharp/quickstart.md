@@ -377,7 +377,7 @@ Since the input loop will be blocking, we'll run our processing code in a separa
 
 1. Loop until the thread is signaled to exit, calling `Update` on the SpacetimeDBClient to process any updates received from the module, and `ProcessCommand` to process any commands received from the input loop.
 
-2. Finally, Close the connection to the module.
+2. Finally, close the connection to the module.
 
 ```csharp
 void ProcessThread(DbConnection conn, CancellationToken ct)
