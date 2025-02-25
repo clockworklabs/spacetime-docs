@@ -484,22 +484,26 @@ SELECT * FROM "Balance$"
 When designing your schema or crafting your queries,
 consider the following best practices to ensure optimal performance:
 
-- **Define Primary Key and Unique Constraints:**  
-    If a column is a primary key or its values are guaranteed to be unique,
-    define a primary key or unique constraint on that column.
+- **Add Primary Key and/or Unique Constraints:**  
+    Constrain columns whose values are guaranteed to be distinct as either unique or primary keys.
     The query planner can further optimize joins if it knows the join values to be unique.
 
 - **Index Filtered Columns:**  
-    Define indexes on columns frequently used in a `WHERE` clause.
+    Index columns frequently used in a `WHERE` clause.
     Indexes reduce the number of rows scanned by the query engine.
 
 - **Index Join Columns:**  
-    Define indexes on columns whose values are frequently used as join keys.
+    Index columns whose values are frequently used as join keys.
     These are columns that are used in the `ON` condition of a `JOIN`.
+
     Again, this reduces the number of rows that must be scanned to answer a query.
     It is also critical for the performance of subscription updates --
     so much so that it is a compiler-enforced requirement,
     as mentioned in the [subscription](#from) section.
+
+    If a column that has already been constrained as unique or a primary key,
+    it is not necessary to explicitly index it as well,
+    since these constraints automatically index the column in question.
 
 - **Optimize Join Order:**  
     Place tables with the most selective filters first in your `FROM` clause.
