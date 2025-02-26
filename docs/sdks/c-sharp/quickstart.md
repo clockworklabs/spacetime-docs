@@ -99,8 +99,8 @@ To `Program.cs`, add:
 ```csharp
 void Main()
 {
+    // Initialize the `AuthToken` module
     AuthToken.Init(".spacetime_csharp_quickstart");
-
     // Builds and connects to the database
     DbConnection? conn = null;
     conn = ConnectToDB();
@@ -137,7 +137,10 @@ In our case, we'll supply the following options:
 To `Program.cs`, add:
 
 ```csharp
+/// The URI of the SpacetimeDB instance hosting our chat module.
 const string HOST = "http://localhost:3000";
+
+/// The module name we chose when we published our module.
 const string DBNAME = "quickstart-chat";
 
 /// Load credentials from a file and connect to the database.
@@ -165,6 +168,7 @@ Once we are connected, we'll use the `AuthToken` module to save our token to loc
 To `Program.cs`, add:
 
 ```csharp
+/// Our `OnConnected` callback: save our credentials to a file.
 void OnConnected(DbConnection conn, Identity identity, string authToken)
 {
     local_identity = identity;
@@ -179,6 +183,7 @@ Should we get an error during connection, we'll be given an `Exception` which co
 To `Program.cs`, add:
 
 ```csharp
+/// Our `OnConnectError` callback: print the error, then exit the process.
 void OnConnectError(Exception e)
 {
     Console.Write($"Error while connecting: {e}");
@@ -192,6 +197,7 @@ When disconnecting, the callback contains the connection details and if an error
 To `Program.cs`, add:
 
 ```csharp
+/// Our `OnDisconnect` callback: print a note, then exit the process.
 void OnDisconnect(DbConnection conn, Exception? e)
 {
     if (e != null)
@@ -247,8 +253,10 @@ Whenever we want to print a user, if they have set a name, we'll use that. If th
 To `Program.cs`, add:
 
 ```csharp
+/// If the user has no set name, use the first 8 characters from their identity.
 string UserNameOrIdentity(User user) => user.Name ?? user.Identity.ToString()[..8];
 
+/// Our `User.OnInsert` callback: if the user is online, print a notification.
 void User_OnInsert(EventContext ctx, User insertedValue)
 {
     if (insertedValue.Online)
@@ -275,6 +283,8 @@ We'll print an appropriate message in each of these cases.
 To `Program.cs`, add:
 
 ```csharp
+/// Our `User.OnUpdate` callback:
+/// print a notification about name and status changes.
 void User_OnUpdate(EventContext ctx, User oldValue, User newValue)
 {
     if (oldValue.Name != newValue.Name)
@@ -306,6 +316,15 @@ We'll print the user's name or identity in the same way as we did when notifying
 To `Program.cs`, add:
 
 ```csharp
+/// Our `Message.OnInsert` callback: print new messages.
+void Message_OnInsert(EventContext ctx, Message insertedValue)
+{
+    if (ctx.Event is not Event<Reducer>.SubscribeApplied)
+    {
+        PrintMessage(ctx.Db, insertedValue);
+    }
+}
+
 void PrintMessage(RemoteTables tables, Message message)
 {
     var sender = tables.User.Identity.Find(message.Sender);
@@ -316,14 +335,6 @@ void PrintMessage(RemoteTables tables, Message message)
     }
 
     Console.WriteLine($"{senderName}: {message.Text}");
-}
-
-void Message_OnInsert(EventContext ctx, Message insertedValue)
-{
-    if (ctx.Event is not Event<Reducer>.SubscribeApplied)
-    {
-        PrintMessage(ctx.Db, insertedValue);
-    }
 }
 ```
 
@@ -355,6 +366,7 @@ We'll test both that our identity matches the sender and that the status is `Fai
 To `Program.cs`, add:
 
 ```csharp
+/// Our `OnSetNameEvent` callback: print a warning if the reducer failed.
 void Reducer_OnSetNameEvent(ReducerEventContext ctx, string name)
 {
     var e = ctx.Event;
@@ -372,6 +384,7 @@ We handle warnings on rejected messages the same way as rejected names, though t
 To `Program.cs`, add:
 
 ```csharp
+/// Our `OnSendMessageEvent` callback: print a warning if the reducer failed.
 void Reducer_OnSendMessageEvent(ReducerEventContext ctx, string text)
 {
     var e = ctx.Event;
@@ -395,6 +408,7 @@ We can also provide an `OnError` callback. This will run if the subscription fai
 In `Program.cs`, update our `OnConnected` function to include `conn.SubscriptionBuilder().OnApplied(OnSubscriptionApplied).SubscribeToAllTables();` so that it reads:
 
 ```csharp
+/// Our `OnConnect` callback: save our credentials to a file.
 void OnConnected(DbConnection conn, Identity identity, string authToken)
 {
     local_identity = identity;
@@ -413,18 +427,20 @@ Once our subscription is applied, we'll print all the previously sent messages. 
 To `Program.cs`, add:
 
 ```csharp
+/// Our `OnSubscriptionApplied` callback:
+/// sort all past messages and print them in timestamp order.
+void OnSubscriptionApplied(SubscriptionEventContext ctx)
+{
+    Console.WriteLine("Connected");
+    PrintMessagesInOrder(ctx.Db);
+}
+
 void PrintMessagesInOrder(RemoteTables tables)
 {
     foreach (Message message in tables.Message.Iter().OrderBy(item => item.Sent))
     {
         PrintMessage(tables, message);
     }
-}
-
-void OnSubscriptionApplied(SubscriptionEventContext ctx)
-{
-    Console.WriteLine("Connected");
-    PrintMessagesInOrder(ctx.Db);
 }
 ```
 
@@ -439,6 +455,7 @@ Afterward, close the connection to the module.
 To `Program.cs`, add:
 
 ```csharp
+/// Our separate thread from main, where we can call process updates and process commands without blocking the main thread. 
 void ProcessThread(DbConnection conn, CancellationToken ct)
 {
     try
@@ -473,6 +490,7 @@ Supported Commands:
 To `Program.cs`, add:
 
 ```csharp
+/// Read each line of standard input, and either set our name or send a message as appropriate.
 void InputLoop()
 {
     while (true)
