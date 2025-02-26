@@ -265,12 +265,12 @@ If you haven't already started the SpacetimeDB server, run the `spacetime start`
 
 ## Publish the module
 
-And that's all of our module code! We'll run `spacetime publish` to compile our module and publish it on SpacetimeDB. `spacetime publish` takes an optional name which will map to the database's unique address. Clients can connect either by name or by address, but names are much more pleasant. Come up with a unique name, and fill it in where we've written `<module-name>`.
+And that's all of our module code! We'll run `spacetime publish` to compile our module and publish it on SpacetimeDB. `spacetime publish` takes an optional name which will map to the database's unique address. Clients can connect either by name or by address, but names are much more pleasant. In this example, we'll be using `quickstart-chat`. Feel free to come up with a unique name, and in the CLI commands, replace where we've written `quickstart-chat` with the name you chose.
 
 From the `quickstart-chat` directory, run:
 
 ```bash
-spacetime publish --project-path server <module-name>
+spacetime publish --project-path server quickstart-chat
 ```
 
 Note: If the WebAssembly optimizer `wasm-opt` is installed, `spacetime publish` will automatically optimize the Web Assembly output of the published module. Instruction for installing the `wasm-opt` binary can be found in [Rust's wasm-opt documentation](https://docs.rs/wasm-opt/latest/wasm_opt/).
@@ -280,13 +280,13 @@ Note: If the WebAssembly optimizer `wasm-opt` is installed, `spacetime publish` 
 You can use the CLI (command line interface) to run reducers. The arguments to the reducer are passed in JSON format.
 
 ```bash
-spacetime call <module-name> SendMessage "Hello, World!"
+spacetime call quickstart-chat SendMessage "Hello, World!"
 ```
 
 Once we've called our `SendMessage` reducer, we can check to make sure it ran by running the `logs` command.
 
 ```bash
-spacetime logs <module-name>
+spacetime logs quickstart-chat
 ```
 
 You should now see the output that your module printed in the database.
@@ -300,7 +300,7 @@ info: Hello, World!
 SpacetimeDB supports a subset of the SQL syntax so that you can easily query the data of your database. We can run a query using the `sql` command.
 
 ```bash
-spacetime sql <module-name> "SELECT * FROM Message"
+spacetime sql quickstart-chat "SELECT * FROM Message"
 ```
 
 ```bash
