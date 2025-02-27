@@ -256,7 +256,7 @@ For more information about WebSocket headers, see [RFC 6455](https://datatracker
 
 | Name                     | Value                                                                                                |
 | ------------------------ | ---------------------------------------------------------------------------------------------------- |
-| `Sec-WebSocket-Protocol` | `v1.bin.spacetimedb` or `v1.text.spacetimedb`                                                        |
+| `Sec-WebSocket-Protocol` | `v1.bin.spacetimedb` or `v1.json.spacetimedb`                                                        |
 | `Connection`             | `Updgrade`                                                                                           |
 | `Upgrade`                | `websocket`                                                                                          |
 | `Sec-WebSocket-Version`  | `13`                                                                                                 |
@@ -265,7 +265,7 @@ For more information about WebSocket headers, see [RFC 6455](https://datatracker
 The SpacetimeDB binary WebSocket protocol, `v1.bin.spacetimedb`, encodes messages as well as reducer and row data using [BSATN](/docs/bsatn).
 Its messages are defined [here](https://github.com/clockworklabs/SpacetimeDB/blob/master/crates/client-api-messages/src/websocket.rs).
 
-The SpacetimeDB text WebSocket protocol, `v1.text.spacetimedb`, encodes messages according to the [SATS-JSON format](/docs/sats-json).
+The SpacetimeDB text WebSocket protocol, `v1.json.spacetimedb`, encodes messages according to the [SATS-JSON format](/docs/sats-json).
 
 #### Optional Headers
 
