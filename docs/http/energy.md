@@ -1,20 +1,20 @@
-# `/energy` HTTP API
+# `/v1/energy` HTTP API
 
-The HTTP endpoints in `/energy` allow clients to query identities' energy balances. Spacetime databases expend energy from their owners' balances while executing reducers.
+The HTTP endpoints in `/v1/energy` allow clients to query identities' energy balances. Spacetime databases expend energy from their owners' balances while executing reducers.
 
 ## At a glance
 
-| Route                                            | Description                                               |
-| ------------------------------------------------ | --------------------------------------------------------- |
-| [`/energy/:identity GET`](#energyidentity-get)   | Get the remaining energy balance for the user `identity`. |
+| Route                                               | Description                                               |
+| --------------------------------------------------- | --------------------------------------------------------- |
+| [`GET /v1/energy/:identity`](#get-v1energyidentity) | Get the remaining energy balance for the user `identity`. |
 
-## `/energy/:identity GET`
+## `GET /v1/energy/:identity`
 
 Get the energy balance of an identity.
 
 Accessible through the CLI as [`spacetime energy balance`](/docs/cli-reference#spacetime-energy-balance).
 
-#### Parameters
+#### Path parameters
 
 | Name        | Value                   |
 | ----------- | ----------------------- |
