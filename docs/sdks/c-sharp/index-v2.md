@@ -175,6 +175,10 @@ class DbConnection {
 
 `FrameTick` will advance the connection until no work remains or until it is disconnected, then return rather than blocking. Games might arrange for this message to be called every frame.
 
+It is not advised to run `FrameTick` on a background thread, since it modifies [`dbConnection.Db`](#property-db). If main thread code is also accessing the `Db`, it may observe data races when `FrameTick` runs on another thread.
+
+(Note that the SDK already does most of the work for parsing messages on a background thread. `FrameTick()` does the minimal amount of work needed to apply updates to the `Db`.)
+
 ## Access tables and reducers
 
 ### Property `Db`
@@ -339,7 +343,7 @@ class SubscriptionBuilder
 }
 ```
 
-Subscribe to a set of queries. `queries` should be a string or an array, vec or slice of strings.
+Subscribe to a set of queries. `queries` should be an array of SQL query strings.
 
 See [the SpacetimeDB SQL Reference](/docs/sql#subscriptions) for information on the queries SpacetimeDB supports as subscriptions.
 
