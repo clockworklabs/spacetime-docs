@@ -37,7 +37,7 @@ C# modules are written with the the C# Module Library (this crate). They are bui
 
 This reference assumes you are familiar with the basics of C#. If you aren't, check out the [C# language documentation](https://learn.microsoft.com/en-us/dotnet/csharp/). For a guided introduction to C# Modules, see the [C# Module Quickstart](https://spacetimedb.com/docs/modules/c-sharp/quickstart).
 
-## Overview
+# Overview
 
 SpacetimeDB modules have two ways to interact with the outside world: tables and reducers.
 
@@ -73,7 +73,7 @@ Tables and reducers in C# modules can use any type that implements the [`Spaceti
 
 <!-- TODO: link to client subscriptions / client one-off queries respectively. -->
 
-## Setup
+# Setup
 
 To create a C# module, install the [`spacetime` CLI tool](https://spacetimedb.com/install) in your preferred shell. Navigate to your work directory and run the following command:
 
@@ -211,13 +211,13 @@ to update the module attached to your database. Note that SpacetimeDB tries to [
 
 You can also generate code for clients of your module using the `spacetime generate` command. See the [client SDK documentation] for more information.
 
-## How it works
+# How it works
 
 Under the hood, SpacetimeDB modules are WebAssembly modules that import a [specific WebAssembly ABI](https://spacetimedb.com/docs/webassembly-abi) and export a small number of special functions. This is automatically configured when you add the `spacetime` crate as a dependency of your application.
 
 The SpacetimeDB host is an application that hosts SpacetimeDB databases. [Its source code is available](https://github.com/clockworklabs/SpacetimeDB) under [the Business Source License with an Additional Use Grant](https://github.com/clockworklabs/SpacetimeDB/blob/master/LICENSE.txt). You can run your own host, or you can upload your module to the public SpacetimeDB network. <!-- TODO: want a link to some dashboard for the public network. --> The network will create a database for you and install your module in it to serve client requests.
 
-#### In More Detail: Publishing a Module
+### In More Detail: Publishing a Module
 
 The `spacetime publish [DATABASE_IDENTITY]` command compiles a module and uploads it to a SpacetimeDB host. After this:
 - The host finds the database with the requested `DATABASE_IDENTITY`.
@@ -233,7 +233,7 @@ However:
 - New versions of a module may remove or change reducers that were previously present. Client code calling those reducers will receive runtime errors.
 
 
-## Tables
+# Tables
 
 Tables are declared using the [`[SpacetimeDB.Table]` attribute](#table-attribute).
 
@@ -307,7 +307,7 @@ ctx.Db.person
 
 [Unique and primary key columns](#unique-and-primary-key-columns) and [indexes](#indexes) generate additional accessors, such as `ctx.Db.person.Id` and `ctx.Db.person.Name`.
 
-### Interface `ITableView`
+## Interface `ITableView`
 
 ```csharp
 namespace SpacetimeDB.Internal;
@@ -336,7 +336,7 @@ The type `Row` is the type of rows in the table.
 | [`Iter` method](#iter-method)       | Iterate all rows of the table |
 | [`Count` property](#count-property) | Count all rows of the table   |
 
-#### `ITableView.Insert` method
+### `ITableView.Insert` method
 
 ```csharp
 Row Insert(Row row);
@@ -357,7 +357,7 @@ Inserting a duplicate row in a table without a unique constraint is a no-op,
 as SpacetimeDB is a set-semantic database.
 Inserting a duplicate row in a table with a unique constraint will cause a unique constraint violation.
 
-#### `ITableView.Delete` method
+### `ITableView.Delete` method
 
 ```csharp
 bool Delete(Row row);
@@ -374,7 +374,7 @@ No analogue to auto-increment placeholders exists for deletions.
 
 Throws an exception if deleting the row would violate any constraints.
 
-#### `ITableView.Iter` method
+### `ITableView.Iter` method
 
 ```csharp
 IEnumerable<Row> Iter();
@@ -384,7 +384,7 @@ Iterate over all rows of the table.
 
 For large tables, this can be a very slow operation! Prefer [filtering](#filter-method) a [`RangedIndex`] or [finding](find-method) a [`UniqueIndex`] if possible.
 
-#### `ITableView.Count` method
+### `ITableView.Count` method
 
 ```csharp
 ulong Count { get; }
@@ -395,7 +395,7 @@ Returns the number of rows of this table.
 This takes into account modifications by the current transaction,
 even though those modifications have not yet been committed or broadcast to clients.
 
-### Public and Private Tables
+## Public and Private Tables
 
 By default, tables are considered **private**. This means that they are only readable by the database owner and by reducers. Reducers run inside the database, so clients cannot see private tables at all.
 
@@ -405,7 +405,7 @@ Using the `[SpacetimeDB.Table(Name = "table_name", Public)]` flag makes a table 
 
 To learn how to subscribe to a public table, see the [client SDK documentation](https://spacetimedb.com/docs/sdks).
 
-### Unique and Primary Key Columns
+## Unique and Primary Key Columns
 
 Columns of a table (that is, fields of a [`[Table]`] struct) can be annotated with `[Unique]` or `[PrimaryKey]`. Multiple columns can be `[Unique]`, but only one can be `[PrimaryKey]`. For example:
 
@@ -447,7 +447,7 @@ It is not currently possible to mark a group of fields as collectively unique.
 
 Filtering on unique columns is only supported for a limited number of types.
 
-### Class `UniqueIndex`
+## Class `UniqueIndex`
 
 ```csharp
 namespace SpacetimeDB.Internal;
@@ -509,7 +509,7 @@ public static partial class Module {
 <!-- Technically, these methods only exist in the generated code, not in the abstract
 base class. This is a wart that is necessary because of a bad interaction between C# inheritance, nullable types, and structs/classes.-->
 
-#### `UniqueIndex.Find` method
+### `UniqueIndex.Find` method
 
 ```csharp
 Row? Find(Column key);
@@ -518,7 +518,7 @@ Row? Find(Column key);
 Finds and returns the row where the value in the unique column matches the supplied `key`,
 or `null` if no such row is present in the database state.
 
-#### `UniqueIndex.Update` method
+### `UniqueIndex.Update` method
 
 ```csharp
 Row Update(Row row);
@@ -531,7 +531,7 @@ Returns the new row as actually inserted, with any auto-inc placeholders substit
 Throws if no row was previously present with the matching value in the unique column,
 or if either the delete or the insertion would violate a constraint.
 
-#### `UniqueIndex.Delete` method
+### `UniqueIndex.Delete` method
 
 ```csharp
 bool Delete(Column key);
@@ -542,7 +542,7 @@ Deletes the row where the value in the unique column matches the supplied `key`,
 Returns `true` if a row with the specified `key` was previously present and has been deleted,
 or `false` if no such row was present.
 
-### Auto-inc columns
+## Auto-inc columns
 
 Columns can be marked `[SpacetimeDB.AutoInc]`. This can only be used on integer types (`int`, `ulong`, etc.)
 
@@ -568,13 +568,14 @@ public static partial class Module
             // are inserted with the sentinel value 0.
             var actual = ctx.Db.example.Insert(new Example { Field = 0 });
             Debug.Assert(actual.Field != 0);
+        }
     }
 }
 ```
 
 `[AutoInc]` is often combined with `[Unique]` or `[PrimaryKey]` to automatically assign unique integer identifiers to rows.
 
-### Indexes
+## Indexes
 
 SpacetimeDB supports both single- and multi-column [B-Tree](https://en.wikipedia.org/wiki/B-tree) indexes.
 
@@ -591,11 +592,11 @@ For example:
 [SpacetimeDB.Index.BTree(Name = "TitleAndDate", Columns = [nameof(Title), nameof(Date)])]
 [SpacetimeDB.Index.BTree(Name = "UrlAndCountry", Columns = [nameof(Url), nameof(Country)])]
 public partial struct AcademicPaper {
-    string Title;
-    string Url;
-    string Date;
-    string Venue;
-    string Country;
+    public string Title;
+    public string Url;
+    public string Date;
+    public string Venue;
+    public string Country;
 } 
 ```
 
@@ -606,23 +607,116 @@ Single-column indexes can also be declared using an annotation on a column:
 ```csharp
 [SpacetimeDB.Table(Name = "academic_paper")]
 public partial struct AcademicPaper {
-    string Title;
-    string Url;
+    public string Title;
+    public string Url;
     [SpacetimeDB.Index.BTree] // The index will be named "Date".
-    string Date;
+    public string Date;
     [SpacetimeDB.Index.BTree] // The index will be named "Venue".
-    string Venue;
+    public string Venue;
     [SpacetimeDB.Index.BTree(Name = "ByCountry")] // The index will be named "ByCountry".
-    string Country;
+    public string Country;
 } 
 ```
 
 
-Any index supports getting an [`Index`] using `ctx.Db.{table}.{index}`. For example, `ctx.Db.academic_paper.TitleAndDate` or `ctx.Db.academic_paper.Venue`.
+Any index supports getting an [`Index`](#class-index) using `ctx.Db.{table}.{index}`. For example, `ctx.Db.academic_paper.TitleAndDate` or `ctx.Db.academic_paper.Venue`.
 
-### 
+## Class `Index`
 
-## Reducers
+```csharp
+public abstract class IndexBase<Row>
+    where Row : IStructuralReadWrite, new()
+{
+    // ...
+}
+```
+
+Each index generates a subclass of `IndexBase`, which accessible via `ctx.Db.{table}.{index}`. For example, `ctx.Db.academic_paper.TitleAndDate`.
+
+Indexes can be applied to a variabe number of columns, referred to as `Column1`, `Column2`, `Column3`... in the following examples.
+
+| Name                                   | Description             |
+| -------------------------------------- | ----------------------- |
+| Method [`Filter`](#method-indexfilter) | Filter rows in an index |
+| Method [`Delete`](#method-indexdelete) | Delete rows in an index |
+
+### Method `Index.Filter`
+
+```csharp
+public IEnumerable<Row> Filter(Column1 bound);
+public IEnumerable<Row> Filter(Bound<Column1> bound);
+public IEnumerable<Row> Filter((Column1, Column2) bound);
+public IEnumerable<Row> Filter((Column1, Bound<Column2>) bound);
+public IEnumerable<Row> Filter((Column1, Column2, Column3) bound);
+public IEnumerable<Row> Filter((Column1, Column2, Bound<Column3>) bound);
+// ...
+```
+
+Returns an iterator over all rows in the database state where the indexed column(s) match the passed `bound`. Bound is a tuple of column values, possible terminated by a `Bound<LastColumn>`. A `Bound<LastColumn>` is simply a tuple `(LastColumn Min, LastColumn Max)`. Any prefix of the indexed columns can be passed, for example:
+
+```csharp
+using SpacetimeDB;
+
+public static partial class Module
+{
+    [SpacetimeDB.Table(Name = "zoo_animal")]
+    [SpacetimeDB.Index.BTree(Name = "SpeciesAgeName", Columns = [nameof(Species), nameof(Age), nameof(Name)])]
+    public partial struct ZooAnimal
+    {
+        public string Species;
+        public uint Age;
+        public string Name;
+        [SpacetimeDB.PrimaryKey]
+        public uint Id;
+    }
+
+    [SpacetimeDB.Reducer]
+    public static void Example(ReducerContext ctx)
+    {
+        foreach (var baboon in ctx.Db.zoo_animal.SpeciesAgeName.Filter("baboon"))
+        {
+            // Work with the baboon.
+        }
+        foreach (var animal in ctx.Db.zoo_animal.SpeciesAgeName.Filter(("b", "e")))
+        {
+            // Work with the animal.
+            // The name of the species starts with a character between "b" and "e".
+        }
+        foreach (var babyBaboon in ctx.Db.zoo_animal.SpeciesAgeName.Filter(("baboon", 1)))
+        {
+            // Work with the baby baboon.
+        }
+        foreach (var youngBaboon in ctx.Db.zoo_animal.SpeciesAgeName.Filter(("baboon", (1, 5))))
+        {
+            // Work with the young baboon.
+        }
+        foreach (var babyBaboonNamedBob in ctx.Db.zoo_animal.SpeciesAgeName.Filter(("baboon", 1, "Bob")))
+        {
+            // Work with the baby baboon named "Bob".
+        }
+        foreach (var babyBaboon in ctx.Db.zoo_animal.SpeciesAgeName.Filter(("baboon", 1, ("a", "f"))))
+        {
+            // Work with the baby baboon, whose name starts with a letter between "a" and "f".
+        }
+    }
+}
+```
+
+### Method `Index.Delete`
+
+```csharp
+public ulong Delete(Column1 bound);
+public ulong Delete(Bound<Column1> bound);
+public ulong Delete((Column1, Column2) bound);
+public ulong Delete((Column1, Bound<Column2>) bound);
+public ulong Delete((Column1, Column2, Column3) bound);
+public ulong Delete((Column1, Column2, Bound<Column3>) bound);
+// ...
+```
+
+Delete all rows in the database state where the indexed column(s) match the passed `bound`. Returns the count of rows deleted. Note that there may be multiple rows deleted even if only a single column value is passed, since the index is not guaranteed to be unique.
+
+# Reducers
 
 Reducers are declared using the [`#[reducer]` macro](macro@crate::reducer).
 
@@ -644,23 +738,98 @@ public static partial class Module {
 
 Every reducer runs inside a [database transaction](https://en.wikipedia.org/wiki/Database_transaction). <!-- TODO: specific transaction level guarantees. --> This means that reducers will not observe the effects of other reducers modifying the database while they run. Also, if a reducer fails, all of its changes to the database will automatically be rolled back. Reducers can fail by [panicking](::std::panic!) or by returning an `Err`.
 
-#### The `ReducerContext` Type
+## Class `ReducerContext`
+
+```csharp
+public sealed record ReducerContext : DbContext<Local>, Internal.IReducerContext
+{
+    // ...
+}
+```
 
 Reducers have access to a special [`ReducerContext`] argument. This argument allows reading and writing the database attached to a module. It also provides some additional functionality, like generating random numbers and scheduling future operations.
 
 [`ReducerContext`] provides access to the database tables via [the `.db` field](ReducerContext#structfield.db). The [`#[table]`](macro@crate::table) macro generates traits that add accessor methods to this field.
 
-#### Lifecycle Reducers
+| Name                                                            | Description                                               |
+| --------------------------------------------------------------- | --------------------------------------------------------- |
+| Property [`Db`](#property-reducercontextdb)                     | The current state of the database                         |
+| Property [`Sender`](#property-reducercontextsender)             | The [`Identity`] of the caller of the reducer             |
+| Property [`ConnectionId`](#property-reducercontextconnectionid) | The [`ConnectionId`] of the caller of the reducer, if any |
+| Property [`Rng`](#property-reducercontextrng)                   | An [`Rng`].                                               |
+| Property [`Timestamp`](#property-reducercontexttimestamp)       | The [`Timestamp`] of the reducer invocation               |
+| Property [`Identity`](#property-reducercontextidentity)         | The [`Identity`] of the module                            |
+
+### Property `ReducerContext.Db`
+
+```csharp
+DbView Db;
+```
+
+Allows accessing the local database attached to a module.
+
+The `#[table]` attribute generates a field of this property.
+
+For a table named *table*, use `ctx.Db.{table}` to get a [table view](#interface-itableview).
+For example, `ctx.Db.users`.
+
+You can also use `ctx.Db.{table}.{index}` to get an [index](#class-index) or [unique index](#class-uniqueindex).
+
+### Property `ReducerContext.Sender`
+
+```csharp
+Identity Sender;
+```
+
+The [`Identity`] of the client that invoked the reducer.
+
+### Property `ReducerContext.ConnectionId`
+
+```csharp
+ConnectionId? ConnectionId;
+```
+
+The [`ConnectionId`] of the client that invoked the reducer.
+
+`null` if no `ConnectionId` was supplied to the `/database/call` HTTP endpoint,
+or via the CLI's `spacetime call` subcommand.
+
+### Property `ReducerContext.Rng`
+
+```csharp
+Rng Rng;
+```
+
+An [`Rng`] that can be used to generate random numbers.
+
+### Property `ReducerContext.Timestamp`
+
+```csharp
+Timestamp Timestamp;
+```
+
+The time at which the reducer was invoked.
+
+### Property `ReducerContext.Identity`
+
+```csharp
+Identity Identity;
+```
+
+The [`Identity`] of the module.
+Note: not the identity of the caller, that's [`Sender`](#property-reducercontextsender).
+
+## Lifecycle Reducers
 
 A small group of reducers are called at set points in the module lifecycle. These are used to initialize
 the database and respond to client connections. See [Lifecycle Reducers](macro@crate::reducer#lifecycle-reducers).
 
-#### Scheduled Reducers
+## Scheduled Reducers
 
 Reducers can be scheduled to run repeatedly. This can be used to implement timers, game loops, and
 maintenance tasks. See [Scheduled Reducers](macro@crate::reducer#scheduled-reducers).
 
-## Automatic migrations
+# Automatic migrations
 
 When you `spacetime publish` a module that has already been published using `spacetime publish <DATABASE_NAME_OR_IDENTITY>`,
 SpacetimeDB attempts to automatically migrate your existing database to the new schema. (The "schema" is just the collection
@@ -668,8 +837,6 @@ of tables and reducers you've declared in your code, together with the types the
 On the plus side, automatic migrations usually don't break clients. The situations that may break clients are documented below.
 
 The following changes are always allowed and never breaking:
-
-<!-- TODO: everything here should be smoke-tested. -->
 
 - ✅ **Adding tables**. Non-updated clients will not be able to see the new tables.
 - ✅ **Adding indexes**.
@@ -702,9 +869,9 @@ The following changes are forbidden without a manual migration:
 
 Currently, manual migration support is limited. The `spacetime publish --clear-database <DATABASE_IDENTITY>` command can be used to **COMPLETELY DELETE** and reinitialize your database, but naturally it should be used with EXTREME CAUTION.
 
-## Other infrastructure
+# Other infrastructure
 
-### Class `Log`
+## Class `Log`
 
 ```csharp
 namespace SpacetimeDB
@@ -772,7 +939,7 @@ public static partial class Module {
 }
 ```
 
-### Attribute `[SpacetimeDB.Type]`
+## Attribute `[SpacetimeDB.Type]`
 
 This attribute makes types self-describing, allowing them to automatically register their structure
 with SpacetimeDB. Any C# type annotated with `[SpacetimeDB.Type]` can be used as a table column or reducer argument.
@@ -842,7 +1009,162 @@ Some types from the standard library are also considered to be marked with `[Spa
 - `SpacetimeDB.I256`
 - `List<T>` where `T` is a `[SpacetimeDB.Type]`
 
-### Record `TaggedEnum`
+## Struct `Identity`
+
+```csharp
+namespace SpacetimeDB;
+
+public readonly record struct Identity
+{
+    public static Identity FromHexString(string hex);
+    public string ToString();
+}
+```
+
+An `Identity` for something interacting with the database.
+
+This is a record struct, so it can be printed, compared with `==`, and used as a `Dictionary` key.
+
+`ToString()` returns a hex encoding of the Identity, suitable for printing.
+
+<!-- TODO: docs for OpenID stuff. -->
+
+## Struct `ConnectionId`
+
+```csharp
+namespace SpacetimeDB;
+
+public readonly record struct ConnectionId
+{
+    public static ConnectionId? FromHexString(string hex);
+    public string ToString();
+}
+```
+
+A unique identifier for a client connection to a SpacetimeDB database.
+
+This is a record struct, so it can be printed, compared with `==`, and used as a `Dictionary` key.
+
+`ToString()` returns a hex encoding of the `ConnectionId`, suitable for printing.
+
+## Struct `Timestamp`
+
+```csharp
+namespace SpacetimeDB;
+
+public record struct Timestamp(long MicrosecondsSinceUnixEpoch)
+    : IStructuralReadWrite,
+        IComparable<Timestamp>
+{
+    // ...
+}
+```
+
+A point in time, measured in microseconds since the Unix epoch.
+This can be converted to/from a standard library [`DateTimeOffset`]. It is provided for consistency of behavior between SpacetimeDB's supported module and SDK languages.
+
+| Name                                  | Description                                           |
+| ------------------------------------- | ----------------------------------------------------- |
+| Property `MicrosecondsSinceUnixEpoch` | Microseconds since the [unix epoch].                  |
+| Conversion to/from `DateTimeOffset`   | Convert to/from a standard library [`DateTimeOffset`] |
+| Static property `UNIX_EPOCH`          | The [unix epoch] as a `Timestamp`                     |
+| Method `TimeDurationSince`            | Measure the time elapsed since another `Timestamp`    |
+| Operator `+`                          | Add a [`TimeDuration`] to a `Timestamp`               |
+| Method `CompareTo`                    | Compare to another `Timestamp`                        |
+
+### Property `Timestamp.MicrosecondsSinceUnixEpoch`
+
+```csharp
+long MicrosecondsSinceUnixEpoch;
+```
+
+The number of microseconds since the [unix epoch].
+
+A positive value means a time after the Unix epoch, and a negative value means a time before.
+
+### Conversion to/from `DateTimeOffset`
+
+```csharp
+public static implicit operator DateTimeOffset(Timestamp t);
+public static implicit operator Timestamp(DateTimeOffset offset);
+```
+`Timestamp` may be converted to/from a [`DateTimeOffset`], but the conversion can lose precision.
+This type has less precision than DateTimeOffset (units of microseconds rather than units of 100ns).
+
+### Static property `Timestamp.UNIX_EPOCH`
+```csharp
+public static readonly Timestamp UNIX_EPOCH = new Timestamp { MicrosecondsSinceUnixEpoch = 0 };
+```
+
+The [unix epoch] as a `Timestamp`.
+
+### Method `Timestamp.TimeDurationSince`
+```csharp
+public readonly TimeDuration TimeDurationSince(Timestamp earlier) =>
+```
+
+Create a new [`TimeDuration`] that is the difference between two `Timestamps`.
+
+### Operator `Timestamp.+`
+```csharp
+public static Timestamp operator +(Timestamp point, TimeDuration interval);
+```
+
+Create a new `Timestamp` that occurs `interval` after `point`.
+
+### Method `Timestamp.CompareTo`
+```csharp
+public int CompareTo(Timestamp that)
+```
+
+Compare two `Timestamp`s.
+
+## Struct `TimeDuration`
+```csharp
+namespace SpacetimeDB;
+
+public record struct TimeDuration(long Microseconds) : IStructuralReadWrite {
+    // ...
+}
+```
+
+A duration that represents an interval between two [`Timestamp`]s.
+
+This type may be converted to/from a [`TimeSpan`]. It is provided for consistency of behavior between SpacetimeDB's supported module and SDK languages.
+
+| Name                                                          | Description                                       |
+| ------------------------------------------------------------- | ------------------------------------------------- |
+| Property [`Microseconds`](#property-timedurationmicroseconds) | Microseconds between the [`Timestamp`]s.          |
+| [Conversion to/from `TimeSpan`](#conversion-tofrom-timespan)  | Convert to/from a standard library [`TimeSpan`]   |
+| Static property [`ZERO`](#static-property-timedurationzero)   | The duration between any [`Timestamp`] and itself |
+
+### Property `TimeDuration.Microseconds`
+```csharp
+long Microseconds;
+```
+
+The number of microseconds between two [`Timestamp`]s.
+
+### Conversion to/from `TimeSpan`
+```csharp
+public static implicit operator TimeSpan(TimeDuration d) =>
+    new(d.Microseconds * Util.TicksPerMicrosecond);
+
+public static implicit operator TimeDuration(TimeSpan timeSpan) =>
+    new(timeSpan.Ticks / Util.TicksPerMicrosecond);
+```
+
+`TimeDuration` may be converted to/from a [`TimeSpan`], but the conversion can lose precision.
+This type has less precision than [`TimeSpan`] (units of microseconds rather than units of 100ns).
+
+### Static property `TimeDuration.ZERO`
+```csharp
+public static readonly TimeDuration ZERO = new TimeDuration { Microseconds = 0 };
+```
+
+The duration between any `Timestamp` and itself.
+
+## Record `TaggedEnum`
 ```csharp
 namespace SpacetimeDB;
 
@@ -936,16 +1258,6 @@ public partial struct RectData {
 public partial record ShapeData : SpacetimeDB.TaggedEnum<(CircleData Circle, RectData Rect)> { }
 ```
 
-<<<<<<< HEAD
-[SpacetimeDB.Reducer(ReducerKind.Disconnect)]
-public static void OnDisconnect(DbEventArgs ctx)
-{
-    Log($"{ctx.Sender} has disconnected.");
-}```
-````
-
-[SEQUENCE]: /docs/appendix#sequence
-=======
 Then code using a `ShapeData` will only have to do one check -- do I have a circle or a rectangle?
 And in each case, the data will be guaranteed to have exactly the fields needed.
 
@@ -956,4 +1268,3 @@ And in each case, the data will be guaranteed to have exactly the fields needed.
 [clients]: https://spacetimedb.com/docs/#client
 [client SDK documentation]: https://spacetimedb.com/docs/#client
 [host]: https://spacetimedb.com/docs/#host
->>>>>>> 25e1326 (Most of the way to C# Module SDK docs)
