@@ -1278,9 +1278,6 @@ public static readonly TimeDuration ZERO = new TimeDuration { Microseconds = 0 }
 
 The duration between any `Timestamp` and itself.
 
-## Class `Rng`
-
-
 ## Record `TaggedEnum`
 ```csharp
 namespace SpacetimeDB;
