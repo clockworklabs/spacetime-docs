@@ -837,7 +837,7 @@ class RemoteTableHandle
 }
 ```
 
-The `OnUpdate` callback runs whenever an already-resident row in the client cache is updated, i.e. replaced with a new row that has the same primary key. Newly registered or canceled callbacks do not take effect until the following event.
+The `OnUpdate` callback runs whenever an already-resident row in the client cache is updated, i.e. replaced with a new row that has the same primary key. The table must have a primary key for callbacks to be triggered. Newly registered or canceled callbacks do not take effect until the following event.
 
 See [the quickstart](/docs/sdks/c-sharp/quickstart#register-callbacks) for examples of regstering and unregistering row callbacks.
 
