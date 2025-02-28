@@ -843,11 +843,51 @@ See [the quickstart](/docs/sdks/c-sharp/quickstart#register-callbacks) for examp
 
 ### Unique constraint index access
 
-For each unique constraint on a table, its table handle has a property which is a unique index handle and whose name is the unique column name. This unique index handle has a method `.Find(Column: value)`. If a `Row` with `value` in the unique column is resident in the client cache, `.Find` returns it. Otherwise it returns null.
+For each unique constraint on a table, its table handle has a property which is a unique index handle and whose name is the unique column name. This unique index handle has a method `.Find(Column value)`. If a `Row` with `value` in the unique column is resident in the client cache, `.Find` returns it. Otherwise it returns null.
+
+
+#### Example
+
+Given the following module-side `User` definition:
+```csharp
+[Table(Name = "User", Public = true)]
+public partial class User
+{
+    [Unique] // Or [PrimaryKey]
+    public Identity Identity;
+    ..
+}
+```
+
+a client would lookup a user as follows:
+```csharp
+User? FindUser(RemoteTables tables, Identity id) => tables.User.Identity.Find(id);
+```
 
 ### BTree index access
 
 For each btree index defined on a remote table, its corresponding table handle has a property which is a btree index handle and whose name is the name of the index. This index handle has a method `IEnumerable<Row> Filter(Column value)` which will return `Row`s with `value` in the indexed `Column`, if there are any in the cache.
+
+#### Example
+
+Given the following module-side `Player` definition:
+```csharp
+[Table(Name = "Player", Public = true)]
+public partial class Player
+{
+    [PrimaryKey]
+    public Identity id;
+
+    [Index.BTree(Name = "Level")]
+    public uint level;
+    ..
+}
+```
+
+a client would count the number of `Player`s at a certain level as follows:
+```csharp
+int CountPlayersAtLevel(RemoteTables tables, uint level) => tables.Player.Level.Filter(level).Count();
+```
 
 ## Observe and invoke reducers
 
