@@ -2,9 +2,10 @@
 
 A local database instance (as started by `spacetime start`) can be configured in `{data-dir}/config.toml`, where `{data-dir}` is the database's data directory. This directory is printed when you run `spacetime start`:
 
-<pre>spacetimedb-standalone version: 1.0.0
+<!-- FIXME: handle bare <pre> better in markdown renderer -->
+<pre class="shiki"><span>spacetimedb-standalone version: 1.0.0
 spacetimedb-standalone path: /home/user/.local/share/spacetime/bin/1.0.0/spacetimedb-standalone
-database running in data directory <b>/home/user/.local/share/spacetime/data</b></pre>
+database running in data directory <b>/home/user/.local/share/spacetime/data</b></span></pre>
 
 On Linux and macOS, this directory is by default `~/.local/share/spacetime/data`. On Windows, it's `%LOCALAPPDATA%\SpacetimeDB\data`.
 
