@@ -603,6 +603,8 @@ record Status : TaggedEnum<(
 )>;
 ```
 
+<!-- TODO: Link to the definition of TaggedEnum in the module docs -->
+
 | Name                                          | Description                                         |
 |-----------------------------------------------|-----------------------------------------------------|
 | [`Committed` variant](#variant-committed)     | The reducer ran successfully.                       |
@@ -904,7 +906,9 @@ Each reducer defined by the module has three methods on the `.Reducers`:
 ### Type `Identity`
 
 A unique public identifier for a client connected to a database.
+See [module docs](/docs/modules/c-sharp) for more details. <!-- TODO: Link to the definition of Identity in the module docs -->
 
 ### Type `ConnectionId`
 
 An opaque identifier for a client connection to a database, intended to differentiate between connections from the same [`Identity`](#type-identity).
+See [module docs](/docs/modules/c-sharp) for more details. <!-- TODO: Link to the definition of ConnectionId in the module docs -->
