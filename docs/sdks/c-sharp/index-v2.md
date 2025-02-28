@@ -232,11 +232,11 @@ Each module's `module_bindings` exports an interface `IRemoteDbContext` which in
 ```csharp
 interface IRemoteDbContext
 {
-    public DbView Db();
+    public DbView Db { get; }
 }
 ```
 
-Call the `ctx.Db()` when operating in generic contexts.
+`Db` will have methods to access each table defined by the module.
 
 #### Example
 
@@ -249,11 +249,12 @@ Call the `ctx.Db()` when operating in generic contexts.
 ```csharp
 interface IRemoteDbContext
 {
-    public RemoteReducers Reducers();
+    public RemoteReducers Reducers { get; }
 }
 ```
 
-Call the `ctx.Reducers()` when operating in generic contexts.
+`Reducers` will have methods to invoke each reducer defined by the module,
+plus methods for adding and removing callbacks on each of those reducers.
 
 #### Example
 
