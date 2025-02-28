@@ -1,17 +1,5 @@
 # SpacetimeDB C# Module Library
 
-<!-- TODO once all text copied in: replacements:
-#[table] -> [Table]
-#[auto_inc] -> [AutoInc]
-#[primary_key] -> [PrimaryKey]
-ctx.db -> ctx.Db
-RangedIndex -> Index
-:: -> (look at it and fix it)
-Rust -> C#
-
-and double check heading levels
--->
-
 [SpacetimeDB](https://spacetimedb.com/) allows using the C# language to write server-side applications called **modules**. Modules run inside a relational database. They have direct access to database tables, and expose public functions called **reducers** that can be invoked over the network. Clients connect directly to the database to read data.
 
 ```text
@@ -45,7 +33,7 @@ SpacetimeDB modules have two ways to interact with the outside world: tables and
 
 - [Reducers](#reducers) are functions that modify data and can be invoked by [clients] over the network. They can read and write data in tables, and write to a private debug log.
 
-These are the only ways for a SpacetimeDB module to interact with the outside world. Calling functions from `std::net` or `std::fs` inside a reducer will result in runtime errors.
+These are the only ways for a SpacetimeDB module to interact with the outside world. Calling functions from `System.IO` or `System.Net` inside a reducer will result in runtime errors.
 
 Declaring tables and reducers is straightforward:
 
@@ -69,7 +57,7 @@ static partial class Module
 
 Note that reducers don't return data directly; they can only modify the database. Clients connect directly to the database and use SQL to query [public](#public-and-private-tables) tables. Clients can also open subscriptions to receive streaming updates as the results of a SQL query change.
 
-Tables and reducers in C# modules can use any type that implements the [`SpacetimeType`] trait.
+Tables and reducers in C# modules can use any type annotated with [`[SpacetimeDB.Type]`](#attribute-spacetimedbtype).
 
 <!-- TODO: link to client subscriptions / client one-off queries respectively. -->
 
@@ -139,7 +127,7 @@ public static partial class Module
 
 This skeleton declares a [table](#tables), some [reducers](#reducers). 
 
-You can also add some [lifecycle reducers](#lifecycle-reducers) using the following code:
+You can also add some [lifecycle reducers](#lifecycle-reducers) to the `Module` class using the following code:
 
 ```csharp
 [Reducer(ReducerKind.Init)]
@@ -154,7 +142,7 @@ public static void ClientConnected(ReducerContext ctx)
     // Called when a client connects.
 }
 
-[Reducer(ReducerKind.ClientDisonnected)]
+[Reducer(ReducerKind.ClientDisconnected)]
 public static void ClientDisconnected(ReducerContext ctx)
 {
     // Called when a client connects.
@@ -201,7 +189,7 @@ The output of `spacetime publish` will end with a line:
 Created new database with name: <name>, identity: <hex string>
 ```
 
-This name is the human-readable name of the created database, and the hex string is its [`Identity`]. These distinguish the created database from the other databases running on the SpacetimeDB network.  They are used when administering the application, for example using the [`spacetime logs <DATABASE_NAME>`](#the-log-crate) command. You should probably write the database name down in a text file so that you can remember it.
+This name is the human-readable name of the created database, and the hex string is its [`Identity`](#struct-identity). These distinguish the created database from the other databases running on the SpacetimeDB network.  They are used when administering the application, for example using the [`spacetime logs <DATABASE_NAME>`](#class-log) command. You should probably write the database name down in a text file so that you can remember it.
 
 After modifying your project, you can run:
 
@@ -239,7 +227,7 @@ Tables are declared using the [`[SpacetimeDB.Table]` attribute](#table-attribute
 
 This macro is applied to a C# `partial class` or `partial struct` with named fields. All of the fields of the table must be marked with [`[SpacetimeDB.Type]`](#type-attribute).
 
-The resulting type is used to store rows of the table. It is normal class (or struct). Row values are not special -- operations on row types do not, by themselves, modify the table. Instead, a [`ReducerContext`](#reducercontext) is needed to get a handle to the table.
+The resulting type is used to store rows of the table. It is normal class (or struct). Row values are not special -- operations on row types do not, by themselves, modify the table. Instead, a [`ReducerContext`](#class-reducercontext) is needed to get a handle to the table.
 
 ```csharp
 public static partial class Module {
@@ -293,10 +281,10 @@ public static partial class Module {
 
 This library generates a custom API for each table, depending on the table's name and structure.
 
-All tables support getting a handle implementing the [`ITableView`] interface from a [`ReducerContext`], using:
+All tables support getting a handle implementing the [`ITableView`](#interface-itableview) interface from a [`ReducerContext`](#class-reducercontext), using:
 
 ```text
-ctx.db.{table_name}
+ctx.Db.{table_name}
 ```
 
 For example,
@@ -321,22 +309,22 @@ public interface ITableView<View, Row>
 <!-- Actually, `Row` is called `T` in the real declaration, but it would be much clearer
 if it was called `Row`. -->
 
-Implemented for every table handle generated by the [`Table`] attribute.
-For a table named `{name}`, a handle can be extracted from a [`ReducerContext`] using `ctx.Db.{name}`. For example, `ctx.Db.person`.
+Implemented for every table handle generated by the [`Table`](#tables) attribute.
+For a table named `{name}`, a handle can be extracted from a [`ReducerContext`](#class-reducercontext) using `ctx.Db.{name}`. For example, `ctx.Db.person`.
 
 Contains methods that are present for every table handle, regardless of what unique constraints
 and indexes are present.
 
 The type `Row` is the type of rows in the table.
 
-| Name                                | Description                   |
-| ----------------------------------- | ----------------------------- |
-| [`Insert` method](#insert-method)   | Insert a row into the table   |
-| [`Delete` method](#delete-method)   | Delete a row from the table   |
-| [`Iter` method](#iter-method)       | Iterate all rows of the table |
-| [`Count` property](#count-property) | Count all rows of the table   |
+| Name                                          | Description                   |
+| --------------------------------------------- | ----------------------------- |
+| [Method `Insert`](#method-itableviewinsert)   | Insert a row into the table   |
+| [Method `Delete`](#method-itableviewdelete)   | Delete a row from the table   |
+| [Method `Iter`](#method-itableviewiter)       | Iterate all rows of the table |
+| [Property `Count`](#property-itableviewcount) | Count all rows of the table   |
 
-### `ITableView.Insert` method
+### Method `ITableView.Insert`
 
 ```csharp
 Row Insert(Row row);
@@ -349,7 +337,7 @@ The `insert` method always returns the inserted row, even when the table contain
 
 (The returned row is a copy of the row in the database.
 Modifying this copy does not directly modify the database.
-See [`UniqueIndex.Update()`](#method-update) if you want to update the row.)
+See [`UniqueIndex.Update()`](#method-uniqueindexupdate) if you want to update the row.)
 
 Throws an exception if inserting the row violates any constraints.
 
@@ -357,7 +345,7 @@ Inserting a duplicate row in a table without a unique constraint is a no-op,
 as SpacetimeDB is a set-semantic database.
 Inserting a duplicate row in a table with a unique constraint will cause a unique constraint violation.
 
-### `ITableView.Delete` method
+### Method `ITableView.Delete`
 
 ```csharp
 bool Delete(Row row);
@@ -368,13 +356,13 @@ Deletes a row equal to `row` from the table.
 Returns `true` if the row was present and has been deleted,
 or `false` if the row was not present and therefore the tables have not changed.
 
-Unlike [`Insert`](#insert-method), there is no need to return the deleted row,
+Unlike [`Insert`](#method-itableviewinsert), there is no need to return the deleted row,
 as it must necessarily have been exactly equal to the `row` argument.
 No analogue to auto-increment placeholders exists for deletions.
 
 Throws an exception if deleting the row would violate any constraints.
 
-### `ITableView.Iter` method
+### Method `ITableView.Iter`
 
 ```csharp
 IEnumerable<Row> Iter();
@@ -382,9 +370,9 @@ IEnumerable<Row> Iter();
 
 Iterate over all rows of the table.
 
-For large tables, this can be a very slow operation! Prefer [filtering](#filter-method) a [`RangedIndex`] or [finding](find-method) a [`UniqueIndex`] if possible.
+For large tables, this can be a very slow operation! Prefer [filtering](#method-indexfilter) a [`Index`](#class-index) or [finding](#method-uniqueindexfind) a [`UniqueIndex`](#class-uniqueindex) if possible.
 
-### `ITableView.Count` method
+### Property `ITableView.Count`
 
 ```csharp
 ulong Count { get; }
@@ -407,7 +395,7 @@ To learn how to subscribe to a public table, see the [client SDK documentation](
 
 ## Unique and Primary Key Columns
 
-Columns of a table (that is, fields of a [`[Table]`] struct) can be annotated with `[Unique]` or `[PrimaryKey]`. Multiple columns can be `[Unique]`, but only one can be `[PrimaryKey]`. For example:
+Columns of a table (that is, fields of a [`[Table]`](#tables) struct) can be annotated with `[Unique]` or `[PrimaryKey]`. Multiple columns can be `[Unique]`, but only one can be `[PrimaryKey]`. For example:
 
 ```csharp
 [SpacetimeDB.Table(Name = "citizen")]
@@ -427,7 +415,7 @@ public partial struct Citizen {
 
 Every row in the table `Person` must have unique entries in the `id`, `ssn`, and `email` columns. Attempting to insert multiple `Person`s with the same `id`, `ssn`, or `email` will throw an exception.
 
-Any `[Unique]` or `[PrimaryKey]` column supports getting a [`UniqueIndex`] from a [`ReducerContext`] using:
+Any `[Unique]` or `[PrimaryKey]` column supports getting a [`UniqueIndex`](#class-uniqueindex) from a [`ReducerContext`](#class-reducercontext) using:
 
 ```text
 ctx.Db.{table}.{unique_column}
@@ -439,9 +427,9 @@ For example,
 ctx.Db.citizen.Ssn
 ```
 
-Notice that updating a row is only possible if a row has a unique column -- there is no `update` method in the base [`Table`] trait. SpacetimeDB has no notion of rows having an "identity" aside from their unique / primary keys.
+Notice that updating a row is only possible if a row has a unique column -- there is no `update` method in the base [`ITableView`](#interface-itableview) interface. SpacetimeDB has no notion of rows having an "identity" aside from their unique / primary keys.
 
-The `#[primary_key]` annotation is similar to the `#[unique]` annotation, except that it leads to additional methods being made available in the [client]-side SDKs.
+The `[PrimaryKey]` annotation is similar to the `[Unique]` annotation, except that it leads to additional methods being made available in the [client]-side SDKs.
 
 It is not currently possible to mark a group of fields as collectively unique.
 
@@ -463,7 +451,7 @@ public abstract class UniqueIndex<Handle, Row, Column, RW> : IndexBase<Row>
 <!-- Actually, `Column` is called `T` in the real declaration, but it would be much clearer
 if it was called `Column`. -->
 
-A unique index on a column. Available for `#[unique]` and `#[primary_key]` columns.
+A unique index on a column. Available for `[Unique]` and `[PrimaryKey]` columns.
 (A custom class derived from `UniqueIndex` is generated for every such column.)
 
 `Row` is the type decorated with `[SpacetimeDB.Table]`, `Column` is the type of the column,
@@ -500,16 +488,16 @@ public static partial class Module {
 }
 ```
 
-| Name                                          | Description                                  |
-| --------------------------------------------- | -------------------------------------------- |
-| [`Find` method](#uniqueindex-find-method)     | Find a row by the value of a unique column   |
-| [`Update` method](#uniqueindex-update-method) | Update a row with a unique column            |
-| [`Delete` method](#uniqueindex-delete-method) | Delete a row by the value of a unique column |
+| Name                                         | Description                                  |
+| -------------------------------------------- | -------------------------------------------- |
+| [Method `Find`](#method-uniqueindexfind)     | Find a row by the value of a unique column   |
+| [Method `Update`](#method-uniqueindexupdate) | Update a row with a unique column            |
+| [Method `Delete`](#method-uniqueindexdelete) | Delete a row by the value of a unique column |
 
 <!-- Technically, these methods only exist in the generated code, not in the abstract
 base class. This is a wart that is necessary because of a bad interaction between C# inheritance, nullable types, and structs/classes.-->
 
-### `UniqueIndex.Find` method
+### Method `UniqueIndex.Find`
 
 ```csharp
 Row? Find(Column key);
@@ -518,7 +506,7 @@ Row? Find(Column key);
 Finds and returns the row where the value in the unique column matches the supplied `key`,
 or `null` if no such row is present in the database state.
 
-### `UniqueIndex.Update` method
+### Method `UniqueIndex.Update`
 
 ```csharp
 Row Update(Row row);
@@ -531,7 +519,7 @@ Returns the new row as actually inserted, with any auto-inc placeholders substit
 Throws if no row was previously present with the matching value in the unique column,
 or if either the delete or the insertion would violate a constraint.
 
-### `UniqueIndex.Delete` method
+### Method `UniqueIndex.Delete`
 
 ```csharp
 bool Delete(Column key);
@@ -548,7 +536,7 @@ Columns can be marked `[SpacetimeDB.AutoInc]`. This can only be used on integer 
 
 When inserting into a table with an `[AutoInc]` column, if the annotated column is set to zero (`0`), the database will automatically overwrite that zero with an atomically increasing value.
 
-[`ITableView.Insert`] returns rows with `#[auto_inc]` columns set to the values that were actually written into the database.
+[`ITableView.Insert`] returns rows with `[AutoInc]` columns set to the values that were actually written into the database.
 
 ```csharp
 public static partial class Module
@@ -736,7 +724,7 @@ public static partial class Module {
 }
 ```
 
-Every reducer runs inside a [database transaction](https://en.wikipedia.org/wiki/Database_transaction). <!-- TODO: specific transaction level guarantees. --> This means that reducers will not observe the effects of other reducers modifying the database while they run. Also, if a reducer fails, all of its changes to the database will automatically be rolled back. Reducers can fail by [panicking](::std::panic!) or by returning an `Err`.
+Every reducer runs inside a [database transaction](https://en.wikipedia.org/wiki/Database_transaction). <!-- TODO: specific transaction level guarantees. --> This means that reducers will not observe the effects of other reducers modifying the database while they run. Also, if a reducer fails, all of its changes to the database will automatically be rolled back. Reducers can fail by throwing an exception.
 
 ## Class `ReducerContext`
 
@@ -749,16 +737,16 @@ public sealed record ReducerContext : DbContext<Local>, Internal.IReducerContext
 
 Reducers have access to a special [`ReducerContext`] argument. This argument allows reading and writing the database attached to a module. It also provides some additional functionality, like generating random numbers and scheduling future operations.
 
-[`ReducerContext`] provides access to the database tables via [the `.db` field](ReducerContext#structfield.db). The [`#[table]`](macro@crate::table) macro generates traits that add accessor methods to this field.
+[`ReducerContext`] provides access to the database tables via [the `.Db` property](#property-reducercontextdb). The [`[Table]`](#tables) macro generates traits that add accessor methods to this field.
 
-| Name                                                            | Description                                               |
-| --------------------------------------------------------------- | --------------------------------------------------------- |
-| Property [`Db`](#property-reducercontextdb)                     | The current state of the database                         |
-| Property [`Sender`](#property-reducercontextsender)             | The [`Identity`] of the caller of the reducer             |
-| Property [`ConnectionId`](#property-reducercontextconnectionid) | The [`ConnectionId`] of the caller of the reducer, if any |
-| Property [`Rng`](#property-reducercontextrng)                   | An [`Rng`].                                               |
-| Property [`Timestamp`](#property-reducercontexttimestamp)       | The [`Timestamp`] of the reducer invocation               |
-| Property [`Identity`](#property-reducercontextidentity)         | The [`Identity`] of the module                            |
+| Name                                                            | Description                                                                     |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Property [`Db`](#property-reducercontextdb)                     | The current state of the database                                               |
+| Property [`Sender`](#property-reducercontextsender)             | The [`Identity`](#struct-identity) of the caller of the reducer                 |
+| Property [`ConnectionId`](#property-reducercontextconnectionid) | The [`ConnectionId`](#struct-connectionid) of the caller of the reducer, if any |
+| Property [`Rng`](#property-reducercontextrng)                   | A [`System.Random`] instance.                                                   |
+| Property [`Timestamp`](#property-reducercontexttimestamp)       | The [`Timestamp`](#struct-timestamp) of the reducer invocation                  |
+| Property [`Identity`](#property-reducercontextidentity)         | The [`Identity`](#struct-timeduration) of the module                            |
 
 ### Property `ReducerContext.Db`
 
@@ -768,7 +756,7 @@ DbView Db;
 
 Allows accessing the local database attached to a module.
 
-The `#[table]` attribute generates a field of this property.
+The `[Table]` attribute generates a field of this property.
 
 For a table named *table*, use `ctx.Db.{table}` to get a [table view](#interface-itableview).
 For example, `ctx.Db.users`.
@@ -781,7 +769,7 @@ You can also use `ctx.Db.{table}.{index}` to get an [index](#class-index) or [un
 Identity Sender;
 ```
 
-The [`Identity`] of the client that invoked the reducer.
+The [`Identity`](#struct-identity) of the client that invoked the reducer.
 
 ### Property `ReducerContext.ConnectionId`
 
@@ -789,7 +777,7 @@ The [`Identity`] of the client that invoked the reducer.
 ConnectionId? ConnectionId;
 ```
 
-The [`ConnectionId`] of the client that invoked the reducer.
+The [`ConnectionId`](#struct-connectionid) of the client that invoked the reducer.
 
 `null` if no `ConnectionId` was supplied to the `/database/call` HTTP endpoint,
 or via the CLI's `spacetime call` subcommand.
@@ -797,10 +785,10 @@ or via the CLI's `spacetime call` subcommand.
 ### Property `ReducerContext.Rng`
 
 ```csharp
-Rng Rng;
+Random Rng;
 ```
 
-An [`Rng`] that can be used to generate random numbers.
+A [`System.Random`] that can be used to generate random numbers.
 
 ### Property `ReducerContext.Timestamp`
 
@@ -816,18 +804,144 @@ The time at which the reducer was invoked.
 Identity Identity;
 ```
 
-The [`Identity`] of the module.
+The [`Identity`](#struct-identity) of the module.
 Note: not the identity of the caller, that's [`Sender`](#property-reducercontextsender).
+
 
 ## Lifecycle Reducers
 
 A small group of reducers are called at set points in the module lifecycle. These are used to initialize
-the database and respond to client connections. See [Lifecycle Reducers](macro@crate::reducer#lifecycle-reducers).
+the database and respond to client connections. You can have one of each per module.
+
+These reducers cannot be called manually and may not have any parameters except for `ReducerContext`.
+
+### The `Init` reducer
+
+This reducer is marked with `[SpacetimeDB.Reducer(ReducerKind.Init)]`. It is run the first time a module is published and any time the database is cleared.
+
+If an error occurs when initializing, the module will not be published.
+
+This reducer can be used to configure any static data tables used by your module. It can also be used to start running [scheduled reducers](#scheduled-reducers).
+
+### The `ClientConnected` reducer
+
+This reducer is marked with `[SpacetimeDB.Reducer(ReducerKind.ClientConnected)]`. It is run when a client connects to the SpacetimeDB module. Their identity can be found in the sender value of the `ReducerContext`.
+
+If an error occurs in the reducer, the client will be disconnected.
+
+### The `ClientDisconnected` reducer
+
+This reducer is marked with `[SpacetimeDB.Reducer(ReducerKind.ClientDisconnected)]`. It is run when a client disconnects from the SpacetimeDB module. Their identity can be found in the sender value of the `ReducerContext`.
+
+If an error occurs in the disconnect reducer, the client is still recorded as disconnected.
+
+<!-- wait, does this still work?
+### The `update` reducer
+
+This reducer is marked with `#[spacetimedb::reducer(update)]`. It is run when the module is updated,
+i.e., when publishing a module for a database that has already been initialized.
+
+If an error occurs when updating, the module will not be published,
+and the previous version of the module attached to the database will continue executing.
+-->
+
 
 ## Scheduled Reducers
 
-Reducers can be scheduled to run repeatedly. This can be used to implement timers, game loops, and
-maintenance tasks. See [Scheduled Reducers](macro@crate::reducer#scheduled-reducers).
+Reducers can be scheduled to run repeatedly. This allows calling the reducers at a particular time, or in a loop. This can be used to implement timers, game loops, and maintenance tasks.
+
+The scheduling information for a reducer is stored in a table.
+This table has two mandatory fields:
+- An `[AutoInc] [PrimaryKey] ulong` field that identifies scheduled reducer calls.
+- A [`ScheduleAt`](#record-scheduleat) field that says when to call the reducer.
+
+Managing timers with a scheduled table is as simple as inserting or deleting rows from the table.
+
+A [`ScheduleAt`](#record-scheduleat) can be created from a [`Timestamp`](#struct-timestamp), in which case the reducer will be scheduled once, or from a [`TimeDuration`](#struct-timeduration), in which case the reducer will be scheduled in a loop.
+
+Example:
+
+```csharp
+using SpacetimeDB;
+
+public static partial class Module
+{
+
+    // First, we declare the table with scheduling information.
+
+    [Table(Name = "send_message_schedule", Scheduled = nameof(SendMessage), ScheduledAt = nameof(ScheduledAt))]
+    public partial struct SendMessageSchedule
+    {
+
+        // Mandatory fields:
+
+        [PrimaryKey]
+        [AutoInc]
+        public ulong Id;
+
+        public ScheduleAt ScheduledAt;
+
+        // Custom fields:
+
+        public string Message;
+    }
+
+    // Then, we declare the scheduled reducer.
+    // The first argument of the reducer should be, as always, a `ReducerContext`.
+    // The second argument should be a row of the scheduling information table.
+
+    [Reducer]
+    public static void SendMessage(ReducerContext ctx, SendMessageSchedule schedule)
+    {
+        Log.Info($"Sending message {schedule.Message}");
+        // ...
+    }
+
+    // Finally, we want to actually start scheduling reducers.
+    // It's convenient to do this inside the `init` reducer.
+
+    [Reducer(ReducerKind.Init)]
+    public static void Init(ReducerContext ctx)
+    {
+        var currentTime = ctx.Timestamp;
+        var tenSeconds = new TimeDuration { Microseconds = +10_000_000 };
+        var futureTimestamp = currentTime + tenSeconds;
+
+        ctx.Db.send_message_schedule.Insert(new()
+        {
+            Id = 0, // Have [AutoInc] assign an Id.
+            ScheduledAt = new ScheduleAt.Time(futureTimestamp),
+            Message = "I'm a bot sending a message one time!"
+        });
+
+        ctx.Db.send_message_schedule.Insert(new()
+        {
+            Id = 0, // Have [AutoInc] assign an Id.
+            ScheduledAt = new ScheduleAt.Interval(tenSeconds),
+            Message = "I'm a bot sending a message every ten seconds!"
+        });
+    }
+}
+```
+
+Scheduled reducers are called on a best-effort basis and may be slightly delayed in their execution
+when a database is under heavy load.
+
+
+Scheduled reducers are normal reducers, and may still be called by clients.
+If a scheduled reducer should only be called by the scheduler, consider beginning it with a check that the caller `Identity` is the module:
+
+```csharp
+[Reducer]
+public static void SendMessage(ReducerContext ctx, SendMessageSchedule schedule)
+{
+    if (ctx.Sender != ctx.Identity)
+    {
+        throw new Exception("Reducer SendMessage may not be invoked by clients, only via scheduling.");
+    }
+    // ...
+}
+```
 
 # Automatic migrations
 
@@ -840,16 +954,16 @@ The following changes are always allowed and never breaking:
 
 - ✅ **Adding tables**. Non-updated clients will not be able to see the new tables.
 - ✅ **Adding indexes**.
-- ✅ **Adding or removing `#[auto_inc]` annotations.**
+- ✅ **Adding or removing `[AutoInc]` annotations.**
 - ✅ **Changing tables from private to public**.
 - ✅ **Adding reducers**.
-- ✅ **Removing `#[unique]`  annotations.**
+- ✅ **Removing `[Unique]`  annotations.**
 
 The following changes are allowed, but may break clients:
 
 - ⚠️ **Changing or removing reducers**. Clients that attempt to call the old version of a changed reducer will receive runtime errors.
 - ⚠️ **Changing tables from public to private**. Clients that are subscribed to a newly-private table will receive runtime errors.
-- ⚠️ **Removing `#[primary_key]` annotations**. Non-updated clients will still use the old `#[primary_key]` as a unique key in their local cache, which can result in non-deterministic behavior when updates are received.
+- ⚠️ **Removing `[PrimaryKey]` annotations**. Non-updated clients will still use the old `[PrimaryKey]` as a unique key in their local cache, which can result in non-deterministic behavior when updates are received.
 - ⚠️ **Removing indexes**. This is only breaking in some situtations.
   The specific problem is subscription queries <!-- TODO: clientside link --> involving semijoins, such as:
     ```sql
@@ -865,7 +979,7 @@ The following changes are forbidden without a manual migration:
 - ❌ **Removing tables**.
 - ❌ **Changing the columns of a table**. This includes changing the order of columns of a table.
 - ❌ **Changing whether a table is used for [scheduling](#scheduled-reducers).** <!-- TODO: update this if we ever actually implement it... -->
-- ❌ **Adding `#[unique]` or `#[primary_key]` constraints.** This could result in existing tables being in an invalid state.
+- ❌ **Adding `[Unique]` or `[PrimaryKey]` constraints.** This could result in existing tables being in an invalid state.
 
 Currently, manual migration support is limited. The `spacetime publish --clear-database <DATABASE_IDENTITY>` command can be used to **COMPLETELY DELETE** and reinitialize your database, but naturally it should be used with EXTREME CAUTION.
 
@@ -917,7 +1031,7 @@ public static partial class Module {
     }
 
     [Reducer]
-    void LogDogs(ReducerContext ctx) {
+    public static void LogDogs(ReducerContext ctx) {
         Log.Info("Examining users.");
 
         var totalDogCount = 0;
@@ -1164,6 +1278,9 @@ public static readonly TimeDuration ZERO = new TimeDuration { Microseconds = 0 }
 
 The duration between any `Timestamp` and itself.
 
+## Class `Rng`
+
+
 ## Record `TaggedEnum`
 ```csharp
 namespace SpacetimeDB;
@@ -1261,6 +1378,17 @@ public partial record ShapeData : SpacetimeDB.TaggedEnum<(CircleData Circle, Rec
 Then code using a `ShapeData` will only have to do one check -- do I have a circle or a rectangle?
 And in each case, the data will be guaranteed to have exactly the fields needed.
 
+## Record `ScheduleAt`
+```csharp
+namespace SpacetimeDB;
+
+public partial record ScheduleAt : TaggedEnum<(TimeDuration Interval, Timestamp Time)>
+```
+
+When a [scheduled reducer](#scheduled-reducers) should execute, either at a specific point in time, or at regular intervals for repeating schedules.
+
+Stored in reducer-scheduling tables as a column.
+
 [macro library]: https://github.com/clockworklabs/SpacetimeDB/tree/master/crates/bindings-macro
 [module library]: https://github.com/clockworklabs/SpacetimeDB/tree/master/crates/lib
 [demo]: /#demo
@@ -1268,3 +1396,7 @@ And in each case, the data will be guaranteed to have exactly the fields needed.
 [clients]: https://spacetimedb.com/docs/#client
 [client SDK documentation]: https://spacetimedb.com/docs/#client
 [host]: https://spacetimedb.com/docs/#host
+[`DateTimeOffset`]: https://learn.microsoft.com/en-us/dotnet/api/system.datetimeoffset?view=net-9.0
+[`TimeSpan`]: https://learn.microsoft.com/en-us/dotnet/api/system.timespan?view=net-9.0
+[unix epoch]: https://en.wikipedia.org/wiki/Unix_time
+[`System.Random`]: https://learn.microsoft.com/en-us/dotnet/api/system.random?view=net-9.0
