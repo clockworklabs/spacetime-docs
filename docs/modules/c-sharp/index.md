@@ -19,7 +19,7 @@
 └───────────────────────┘                └───────────────────────┘
 ```
 
-C# modules are written with the the C# Module Library (this crate). They are built using the [dotnet CLI tool](https://learn.microsoft.com/en-us/dotnet/core/tools/) and deployed using the [`spacetime` CLI tool](https://spacetimedb.com/install). C# modules can import any [NuGet package](https://www.nuget.org/packages) that supports being compiled to WebAssembly.
+C# modules are written with the the C# Module Library (this package). They are built using the [dotnet CLI tool](https://learn.microsoft.com/en-us/dotnet/core/tools/) and deployed using the [`spacetime` CLI tool](https://spacetimedb.com/install). C# modules can import any [NuGet package](https://www.nuget.org/packages) that supports being compiled to WebAssembly.
 
 (Note: C# can also be used to write **clients** of SpacetimeDB databases, but this requires using a different library, the SpacetimeDB C# Client SDK. See the documentation on [clients] for more information.)
 
@@ -201,7 +201,7 @@ You can also generate code for clients of your module using the `spacetime gener
 
 # How it works
 
-Under the hood, SpacetimeDB modules are WebAssembly modules that import a [specific WebAssembly ABI](https://spacetimedb.com/docs/webassembly-abi) and export a small number of special functions. This is automatically configured when you add the `spacetime` crate as a dependency of your application.
+Under the hood, SpacetimeDB modules are WebAssembly modules that import a [specific WebAssembly ABI](https://spacetimedb.com/docs/webassembly-abi) and export a small number of special functions. This is automatically configured when you add the `SpacetimeDB.Runtime` package as a dependency of your application.
 
 The SpacetimeDB host is an application that hosts SpacetimeDB databases. [Its source code is available](https://github.com/clockworklabs/SpacetimeDB) under [the Business Source License with an Additional Use Grant](https://github.com/clockworklabs/SpacetimeDB/blob/master/LICENSE.txt). You can run your own host, or you can upload your module to the public SpacetimeDB network. <!-- TODO: want a link to some dashboard for the public network. --> The network will create a database for you and install your module in it to serve client requests.
 
@@ -225,7 +225,7 @@ However:
 
 Tables are declared using the [`[SpacetimeDB.Table]` attribute](#table-attribute).
 
-This macro is applied to a C# `partial class` or `partial struct` with named fields. All of the fields of the table must be marked with [`[SpacetimeDB.Type]`](#type-attribute).
+This macro is applied to a C# `partial class` or `partial struct` with named fields. (The `partial` modifier is required to allow code generation to add methods.) All of the fields of the table must be marked with [`[SpacetimeDB.Type]`](#type-attribute).
 
 The resulting type is used to store rows of the table. It's a normal class (or struct). Row values are not special -- operations on row types do not, by themselves, modify the table. Instead, a [`ReducerContext`](#class-reducercontext) is needed to get a handle to the table.
 
@@ -369,7 +369,9 @@ IEnumerable<Row> Iter();
 
 Iterate over all rows of the table.
 
-For large tables, this can be a very slow operation! Prefer [filtering](#method-indexfilter) a [`Index`](#class-index) or [finding](#method-uniqueindexfind) a [`UniqueIndex`](#class-uniqueindex) if possible.
+(This keeps track of changes made to the table since the start of this reducer invocation. For example, if rows have been [deleted](#method-itableviewdelete) since the start of this reducer invocation, those rows will not be returned by `Iter`. Similarly, [inserted](#method-itableviewinsert) rows WILL be returned.)
+
+For large tables, this can be a slow operation! Prefer [filtering](#method-indexfilter) by an [`Index`](#class-index) or [finding](#method-uniqueindexfind) a [`UniqueIndex`](#class-uniqueindex) if possible.
 
 ### Property `ITableView.Count`
 
@@ -423,7 +425,7 @@ ctx.Db.{table}.{unique_column}
 
 For example, 
 
-```no_build
+```csharp
 ctx.Db.citizen.Ssn
 ```
 
@@ -458,7 +460,7 @@ A unique index on a column. Available for `[Unique]` and `[PrimaryKey]` columns.
 and `Handle` is the type of the generated table handle.
 
 For a table *table* with a column *column*, use `ctx.Db.{table}.{column}`
-to get a `UniqueColumn` from a [`ReducerContext`](crate::ReducerContext).
+to get a `UniqueColumn` from a [`ReducerContext`](#class-reducercontext).
 
 Example:
 
@@ -706,9 +708,9 @@ Delete all rows in the database state where the indexed column(s) match the pass
 
 # Reducers
 
-Reducers are declared using the [`#[reducer]` macro](macro@crate::reducer).
+Reducers are declared using the `[SpacetimeDB.Reducer]` attribute.
 
-`#[reducer]` is always applied to top level C# functions. The first argument of a reducer must be a [`ReducerContext`]. The remaining arguments must be types marked with [`SpacetimeDB.Type`]. Reducers should return `void`.
+`[SpacetimeDB.Reducer]` is always applied to static C# functions. The first parameter of a reducer must be a [`ReducerContext`]. The remaining parameters must be types marked with [`SpacetimeDB.Type`]. Reducers should return `void`.
 
 ```csharp
 public static partial class Module {
@@ -737,7 +739,7 @@ public sealed record ReducerContext : DbContext<Local>, Internal.IReducerContext
 
 Reducers have access to a special [`ReducerContext`] parameter. This parameter allows reading and writing the database attached to a module. It also provides some additional functionality, like generating random numbers and scheduling future operations.
 
-[`ReducerContext`] provides access to the database tables via [the `.Db` property](#property-reducercontextdb). The [`[Table]`](#tables) macro generates traits that add accessor methods to this field.
+[`ReducerContext`] provides access to the database tables via [the `.Db` property](#property-reducercontextdb). The [`[Table]`](#tables) attribute generated code that adds table accessors to this property.
 
 | Name                                                            | Description                                                                     |
 | --------------------------------------------------------------- | ------------------------------------------------------------------------------- |
@@ -746,7 +748,7 @@ Reducers have access to a special [`ReducerContext`] parameter. This parameter a
 | Property [`ConnectionId`](#property-reducercontextconnectionid) | The [`ConnectionId`](#struct-connectionid) of the caller of the reducer, if any |
 | Property [`Rng`](#property-reducercontextrng)                   | A [`System.Random`] instance.                                                   |
 | Property [`Timestamp`](#property-reducercontexttimestamp)       | The [`Timestamp`](#struct-timestamp) of the reducer invocation                  |
-| Property [`Identity`](#property-reducercontextidentity)         | The [`Identity`](#struct-identity) of the module                            |
+| Property [`Identity`](#property-reducercontextidentity)         | The [`Identity`](#struct-identity) of the module                                |
 
 ### Property `ReducerContext.Db`
 
@@ -805,7 +807,10 @@ Identity Identity;
 ```
 
 The [`Identity`](#struct-identity) of the module.
-Note: not the identity of the caller, that's [`Sender`](#property-reducercontextsender).
+
+This can be used to [check whether a scheduled reducer is being called by a user](#restricting-scheduled-reducers).
+
+Note: this is not the identity of the caller, that's [`ReducerContext.Sender`](#property-reducercontextsender).
 
 
 ## Lifecycle Reducers
@@ -918,6 +923,7 @@ public static partial class Module
 Scheduled reducers are called on a best-effort basis and may be slightly delayed in their execution
 when a database is under heavy load.
 
+### Restricting scheduled reducers
 
 Scheduled reducers are normal reducers, and may still be called by clients.
 If a scheduled reducer should only be called by the scheduler, consider beginning it with a check that the caller `Identity` is the module:
@@ -1377,8 +1383,6 @@ When a [scheduled reducer](#scheduled-reducers) should execute, either at a spec
 
 Stored in reducer-scheduling tables as a column.
 
-[macro library]: https://github.com/clockworklabs/SpacetimeDB/tree/master/crates/bindings-macro
-[module library]: https://github.com/clockworklabs/SpacetimeDB/tree/master/crates/lib
 [demo]: /#demo
 [client]: https://spacetimedb.com/docs/#client
 [clients]: https://spacetimedb.com/docs/#client
