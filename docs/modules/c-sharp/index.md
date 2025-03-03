@@ -1,6 +1,6 @@
 # SpacetimeDB C# Module Library
 
-[SpacetimeDB](https://spacetimedb.com/) allows using the C# language to write server-side applications called **modules**. Modules run inside a relational database. They have direct access to database tables, and expose public functions called **reducers** that can be invoked over the network. Clients connect directly to the database to read data.
+[SpacetimeDB](https://spacetimedb.com/) allows using the C# language to write server-side applications called **modules**. Modules, which run inside a relational database, have direct access to database tables, and expose public functions called **reducers** that can be invoked over the network. Clients connect directly to the database to read data.
 
 ```text
     Client Application                          SpacetimeDB
@@ -21,7 +21,7 @@
 
 C# modules are written with the the C# Module Library (this crate). They are built using the [dotnet CLI tool](https://learn.microsoft.com/en-us/dotnet/core/tools/) and deployed using the [`spacetime` CLI tool](https://spacetimedb.com/install). C# modules can import any [NuGet package](https://www.nuget.org/packages) that supports being compiled to WebAssembly.
 
-(Note: C# can also be used to write **clients** of SpacetimeDB databases, but this requires using a completely different library, the SpacetimeDB C# Client SDK. See the documentation on [clients] for more information.)
+(Note: C# can also be used to write **clients** of SpacetimeDB databases, but this requires using a different library, the SpacetimeDB C# Client SDK. See the documentation on [clients] for more information.)
 
 This reference assumes you are familiar with the basics of C#. If you aren't, check out the [C# language documentation](https://learn.microsoft.com/en-us/dotnet/csharp/). For a guided introduction to C# Modules, see the [C# Module Quickstart](https://spacetimedb.com/docs/modules/c-sharp/quickstart).
 
@@ -55,7 +55,7 @@ static partial class Module
 ```
 
 
-Note that reducers don't return data directly; they can only modify the database. Clients connect directly to the database and use SQL to query [public](#public-and-private-tables) tables. Clients can also open subscriptions to receive streaming updates as the results of a SQL query change.
+Note that reducers don't return data directly; they can only modify the database. Clients connect directly to the database and use SQL to query [public](#public-and-private-tables) tables. Clients can also subscribe to a set of rows using SQL queries and receive streaming updates whenever any of those rows change.
 
 Tables and reducers in C# modules can use any type annotated with [`[SpacetimeDB.Type]`](#attribute-spacetimedbtype).
 
@@ -125,7 +125,7 @@ public static partial class Module
 }
 ```
 
-This skeleton declares a [table](#tables), some [reducers](#reducers). 
+This skeleton declares a [table](#tables) and some [reducers](#reducers). 
 
 You can also add some [lifecycle reducers](#lifecycle-reducers) to the `Module` class using the following code:
 
@@ -182,7 +182,7 @@ For example:
 spacetime publish silly_demo_app
 ```
 
-When you publish your module, a database named will be created with the requested tables, and the module will be installed inside it.
+When you publish your module, a database named `silly_demo_app` will be created with the requested tables, and the module will be installed inside it.
 
 The output of `spacetime publish` will end with a line:
 ```text
@@ -205,7 +205,7 @@ Under the hood, SpacetimeDB modules are WebAssembly modules that import a [speci
 
 The SpacetimeDB host is an application that hosts SpacetimeDB databases. [Its source code is available](https://github.com/clockworklabs/SpacetimeDB) under [the Business Source License with an Additional Use Grant](https://github.com/clockworklabs/SpacetimeDB/blob/master/LICENSE.txt). You can run your own host, or you can upload your module to the public SpacetimeDB network. <!-- TODO: want a link to some dashboard for the public network. --> The network will create a database for you and install your module in it to serve client requests.
 
-### In More Detail: Publishing a Module
+## In More Detail: Publishing a Module
 
 The `spacetime publish [DATABASE_IDENTITY]` command compiles a module and uploads it to a SpacetimeDB host. After this:
 - The host finds the database with the requested `DATABASE_IDENTITY`.
@@ -227,7 +227,7 @@ Tables are declared using the [`[SpacetimeDB.Table]` attribute](#table-attribute
 
 This macro is applied to a C# `partial class` or `partial struct` with named fields. All of the fields of the table must be marked with [`[SpacetimeDB.Type]`](#type-attribute).
 
-The resulting type is used to store rows of the table. It is normal class (or struct). Row values are not special -- operations on row types do not, by themselves, modify the table. Instead, a [`ReducerContext`](#class-reducercontext) is needed to get a handle to the table.
+The resulting type is used to store rows of the table. It's a normal class (or struct). Row values are not special -- operations on row types do not, by themselves, modify the table. Instead, a [`ReducerContext`](#class-reducercontext) is needed to get a handle to the table.
 
 ```csharp
 public static partial class Module {
@@ -256,8 +256,8 @@ public static partial class Module {
         person = null;
     }
 
-    // To interact with the database, you need a `ReducerContext`.
-    // The first argument of a reducer is always a `ReducerContext`.
+    // To interact with the database, you need a `ReducerContext`,
+    // which is provided as the first parameter of any reducer.
     [SpacetimeDB.Reducer]
     public static void DoSomething(ReducerContext ctx) {
         // The following inserts a row into the table:
@@ -341,9 +341,8 @@ See [`UniqueIndex.Update()`](#method-uniqueindexupdate) if you want to update th
 
 Throws an exception if inserting the row violates any constraints.
 
-Inserting a duplicate row in a table without a unique constraint is a no-op,
+Inserting a duplicate row in a table is a no-op,
 as SpacetimeDB is a set-semantic database.
-Inserting a duplicate row in a table with a unique constraint will cause a unique constraint violation.
 
 ### Method `ITableView.Delete`
 
@@ -382,10 +381,11 @@ Returns the number of rows of this table.
 
 This takes into account modifications by the current transaction,
 even though those modifications have not yet been committed or broadcast to clients.
+This applies generally to insertions, deletions, updates, and iteration as well.
 
 ## Public and Private Tables
 
-By default, tables are considered **private**. This means that they are only readable by the database owner and by reducers. Reducers run inside the database, so clients cannot see private tables at all.
+By default, tables are considered **private**. This means that they are only readable by the database owner and by reducers. Reducers run inside the database, so clients cannot see private tables at all or even know of their existence.
 
 Using the `[SpacetimeDB.Table(Name = "table_name", Public)]` flag makes a table public. **Public** tables are readable by all clients. They can still only be modified by reducers. 
 
@@ -429,7 +429,7 @@ ctx.Db.citizen.Ssn
 
 Notice that updating a row is only possible if a row has a unique column -- there is no `update` method in the base [`ITableView`](#interface-itableview) interface. SpacetimeDB has no notion of rows having an "identity" aside from their unique / primary keys.
 
-The `[PrimaryKey]` annotation is similar to the `[Unique]` annotation, except that it leads to additional methods being made available in the [client]-side SDKs.
+The `[PrimaryKey]` annotation implies a `[Unique]` annotation, but avails additional methods in the [client]-side SDKs.
 
 It is not currently possible to mark a group of fields as collectively unique.
 
@@ -512,7 +512,7 @@ or `null` if no such row is present in the database state.
 Row Update(Row row);
 ```
 
-Deletes the row where the value in the unique column matches that in the corresponding field of `row`, then inserts `row`.
+Deletes the row where the value in the unique column matches that in the corresponding field of `row` and then inserts `row`.
 
 Returns the new row as actually inserted, with any auto-inc placeholders substituted for computed values.
 
@@ -534,9 +534,9 @@ or `false` if no such row was present.
 
 Columns can be marked `[SpacetimeDB.AutoInc]`. This can only be used on integer types (`int`, `ulong`, etc.)
 
-When inserting into a table with an `[AutoInc]` column, if the annotated column is set to zero (`0`), the database will automatically overwrite that zero with an atomically increasing value.
+When inserting into or updating a row in a table with an `[AutoInc]` column, if the annotated column is set to zero (`0`), the database will automatically overwrite that zero with an atomically increasing value.
 
-[`ITableView.Insert`] returns rows with `[AutoInc]` columns set to the values that were actually written into the database.
+[`ITableView.Insert`] and [`UniqueIndex.Update()`](#method-uniqueindexupdate) returns rows with `[AutoInc]` columns set to the values that were actually written into the database.
 
 ```csharp
 public static partial class Module
@@ -607,7 +607,7 @@ public partial struct AcademicPaper {
 ```
 
 
-Any index supports getting an [`Index`](#class-index) using `ctx.Db.{table}.{index}`. For example, `ctx.Db.academic_paper.TitleAndDate` or `ctx.Db.academic_paper.Venue`.
+Any table supports getting an [`Index`](#class-index) using `ctx.Db.{table}.{index}`. For example, `ctx.Db.academic_paper.TitleAndDate` or `ctx.Db.academic_paper.Venue`.
 
 ## Class `Index`
 
@@ -619,9 +619,9 @@ public abstract class IndexBase<Row>
 }
 ```
 
-Each index generates a subclass of `IndexBase`, which accessible via `ctx.Db.{table}.{index}`. For example, `ctx.Db.academic_paper.TitleAndDate`.
+Each index generates a subclass of `IndexBase`, which is accessible via `ctx.Db.{table}.{index}`. For example, `ctx.Db.academic_paper.TitleAndDate`.
 
-Indexes can be applied to a variabe number of columns, referred to as `Column1`, `Column2`, `Column3`... in the following examples.
+Indexes can be applied to a variable number of columns, referred to as `Column1`, `Column2`, `Column3`... in the following examples.
 
 | Name                                   | Description             |
 | -------------------------------------- | ----------------------- |
@@ -640,7 +640,7 @@ public IEnumerable<Row> Filter((Column1, Column2, Bound<Column3>) bound);
 // ...
 ```
 
-Returns an iterator over all rows in the database state where the indexed column(s) match the passed `bound`. Bound is a tuple of column values, possible terminated by a `Bound<LastColumn>`. A `Bound<LastColumn>` is simply a tuple `(LastColumn Min, LastColumn Max)`. Any prefix of the indexed columns can be passed, for example:
+Returns an iterator over all rows in the database state where the indexed column(s) match the passed `bound`. Bound is a tuple of column values, possibly terminated by a `Bound<LastColumn>`. A `Bound<LastColumn>` is simply a tuple `(LastColumn Min, LastColumn Max)`. Any prefix of the indexed columns can be passed, for example:
 
 ```csharp
 using SpacetimeDB;
@@ -724,7 +724,7 @@ public static partial class Module {
 }
 ```
 
-Every reducer runs inside a [database transaction](https://en.wikipedia.org/wiki/Database_transaction). <!-- TODO: specific transaction level guarantees. --> This means that reducers will not observe the effects of other reducers modifying the database while they run. Also, if a reducer fails, all of its changes to the database will automatically be rolled back. Reducers can fail by throwing an exception.
+Every reducer runs inside a [database transaction](https://en.wikipedia.org/wiki/Database_transaction). <!-- TODO: specific transaction level guarantees. --> This means that reducers will not observe the effects of other reducers modifying the database while they run. If a reducer fails, all of its changes to the database will automatically be rolled back. Reducers can fail by throwing an exception.
 
 ## Class `ReducerContext`
 
@@ -735,7 +735,7 @@ public sealed record ReducerContext : DbContext<Local>, Internal.IReducerContext
 }
 ```
 
-Reducers have access to a special [`ReducerContext`] argument. This argument allows reading and writing the database attached to a module. It also provides some additional functionality, like generating random numbers and scheduling future operations.
+Reducers have access to a special [`ReducerContext`] parameter. This parameter allows reading and writing the database attached to a module. It also provides some additional functionality, like generating random numbers and scheduling future operations.
 
 [`ReducerContext`] provides access to the database tables via [the `.Db` property](#property-reducercontextdb). The [`[Table]`](#tables) macro generates traits that add accessor methods to this field.
 
@@ -746,7 +746,7 @@ Reducers have access to a special [`ReducerContext`] argument. This argument all
 | Property [`ConnectionId`](#property-reducercontextconnectionid) | The [`ConnectionId`](#struct-connectionid) of the caller of the reducer, if any |
 | Property [`Rng`](#property-reducercontextrng)                   | A [`System.Random`] instance.                                                   |
 | Property [`Timestamp`](#property-reducercontexttimestamp)       | The [`Timestamp`](#struct-timestamp) of the reducer invocation                  |
-| Property [`Identity`](#property-reducercontextidentity)         | The [`Identity`](#struct-timeduration) of the module                            |
+| Property [`Identity`](#property-reducercontextidentity)         | The [`Identity`](#struct-identity) of the module                            |
 
 ### Property `ReducerContext.Db`
 
@@ -835,20 +835,10 @@ This reducer is marked with `[SpacetimeDB.Reducer(ReducerKind.ClientDisconnected
 
 If an error occurs in the disconnect reducer, the client is still recorded as disconnected.
 
-<!-- wait, does this still work?
-### The `update` reducer
-
-This reducer is marked with `#[spacetimedb::reducer(update)]`. It is run when the module is updated,
-i.e., when publishing a module for a database that has already been initialized.
-
-If an error occurs when updating, the module will not be published,
-and the previous version of the module attached to the database will continue executing.
--->
-
 
 ## Scheduled Reducers
 
-Reducers can be scheduled to run repeatedly. This allows calling the reducers at a particular time, or in a loop. This can be used to implement timers, game loops, and maintenance tasks.
+Reducers can schedule other reducers to run asynchronously. This allows calling the reducers at a particular time, or at repeating intervals. This can be used to implement timers, game loops, and maintenance tasks.
 
 The scheduling information for a reducer is stored in a table.
 This table has two mandatory fields:
@@ -856,6 +846,7 @@ This table has two mandatory fields:
 - A [`ScheduleAt`](#record-scheduleat) field that says when to call the reducer.
 
 Managing timers with a scheduled table is as simple as inserting or deleting rows from the table.
+This makes scheduling transactional in SpacetimeDB. If a reducer A first schedules B but then errors for some other reason, B will not be scheduled to run.
 
 A [`ScheduleAt`](#record-scheduleat) can be created from a [`Timestamp`](#struct-timestamp), in which case the reducer will be scheduled once, or from a [`TimeDuration`](#struct-timeduration), in which case the reducer will be scheduled in a loop.
 
@@ -947,7 +938,7 @@ public static void SendMessage(ReducerContext ctx, SendMessageSchedule schedule)
 
 When you `spacetime publish` a module that has already been published using `spacetime publish <DATABASE_NAME_OR_IDENTITY>`,
 SpacetimeDB attempts to automatically migrate your existing database to the new schema. (The "schema" is just the collection
-of tables and reducers you've declared in your code, together with the types they depend on.) This form of migration is very limited and only supports a few kinds of changes.
+of tables and reducers you've declared in your code, together with the types they depend on.) This form of migration is limited and only supports a few kinds of changes.
 On the plus side, automatic migrations usually don't break clients. The situations that may break clients are documented below.
 
 The following changes are always allowed and never breaking:
