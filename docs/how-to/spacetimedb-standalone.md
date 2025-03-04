@@ -21,9 +21,7 @@ sudo chown -R spacetimedb:spacetimedb /stdb
 Switch to the new user and install SpacetimeDB:
 
 ```sh
-sudo su - spacetimedb
-curl -sSf https://install.spacetimedb.com | sh -s -- --root-dir /stdb
-exit
+sudo -u spacetimedb bash -c 'curl -sSf https://install.spacetimedb.com | sh -s -- --root-dir /stdb --yes'
 ```
 
 ## Step 2: Create a Systemd Service for SpacetimeDB
@@ -41,7 +39,7 @@ Description=SpacetimeDB Server
 After=network.target
 
 [Service]
-ExecStart=/stdb/bin/spacetime --root-dir /stdb start
+ExecStart=/stdb/bin/spacetime --root-dir=/stdb start
 Restart=always
 User=spacetimedb
 WorkingDirectory=/stdb
@@ -195,13 +193,13 @@ sudo systemctl stop spacetimedb
 Then upgrade SpacetimeDB:
 
 ```sh
-sudo -u spacetimedb -i -- spacetime version upgrade
+sudo -u spacetimedb -i -- spacetime --root-dir=/stdb version upgrade
 ```
 
 To install a specific version, use:
 
 ```sh
-sudo -u spacetimedb -i -- spacetime install <version-number>
+sudo -u spacetimedb -i -- spacetime --root-dir=/stdb install <version-number>
 ```
 
 Finally, restart the service:
@@ -222,13 +220,13 @@ sudo journalctl -u spacetimedb --no-pager | tail -20
 Verify that the `spacetimedb` user has the correct permissions:
 
 ```sh
-sudo ls -lah /stdb/.local/bin/spacetime
+sudo ls -lah /stdb/spacetime
 ```
 
 If needed, adjust permissions:
 
 ```sh
-sudo chmod +x /stdb/.local/bin/spacetime
+sudo chmod +x /stdb/spacetime
 ```
 
 ### Let's Encrypt Certificate Renewal Issues
