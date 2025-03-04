@@ -21,8 +21,8 @@ sudo chown -R spacetimedb:spacetimedb /stdb
 Switch to the new user and install SpacetimeDB:
 
 ```sh
-sudo su - spacetimedb2
-curl -sSf https://install.spacetimedb.com | sh -s -- --root-dir /stdb2
+sudo su - spacetimedb
+curl -sSf https://install.spacetimedb.com | sh -s -- --root-dir /stdb
 exit
 ```
 
