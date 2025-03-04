@@ -13,15 +13,16 @@ Also, join the community! We have an official discord server: https://discord.gg
 For security purposes, create a dedicated `spacetimedb` user to run SpacetimeDB with a home directory at `/stdb`:
 
 ```sh
-sudo useradd --home-dir /stdb --shell /bin/bash --skel /etc/skel -m spacetimedb
+sudo mkdir /stdb
+sudo useradd --system spacetimedb
+sudo chown -R spacetimedb:spacetimedb /stdb
 ```
 
 Switch to the new user and install SpacetimeDB:
 
 ```sh
-sudo -u spacetimedb -i
-curl -sSf https://install.spacetimedb.com | sh
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> .bashrc
+sudo su - spacetimedb2
+curl -sSf https://install.spacetimedb.com | sh -s -- --root-dir /stdb2
 exit
 ```
 
@@ -40,7 +41,7 @@ Description=SpacetimeDB Server
 After=network.target
 
 [Service]
-ExecStart=/stdb/.local/bin/spacetime start
+ExecStart=/stdb/bin/spacetime --root-dir /stdb start
 Restart=always
 User=spacetimedb
 WorkingDirectory=/stdb
