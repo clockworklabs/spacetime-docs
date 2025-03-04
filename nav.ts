@@ -35,6 +35,7 @@ const nav: Nav = {
 
     section('Deploying'),
     page('Maincloud', 'deploying/maincloud', 'deploying/maincloud.md'),
+    page('Self-Hosting SpacetimeDB', 'how-to/spacetimedb-standalone', 'how-to/spacetimedb-standalone.md'),
 
     section('Unity Tutorial - Basic Multiplayer'),
     page('Overview', 'unity', 'unity/index.md'),
@@ -91,7 +92,6 @@ const nav: Nav = {
 
     section('How To'),
     page('Incremental Migrations', 'how-to/incremental-migrations', 'how-to/incremental-migrations.md'),
-    page('Self-Hosting SpacetimeDB', 'how-to/spacetimedb-standalone', 'how-to/spacetimedb-standalone.md'),
 
     section('HTTP API'),
     page('HTTP', 'http', 'http/index.md'),

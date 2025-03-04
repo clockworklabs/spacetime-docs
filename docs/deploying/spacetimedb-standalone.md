@@ -93,21 +93,20 @@ server {
     }
 
     # This restricts who can publish new databases to your SpacetimeDB instance. We recommend
-    # restricting this ability to local connections. You should uncomment this before you use a
-    # SpacetimeDB server in production.
-    # location /v1/publish {
-        # allow 127.0.0.1;
-        # deny all;
-        # proxy_pass http://localhost:3000;
-        # proxy_http_version 1.1;
-        # proxy_set_header Upgrade $http_upgrade;
-        # proxy_set_header Connection "Upgrade";
-        # proxy_set_header Host $host;
-    # }
+    # restricting this ability to local connections. 
+    location /v1/publish {
+        allow 127.0.0.1;
+        deny all;
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+    }
 }
 ```
 
-This configuration contains a restriction to the `/v1/publish` route. This restriction makes it so that you can only publish to the database if you're publishing from a local connection on the host. You should uncomment that section and then run `sudo systemctl nginx restart` in order to apply that config change.
+This configuration contains a restriction to the `/v1/publish` route. This restriction makes it so that you can only publish to the database if you're publishing from a local connection on the host. 
 
 Enable the configuration:
 
@@ -164,12 +163,6 @@ On your local machine, add this new server to your CLI config. Make sure to repl
 
 ```bash
 spacetime server add self-hosted --url https://example.com
-```
-
-By default you should be able to publish to this server from your local machine:
-
-```bash
-spacetime publish -s self-hosted <module-name>
 ```
 
 If you have uncommented the `/v1/publish` restriction in Step 3 then you won't be able to publish to this instance unless you copy your module to the host first and then publish. We recommend something like this:
