@@ -7,7 +7,6 @@ This tutorial will guide you through setting up SpacetimeDB on an Ubuntu 24.04 s
 - A domain name (e.g., `example.com`)
 - `sudo` privileges on the server
 
-
 ## Step 1: Create a Dedicated User for SpacetimeDB
 For security purposes, create a dedicated `spacetimedb` user to run SpacetimeDB:
 
