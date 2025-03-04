@@ -7,6 +7,8 @@ This tutorial will guide you through setting up SpacetimeDB on an Ubuntu 24.04 s
 - A domain name (e.g., `example.com`)
 - `sudo` privileges on the server
 
+Also, join the community! We have an official discord server: https://discord.gg/spacetimedb
+
 ## Step 1: Create a Dedicated User for SpacetimeDB
 For security purposes, create a dedicated `spacetimedb` user to run SpacetimeDB with a home directory at `/stdb`:
 
@@ -91,8 +93,23 @@ server {
         proxy_set_header Connection "Upgrade";
         proxy_set_header Host $host;
     }
+
+    # This restricts who can publish new databases to your SpacetimeDB instance. We recommend
+    # restricting this ability to local connections. You should uncomment this before you use a
+    # SpacetimeDB server in production.
+    # location /v1/publish {
+        # allow 127.0.0.1;
+        # deny all;
+        # proxy_pass http://localhost:3000;
+        # proxy_http_version 1.1;
+        # proxy_set_header Upgrade $http_upgrade;
+        # proxy_set_header Connection "Upgrade";
+        # proxy_set_header Host $host;
+    # }
 }
 ```
+
+This configuration contains a restriction to the `/v1/publish` route. This restriction makes it so that you can only publish to the database if you're publishing from a local connection on the host. You should uncomment that section and then run `sudo systemctl nginx restart` in order to apply that config change.
 
 Enable the configuration:
 
@@ -145,13 +162,29 @@ sudo systemctl status certbot.timer
 
 ## Step 5: Verify Installation
 
-On your local machine, add this new server to your CLI config:
+On your local machine, add this new server to your CLI config. Make sure to replace `example.com` with your own domain:
 
 ```bash
-spacetime server add tutorial-test --url https://tutorial-test.spacetimedb.net
+spacetime server add self-hosted --url https://example.com
 ```
 
-## Step 6: Updating SpacetimeDB
+By default you should be able to publish to this server from your local machine:
+
+```bash
+spacetime publish -s self-hosted <module-name>
+```
+
+If you have uncommented the `/v1/publish` restriction in Step 3 then you won't be able to publish to this instance unless you copy your module to the host first and then publish. We recommend something like this:
+
+```bash
+spacetime build
+scp target/wasm32-unknown-unknown/release/spacetime_module.wasm ubuntu@<host>:/home/ubuntu/
+ssh ubuntu@<host> spacetime publish -s local --bin-path spacetime_module.wasm <module-name>
+```
+
+You could put the above commands into a shell script to make publishing to your server easier and faster. It's also possible to integrate a script like this into Github Actions to publish on some event (like a PR merging into master).
+
+## Step 6: Updating SpacetimeDB Version
 To update SpacetimeDB to the latest version, first stop the service:
 
 ```sh
@@ -173,7 +206,7 @@ sudo -u spacetimedb -i -- spacetime install <version-number>
 Finally, restart the service:
 
 ```sh
-sudo systemctl restart spacetimedb
+sudo systemctl start spacetimedb
 ```
 
 ## Step 7: Troubleshooting
