@@ -11,7 +11,7 @@ const nav = {
         page('Getting Started', 'getting-started', 'getting-started.md'),
         section('Deploying'),
         page('Maincloud', 'deploying/maincloud', 'deploying/maincloud.md'),
-        page('Self-Hosting SpacetimeDB', 'how-to/spacetimedb-standalone', 'how-to/spacetimedb-standalone.md'),
+        page('Self-Hosting SpacetimeDB', 'deploying/spacetimedb-standalone', 'deploying/spacetimedb-standalone.md'),
         section('Unity Tutorial - Basic Multiplayer'),
         page('Overview', 'unity', 'unity/index.md'),
         page('1 - Setup', 'unity/part-1', 'unity/part-1.md'),
