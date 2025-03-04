@@ -10,7 +10,7 @@ This tutorial will guide you through setting up SpacetimeDB on an Ubuntu 24.04 s
 Also, join the community! We have an official discord server: https://discord.gg/spacetimedb
 
 ## Step 1: Create a Dedicated User for SpacetimeDB
-For security purposes, create a dedicated `spacetimedb` user to run SpacetimeDB with a home directory at `/stdb`:
+For security purposes, create a dedicated `spacetimedb` user to run SpacetimeDB:
 
 ```sh
 sudo mkdir /stdb
@@ -51,7 +51,6 @@ WantedBy=multi-user.target
 Enable and start the service:
 
 ```sh
-sudo systemctl daemon-reload
 sudo systemctl enable spacetimedb
 sudo systemctl start spacetimedb
 ```
@@ -223,7 +222,7 @@ Verify that the `spacetimedb` user has the correct permissions:
 sudo ls -lah /stdb/spacetime
 ```
 
-If needed, adjust permissions:
+If needed, add the executable permission:
 
 ```sh
 sudo chmod +x /stdb/spacetime
