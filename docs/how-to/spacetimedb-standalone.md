@@ -39,7 +39,7 @@ Description=SpacetimeDB Server
 After=network.target
 
 [Service]
-ExecStart=/stdb/bin/spacetime --root-dir=/stdb start
+ExecStart=/stdb/spacetime --root-dir=/stdb start --listen-addr='127.0.0.1:3000'
 Restart=always
 User=spacetimedb
 WorkingDirectory=/stdb
