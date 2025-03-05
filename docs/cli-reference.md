@@ -282,7 +282,7 @@ Run `spacetime help publish` for more detailed information.
 
   Possible values: `csharp`, `typescript`, `rust`
 
-* `--build-options <BUILD_OPTIONS>` — Options to pass to the build command, for example --build-options='--skip-println-checks'
+* `--build-options <BUILD_OPTIONS>` — Options to pass to the build command, for example --build-options='--lint-dir='
 
   Default value: ``
 * `-y`, `--yes` — Run non-interactively wherever possible. This will answer "yes" to almost all prompts, but will sometimes answer "no" to preserve non-interactivity (e.g. when prompting whether to log in with spacetimedb.com).
