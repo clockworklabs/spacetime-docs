@@ -81,7 +81,7 @@ Run `spacetime help publish` for more detailed information.
 ###### <b>Options:</b>
 
 * `-c`, `--delete-data` — When publishing to an existing database identity, first DESTROY all data associated with the module
-* `--build-options <BUILD_OPTIONS>` — Options to pass to the build command, for example --build-options='--skip-println-checks'
+* `--build-options <BUILD_OPTIONS>` — Options to pass to the build command, for example --build-options='--lint-dir='
 
   Default value: ``
 * `-p`, `--project-path <PROJECT_PATH>` — The system path (absolute or relative) to the module project
