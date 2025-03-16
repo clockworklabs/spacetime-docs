@@ -1146,7 +1146,7 @@ public class CameraController : MonoBehaviour
 
 Add the `CameraController` as a component to the `Main Camera` object in the scene.
 
-Lastly modify the `GameManager.SetupArea` method to set the `WorldSize` on the `CameraController`.
+Lastly modify the `GameManager.SetupArena` method to set the `WorldSize` on the `CameraController`.
 
 ```cs
     private void SetupArena(float worldSize)
