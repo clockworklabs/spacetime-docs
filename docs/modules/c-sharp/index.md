@@ -201,7 +201,7 @@ You can also generate code for clients of your module using the `spacetime gener
 
 # How it works
 
-Under the hood, SpacetimeDB modules are WebAssembly modules that import a [specific WebAssembly ABI](https://spacetimedb.com/docs/webassembly-abi) and export a small number of special functions. This is automatically configured when you add the `SpacetimeDB.Runtime` package as a dependency of your application.
+Under the hood, SpacetimeDB modules are WebAssembly modules that import a [specific WebAssembly ABI](https://spacetimedb.com/docs/internals/webassembly-abi) and export a small number of special functions. This is automatically configured when you add the `SpacetimeDB.Runtime` package as a dependency of your application.
 
 The SpacetimeDB host is an application that hosts SpacetimeDB databases. [Its source code is available](https://github.com/clockworklabs/SpacetimeDB) under [the Business Source License with an Additional Use Grant](https://github.com/clockworklabs/SpacetimeDB/blob/master/LICENSE.txt). You can run your own host, or you can upload your module to the public SpacetimeDB network. <!-- TODO: want a link to some dashboard for the public network. --> The network will create a database for you and install your module in it to serve client requests.
 
