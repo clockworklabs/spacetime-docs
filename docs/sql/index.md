@@ -487,6 +487,8 @@ consider the following best practices to ensure optimal performance:
 - **Add Primary Key and/or Unique Constraints:**  
     Constrain columns whose values are guaranteed to be distinct as either unique or primary keys.
     The query planner can further optimize joins if it knows the join values to be unique.
+    - **Differences between primary keys and unique constraints:**<br>
+    In SpacetimeDB, the only difference between unique and primary_key is that the [client SDKs](/docs/sdks) assign special semantics to primary_key columns. Specifically, the on_update callback fires for a row when a single transaction deletes an old row with a certain primary key, and then inserts a new row with that same primary key. Tables without a primary key column will never observe an on_update event. (Also, a table can only have at most one primary key column, but may have as many unique columns as it wants.) Otherwise, the two constraints are equivalent.
 
 - **Index Filtered Columns:**  
     Index columns frequently used in a `WHERE` clause.
