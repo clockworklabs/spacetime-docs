@@ -67,6 +67,8 @@ impl DbConnection {
 
 Construct a `DbConnection` by calling `DbConnection::builder()` and chaining configuration methods, then calling `.build()`. You must at least specify `with_uri`, to supply the URI of the SpacetimeDB to which you published your module, and `with_module_name`, to supply the human-readable SpacetimeDB domain name or the raw `Identity` which identifies the module.
 
+Please be aware that you must [advance the connection](#advance-the-connection-and-process-messages) to process messages. If you don't do that, no callbacks will ever be invoked!
+
 | Name                                                      | Description                                                                          |
 |-----------------------------------------------------------|--------------------------------------------------------------------------------------|
 | [`with_uri` method](#method-with_uri)                     | Set the URI of the SpacetimeDB instance which hosts the remote database.             |
@@ -160,7 +162,9 @@ After configuring the connection and registering callbacks, attempt to open the 
 
 ### Advance the connection and process messages
 
-In the interest of supporting a wide variety of client applications with different execution strategies, the SpacetimeDB SDK allows you to choose when the `DbConnection` spends compute time and processes messages. If you do not arrange for the connection to advance by calling one of these methods, the `DbConnection` will never advance, and no callbacks will ever be invoked.
+In the interest of supporting a wide variety of client applications with different execution strategies, the SpacetimeDB SDK allows you to choose when the `DbConnection` spends compute time and processes messages.
+
+> NOTE: If you do not arrange for the connection to advance by calling one of these methods, the `DbConnection` will never advance, and no callbacks will ever be invoked.
 
 | Name                                          | Description                                           |
 |-----------------------------------------------|-------------------------------------------------------|

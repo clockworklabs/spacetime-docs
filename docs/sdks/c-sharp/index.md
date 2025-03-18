@@ -68,6 +68,8 @@ class DbConnection
 
 Construct a `DbConnection` by calling `DbConnection.Builder()`, chaining configuration methods, and finally calling `.Build()`. At a minimum, you must specify `WithUri` to provide the URI of the SpacetimeDB instance, and `WithModuleName` to specify the module's name or identity.
 
+Please be aware that you must [advance the connection](#advance-the-connection-and-process-messages) to process messages. If you don't do that, no callbacks will ever be invoked!
+
 | Name                                                    | Description                                                                                |
 |---------------------------------------------------------|--------------------------------------------------------------------------------------------|
 | [WithUri method](#method-withuri)                       | Set the URI of the SpacetimeDB instance hosting the remote database.                       |
@@ -159,7 +161,9 @@ After configuring the connection and registering callbacks, attempt to open the 
 
 ## Advance the connection and process messages
 
-In the interest of supporting a wide variety of client applications with different execution strategies, the SpacetimeDB SDK allows you to choose when the `DbConnection` spends compute time and processes messages. If you do not arrange for the connection to advance by calling one of these methods, the `DbConnection` will never advance, and no callbacks will ever be invoked.
+In the interest of supporting a wide variety of client applications with different execution strategies, the SpacetimeDB SDK allows you to choose when the `DbConnection` spends compute time and processes messages.
+
+> NOTE: If you do not arrange for the connection to advance by calling one of these methods, the `DbConnection` will never advance, and no callbacks will ever be invoked.
 
 | Name                                        | Description                                           |
 |---------------------------------------------|-------------------------------------------------------|
