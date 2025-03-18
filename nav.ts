@@ -44,6 +44,9 @@ const nav: Nav = {
     page('3 - Gameplay', 'unity/part-3', 'unity/part-3.md'),
     page('4 - Moving and Colliding', 'unity/part-4', 'unity/part-4.md'),
 
+    section('SQL'),
+    page('SQL Reference', 'sql', 'sql/index.md'),
+
     section('CLI Reference'),
     page('CLI Reference', 'cli-reference', 'cli-reference.md'),
     page(
@@ -84,9 +87,6 @@ const nav: Nav = {
     ),
     page('TypeScript Reference', 'sdks/typescript', 'sdks/typescript/index.md'),
 
-    section('SQL'),
-    page('SQL Reference', 'sql', 'sql/index.md'),
-
     section('Subscriptions'),
     page('Subscription Reference', 'subscriptions', 'subscriptions/index.md'),
 
@@ -94,14 +94,14 @@ const nav: Nav = {
     page('Incremental Migrations', 'how-to/incremental-migrations', 'how-to/incremental-migrations.md'),
 
     section('HTTP API'),
-    page('HTTP', 'http', 'http/index.md'),
+    page('Authorization', 'http/authorization', 'http/authorization.md'),
     page('`/identity`', 'http/identity', 'http/identity.md'),
     page('`/database`', 'http/database', 'http/database.md'),
 
     section('Internals'),
-    page('Module ABI Reference', 'webassembly-abi', 'webassembly-abi/index.md'),
-    page('SATS-JSON Data Format', 'sats-json', 'sats-json.md'),
-    page('BSATN Data Format', 'bsatn', 'bsatn.md'),
+    page('Module ABI Reference', 'webassembly-abi', 'internals/webassembly-abi.md'),
+    page('SATS-JSON Data Format', 'sats-json', 'internals/sats-json.md'),
+    page('BSATN Data Format', 'bsatn', 'internals/bsatn.md'),
 
     section('Appendix'),
     page('Appendix', 'appendix', 'appendix.md'),
