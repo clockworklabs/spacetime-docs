@@ -44,6 +44,9 @@ const nav: Nav = {
     page('3 - Gameplay', 'unity/part-3', 'unity/part-3.md'),
     page('4 - Moving and Colliding', 'unity/part-4', 'unity/part-4.md'),
 
+    section('SQL'),
+    page('SQL Reference', 'sql', 'sql/index.md'),
+
     section('CLI Reference'),
     page('CLI Reference', 'cli-reference', 'cli-reference.md'),
     page(
@@ -83,9 +86,6 @@ const nav: Nav = {
       'sdks/typescript/quickstart.md'
     ),
     page('TypeScript Reference', 'sdks/typescript', 'sdks/typescript/index.md'),
-
-    section('SQL'),
-    page('SQL Reference', 'sql', 'sql/index.md'),
 
     section('Subscriptions'),
     page('Subscription Reference', 'subscriptions', 'subscriptions/index.md'),
