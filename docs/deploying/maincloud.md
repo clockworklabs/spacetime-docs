@@ -12,6 +12,8 @@ Maincloud is a managed cloud service that provides developers an easy way to dep
 spacetime publish -s maincloud my-cool-module
 ```
 
+`maincloud` is the nickname for the hostname `maincloud.spacetimedb.com`, which is pre-configured in the SpacetimeDB CLI. See [`spacetime server`↴](/docs/cli-reference#spacetime-server) for more information.
+
 ## Connecting your Identity to the Web Dashboard
 
 By logging in your CLI via spacetimedb.com, you can view your published modules on the web dashboard.
