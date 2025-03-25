@@ -582,9 +582,15 @@ Notice that the food automatically respawns as you vaccuum them up. This is beca
 - Publish to Maincloud `spacetime publish -s maincloud <your module name> --delete-data`
   - `<your module name>` This name should be unique and cannot contain any special characters.
 - Update the URL in the Unity project to: `https://maincloud.spacetimedb.com/`
-- Change your Unity Module name to match `<your module name>`.
-- In your `GameManager.cs`, add the following code to Start():
+- Update the Module name in the Unity project to `<your module name>`.
+- Clear the PlayerPrefs in Start() within `GameManager.cs`
+- Your `GameManager.cs` should look something like this:
 ```csharp
+const string SERVER_URL = "https://maincloud.spacetimedb.com";
+const string MODULE_NAME = "<your module name>";
+
+...
+
 private void Start()
 {
     // Clear cached connection data to ensure proper connection
