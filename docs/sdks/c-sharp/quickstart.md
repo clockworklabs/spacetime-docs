@@ -90,7 +90,7 @@ We'll work outside-in, first defining our `Main` function at a high level, then 
 1. Initialize the `AuthToken` module, which loads and stores our authentication token to/from local storage.
 2. Connect to the database.
 3. Register a number of callbacks to run in response to various database events.
-4. Start our processing thread which connects to the SpacetimeDB module, updates the SpacetimeDB client and processes commands that come in from the input loop running in the main thread.
+4. Start our processing thread which connects to the SpacetimeDB database, updates the SpacetimeDB client and processes commands that come in from the input loop running in the main thread.
 5. Start the input loop, which reads commands from standard input and sends them to the processing thread.
 6. When the input loop exits, stop the processing thread and wait for it to exit.
 
@@ -455,7 +455,7 @@ Since the input loop will be blocking, we'll run our processing code in a separa
 
 This thread will loop until the thread is signaled to exit, calling the update function `FrameTick` on the `DbConnection` to process any updates received from the module, and `ProcessCommand` to process any commands received from the input loop.
 
-Afterward, close the connection to the module.
+Afterward, close the connection to the database.
 
 To `Program.cs`, add:
 

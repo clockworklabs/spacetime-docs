@@ -508,7 +508,7 @@ public static Entity SpawnCircleAt(ReducerContext ctx, uint player_id, uint mass
 The `EnterGame` reducer takes one argument, the player's `name`. We can use this name to display as a label for the player in the match, by storing the name on the player's row. We are also spawning some circles for the player to control now that they are entering the game. To do this, we choose a random position within the bounds of the arena and create a new entity and corresponding circle row.
 :::
 
-Let's also modify our `disconnect` reducer to remove the circles from the arena when the player disconnects from the server.
+Let's also modify our `disconnect` reducer to remove the circles from the arena when the player disconnects from the database server.
 
 :::server-rust
 ```rust

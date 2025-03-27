@@ -7,7 +7,7 @@ Please note that TypeScript is supported as a client language only. **Before you
 - [Rust](/docs/modules/rust/quickstart)
 - [C#](/docs/modules/c-sharp/quickstart)
 
-By the end of this introduciton, you will have created a basic single page web app which connects to the `quickstart-chat` module created in the above module quickstart guides.
+By the end of this introduciton, you will have created a basic single page web app which connects to the `quickstart-chat` database created in the above module quickstart guides.
 
 ## Project structure
 
@@ -393,7 +393,7 @@ import { Identity } from '@clockworklabs/spacetimedb-sdk';
 
 ## Create your SpacetimeDB client
 
-Now that we've imported the `DbConnection` type, we can use it to connect our app to our module.
+Now that we've imported the `DbConnection` type, we can use it to connect our app to our database.
 
 Add the following to your `App` function, just below `const [newMessage, setNewMessage] = useState('');`:
 
@@ -630,7 +630,7 @@ Try opening a few incognito windows to see what it's like with multiple users!
 
 ### Notify about new users
 
-We can also register `onInsert` and `onDelete` callbacks for the purpose of handling events, not just state. For example, we might want to show a notification any time a new user connects to the module.
+We can also register `onInsert` and `onDelete` callbacks for the purpose of handling events, not just state. For example, we might want to show a notification any time a new user connects to the database.
 
 Note that these callbacks can fire in two contexts:
 

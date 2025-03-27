@@ -53,11 +53,11 @@ A connection to a remote database is represented by the `DbConnection` class. Th
 
 | Name                                                                   | Description                                                                   |
 |------------------------------------------------------------------------|-------------------------------------------------------------------------------|
-| [Connect to a module](#connect-to-a-module)                            | Construct a `DbConnection` instance.                                          |
+| [Connect to a database](#connect-to-a-database)                            | Construct a `DbConnection` instance.                                          |
 | [Advance the connection](#advance-the-connection-and-process-messages) | Poll the `DbConnection` or run it in the background.                          |
 | [Access tables and reducers](#access-tables-and-reducers)              | Access the client cache, request reducer invocations, and register callbacks. |
 
-## Connect to a module
+## Connect to a database
 
 ```csharp
 class DbConnection
@@ -109,7 +109,7 @@ class DbConnectionBuilder<DbConnection>
 }
 ```
 
-Chain a call to `.OnConnect(callback)` to your builder to register a callback to run when your new `DbConnection` successfully initiates its connection to the remote module. The callback accepts three arguments: a reference to the `DbConnection`, the `Identity` by which SpacetimeDB identifies this connection, and a private access token which can be saved and later passed to [`WithToken`](#method-withtoken) to authenticate the same user in future connections.
+Chain a call to `.OnConnect(callback)` to your builder to register a callback to run when your new `DbConnection` successfully initiates its connection to the remote database. The callback accepts three arguments: a reference to the `DbConnection`, the `Identity` by which SpacetimeDB identifies this connection, and a private access token which can be saved and later passed to [`WithToken`](#method-withtoken) to authenticate the same user in future connections.
 
 ### Callback `OnConnectError`
 
@@ -133,7 +133,7 @@ class DbConnectionBuilder<DbConnection>
 }
 ```
 
-Chain a call to `.OnDisconnect(callback)` to your builder to register a callback to run when your `DbConnection` disconnects from the remote module, either as a result of a call to [`Disconnect`](#method-disconnect) or due to an error.
+Chain a call to `.OnDisconnect(callback)` to your builder to register a callback to run when your `DbConnection` disconnects from the remote database, either as a result of a call to [`Disconnect`](#method-disconnect) or due to an error.
 
 ### Method `WithToken`
 

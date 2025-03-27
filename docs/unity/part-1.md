@@ -83,8 +83,8 @@ When you build a new connection to SpacetimeDB, that connection will be added to
 
 Click on the `GameManager` object in the scene and click **Add Component**. Search for and select the `SpacetimeDBNetworkManager` to add it to your `GameManager` object.
 
-Our Unity project is all set up! If you press play, it will show a blank screen, but it should start the game without any errors. Now we're ready to get started on our SpacetimeDB server module, so we have something to connect to!
+Our Unity project is all set up! If you press play, it will show a blank screen, but it should start the game without any errors. Now we're ready to get started on our SpacetimeDB database server, so we have something to connect to!
 
 ### Create the Server Module
 
-We've now got the very basics set up. In [part 2](part-2) you'll learn the basics of how how to create a SpacetimeDB server module and how to connect to it from your client.
+We've now got the very basics set up. In [part 2](part-2) you'll learn the basics of how how to create a SpacetimeDB server module and how to connect to the database from your client.

@@ -94,11 +94,11 @@ A connection to a remote database is represented by the `DbConnection` type. Thi
 
 | Name                                                      | Description                                                                                      |
 |-----------------------------------------------------------|--------------------------------------------------------------------------------------------------|
-| [Connect to a module](#connect-to-a-module)               | Construct a `DbConnection`.                                                                      |
+| [Connect to a database](#connect-to-a-database)               | Construct a `DbConnection`.                                                                      |
 | [Access tables and reducers](#access-tables-and-reducers) | Access subscribed rows in the client cache, request reducer invocations, and register callbacks. |
 
 
-### Connect to a module
+### Connect to a database
 
 ```typescript
 class DbConnection {
@@ -126,7 +126,7 @@ class DbConnectionBuilder {
 }
 ```
 
-Configure the URI of the SpacetimeDB instance or cluster which hosts the remote module.
+Configure the URI of the SpacetimeDB instance or cluster which hosts the remote database.
 
 #### Method `withModuleName`
 
@@ -149,7 +149,7 @@ class DbConnectionBuilder {
 }
 ```
 
-Chain a call to `.onConnect(callback)` to your builder to register a callback to run when your new `DbConnection` successfully initiates its connection to the remote module. The callback accepts three arguments: a reference to the `DbConnection`, the `Identity` by which SpacetimeDB identifies this connection, and a private access token which can be saved and later passed to [`withToken`](#method-withtoken) to authenticate the same user in future connections.
+Chain a call to `.onConnect(callback)` to your builder to register a callback to run when your new `DbConnection` successfully initiates its connection to the remote database. The callback accepts three arguments: a reference to the `DbConnection`, the `Identity` by which SpacetimeDB identifies this connection, and a private access token which can be saved and later passed to [`withToken`](#method-withtoken) to authenticate the same user in future connections.
 
 #### Callback `onConnectError`
 
@@ -173,7 +173,7 @@ class DbConnectionBuilder {
 }
 ```
 
-Chain a call to `.onDisconnect(callback)` to your builder to register a callback to run when your `DbConnection` disconnects from the remote module, either as a result of a call to [`disconnect`](#method-disconnect) or due to an error.
+Chain a call to `.onDisconnect(callback)` to your builder to register a callback to run when your `DbConnection` disconnects from the remote database, either as a result of a call to [`disconnect`](#method-disconnect) or due to an error.
 
 #### Method `withToken`
 

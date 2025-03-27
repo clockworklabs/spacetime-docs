@@ -307,9 +307,9 @@ For example:
 >
 > You can supply your users with authorization tokens in several different ways; which one is best for you will depend on the needs of your app. [...] (I don't actually want to write a real answer to this question - pgoldman 2024-11-19.)
 >
-> #### Can my client connect to multiple modules at the same time?
+> #### Can my client connect to multiple databases at the same time?
 >
-> Yes! Your client can construct as many `DbConnection`s simultaneously as it wants to, each of which will operate independently. If you want to connect to two modules with different schemas, use `spacetime generate` to include bindings for both of them in your client project. Note that SpacetimeDB may reject multiple concurrent connections to the same module by a single client.
+> Yes! Your client can construct as many `DbConnection`s simultaneously as it wants to, each of which will operate independently. If you want to connect to two databases with different schemas, use `spacetime generate` to include bindings for both of them in your client project. Note that SpacetimeDB may reject multiple concurrent connections to the same database by a single client.
 
 ## Tutorial pages
 

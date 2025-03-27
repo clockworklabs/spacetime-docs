@@ -261,9 +261,9 @@ def identity_from_claims(issuer: str, subject: str) -> [u8; 32]:
 
 ### ConnectionId
 
-A `ConnectionId` identifies client connections to a SpacetimeDB module.
+A `ConnectionId` identifies client connections to a SpacetimeDB database.
 
-A user has a single [`Identity`](#identity), but may open multiple connections to your module. Each of these will receive a unique `ConnectionId`.
+A user has a single [`Identity`](#identity), but may open multiple connections to your database. Each of these will receive a unique `ConnectionId`.
 
 ### Energy
 **Energy** is the currency used to pay for data storage and compute operations in a SpacetimeDB host.

@@ -611,7 +611,7 @@ So far you've learned how to configure a new Unity project to work with Spacetim
 So far you've learned how to configure a new Unity project to work with SpacetimeDB, how to develop, build, and publish a SpacetimeDB server module. Within the module, you've learned how to create tables, update tables, and write reducers. You've learned about special reducers like `ClientConnected` and `Init` and how to created scheduled reducers. You learned how we can used scheduled reducers to implement a physics simulation right within your module.
 :::
 
-You've also learned how view module logs and connect your client to your server module, call reducers from the client and synchronize the data with client. Finally you learned how to use that synchronized data to draw game objects on the screen, so that we can interact with them and play a game!
+You've also learned how view module logs and connect your client to your database server, call reducers from the client and synchronize the data with client. Finally you learned how to use that synchronized data to draw game objects on the screen, so that we can interact with them and play a game!
 
 And all of that completely from scratch!
 

@@ -830,13 +830,13 @@ This reducer can be used to configure any static data tables used by your module
 
 ### The `ClientConnected` reducer
 
-This reducer is marked with `[SpacetimeDB.Reducer(ReducerKind.ClientConnected)]`. It is run when a client connects to the SpacetimeDB module. Their identity can be found in the sender value of the `ReducerContext`.
+This reducer is marked with `[SpacetimeDB.Reducer(ReducerKind.ClientConnected)]`. It is run when a client connects to the SpacetimeDB database. Their identity can be found in the sender value of the `ReducerContext`.
 
 If an error occurs in the reducer, the client will be disconnected.
 
 ### The `ClientDisconnected` reducer
 
-This reducer is marked with `[SpacetimeDB.Reducer(ReducerKind.ClientDisconnected)]`. It is run when a client disconnects from the SpacetimeDB module. Their identity can be found in the sender value of the `ReducerContext`.
+This reducer is marked with `[SpacetimeDB.Reducer(ReducerKind.ClientDisconnected)]`. It is run when a client disconnects from the SpacetimeDB database. Their identity can be found in the sender value of the `ReducerContext`.
 
 If an error occurs in the disconnect reducer, the client is still recorded as disconnected.
 

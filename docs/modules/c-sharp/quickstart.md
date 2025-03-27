@@ -233,7 +233,7 @@ public static void ClientConnected(ReducerContext ctx)
 }
 ```
 
-Similarly, whenever a client disconnects, the module will execute the `OnDisconnect` event if it's registered with `ReducerKind.ClientDisconnected`. We'll use it to un-set the `Online` status of the `User` for the disconnected client.
+Similarly, whenever a client disconnects, the database will execute the `OnDisconnect` event if it's registered with `ReducerKind.ClientDisconnected`. We'll use it to un-set the `Online` status of the `User` for the disconnected client.
 
 Add the following code after the `OnConnect` handler:
 
