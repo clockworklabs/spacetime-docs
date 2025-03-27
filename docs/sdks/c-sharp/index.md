@@ -222,7 +222,7 @@ The `IDbContext` interface is implemented by connections and contexts to *every*
 |---------------------------------------------------------------|--------------------------------------------------------------------------|
 | [`IRemoteDbContext` interface](#interface-iremotedbcontext)   | Module-specific `IDbContext`.                                            |
 | [`Db` method](#method-db)                                     | Provides access to the subscribed view of the remote database's tables.  |
-| [`Reducers` method](#method-reducers)                         | Provides access to reducers exposed by the remote module.                |
+| [`Reducers` method](#method-reducers)                         | Provides access to reducers exposed by the remote database.                |
 | [`Disconnect` method](#method-disconnect)                     | End the connection.                                                      |
 | [Subscribe to queries](#subscribe-to-queries)                 | Register SQL queries to receive updates about matching rows.             |
 | [Read connection metadata](#read-connection-metadata)         | Access the connection's `Identity` and `ConnectionId`                    |
@@ -498,7 +498,7 @@ class EventContext {
 }
 ```
 
-The `Reducers` property of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `Reducers` property of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ### Record `Event`
 
@@ -522,7 +522,7 @@ record Event<R>
 }
 ```
 
-Event when we are notified that a reducer ran in the remote module. The [`ReducerEvent`](#record-reducerevent) contains metadata about the reducer run, including its arguments and termination [`Status`](#record-status).
+Event when we are notified that a reducer ran in the remote database. The [`ReducerEvent`](#record-reducerevent) contains metadata about the reducer run, including its arguments and termination [`Status`](#record-status).
 
 This event is passed to row callbacks resulting from modifications by the reducer.
 
@@ -574,7 +574,7 @@ record Event<R>
 }
 ```
 
-Event when we are notified of a transaction in the remote module which we cannot associate with a known reducer. This may be an ad-hoc SQL query or a reducer for which we do not have bindings.
+Event when we are notified of a transaction in the remote database which we cannot associate with a known reducer. This may be an ad-hoc SQL query or a reducer for which we do not have bindings.
 
 This event is passed to [row callbacks](#callback-oninsert) resulting from modifications by the transaction.
 
@@ -668,7 +668,7 @@ class ReducerEventContext {
 }
 ```
 
-The `Reducers` property of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `Reducers` property of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Type `SubscriptionEventContext`
 
@@ -699,7 +699,7 @@ class SubscriptionEventContext {
 }
 ```
 
-The `Reducers` property of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `Reducers` property of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Type `ErrorContext`
 
@@ -741,7 +741,7 @@ class ErrorContext {
 }
 ```
 
-The `Reducers` property of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `Reducers` property of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Access the client cache
 

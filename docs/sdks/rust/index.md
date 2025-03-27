@@ -220,7 +220,7 @@ struct DbConnection {
 }
 ```
 
-The `reducers` field of the `DbConnection` provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the `DbConnection` provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Trait `DbContext`
 
@@ -528,7 +528,7 @@ struct EventContext {
 }
 ```
 
-The `reducers` field of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ### Enum `Event`
 
@@ -553,7 +553,7 @@ spacetimedb_sdk::Event<module_bindings::Reducer>
 spacetimedb_sdk::Event::Reducer(spacetimedb_sdk::ReducerEvent<module_bindings::Reducer>)
 ```
 
-Event when we are notified that a reducer ran in the remote module. The [`ReducerEvent`](#struct-reducerevent) contains metadata about the reducer run, including its arguments and termination [`Status`](#enum-status).
+Event when we are notified that a reducer ran in the remote database. The [`ReducerEvent`](#struct-reducerevent) contains metadata about the reducer run, including its arguments and termination [`Status`](#enum-status).
 
 This event is passed to row callbacks resulting from modifications by the reducer.
 
@@ -589,7 +589,7 @@ This event is passed to [row `on_delete` callbacks](#callback-on_delete) resulti
 
 #### Variant `UnknownTransaction`
 
-Event when we are notified of a transaction in the remote module which we cannot associate with a known reducer. This may be an ad-hoc SQL query or a reducer for which we do not have bindings.
+Event when we are notified of a transaction in the remote database which we cannot associate with a known reducer. This may be an ad-hoc SQL query or a reducer for which we do not have bindings.
 
 This event is passed to [row callbacks](#callback-on_insert) resulting from modifications by the transaction.
 
@@ -710,7 +710,7 @@ struct ReducerEventContext {
 }
 ```
 
-The `reducers` field of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Type `SubscriptionEventContext`
 
@@ -741,7 +741,7 @@ struct SubscriptionEventContext {
 }
 ```
 
-The `reducers` field of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Type `ErrorContext`
 
@@ -783,7 +783,7 @@ struct ErrorContext {
 }
 ```
 
-The `reducers` field of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Access the client cache
 

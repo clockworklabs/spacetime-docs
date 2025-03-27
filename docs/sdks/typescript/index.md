@@ -216,7 +216,7 @@ class DbConnection {
 }
 ```
 
-The `reducers` field of the `DbConnection` provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the `DbConnection` provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Interface `DbContext`
 
@@ -257,7 +257,7 @@ interface DbContext {
 }
 ```
 
-The `reducers` field of a `DbContext` provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of a `DbContext` provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ### Method `disconnect`
 
@@ -469,7 +469,7 @@ class EventContext {
 }
 ```
 
-The `reducers` field of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ### Type `Event`
 
@@ -499,7 +499,7 @@ type Event<Reducer> =
 { tag: 'Reducer'; value: ReducerEvent<Reducer> }
 ```
 
-Event when we are notified that a reducer ran in the remote module. The [`ReducerEvent`](#type-reducerevent) contains metadata about the reducer run, including its arguments and termination status(#type-updatestatus).
+Event when we are notified that a reducer ran in the remote database. The [`ReducerEvent`](#type-reducerevent) contains metadata about the reducer run, including its arguments and termination status(#type-updatestatus).
 
 This event is passed to row callbacks resulting from modifications by the reducer.
 
@@ -540,7 +540,7 @@ This event is passed to [row `onDelete` callbacks](#callback-ondelete) resulting
 { tag: 'UnknownTransaction' }
 ```
 
-Event when we are notified of a transaction in the remote module which we cannot associate with a known reducer. This may be an ad-hoc SQL query or a reducer for which we do not have bindings.
+Event when we are notified of a transaction in the remote database which we cannot associate with a known reducer. This may be an ad-hoc SQL query or a reducer for which we do not have bindings.
 
 This event is passed to [row callbacks](#callback-oninsert) resulting from modifications by the transaction.
 
@@ -676,7 +676,7 @@ class ReducerEventContext {
 }
 ```
 
-The `reducers` field of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Type `SubscriptionEventContext`
 
@@ -705,7 +705,7 @@ class SubscriptionEventContext {
 }
 ```
 
-The `reducers` field of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Type `ErrorContext`
 
@@ -744,7 +744,7 @@ class ErrorContext {
 }
 ```
 
-The `reducers` field of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Access the client cache
 
