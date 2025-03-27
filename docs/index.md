@@ -229,7 +229,7 @@ Clients are regular software applications that developers can choose how to depl
 
 ### Identity
 
-A SpacetimeDB `Identity` identifies someone interacting with a module. It is a long lived, public, globally valid identifier that will always refer to the same end user, even across different connections.
+A SpacetimeDB `Identity` identifies someone interacting with a database. It is a long lived, public, globally valid identifier that will always refer to the same end user, even across different connections.
 
 A user's `Identity` is attached to every [reducer call](#reducer) they make, and you can use this to decide what they are allowed to do.
 

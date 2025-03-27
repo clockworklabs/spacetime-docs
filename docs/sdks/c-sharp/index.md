@@ -191,7 +191,7 @@ class DbConnection
 }
 ```
 
-The `Db` property of the `DbConnection` provides access to the subscribed view of the remote database's tables. See [Access the client cache](#access-the-client-cache).
+The `Db` property of the `DbConnection` provides access to the subscribed view of the remote database module's tables. See [Access the client cache](#access-the-client-cache).
 
 ### Property `Reducers`
 
@@ -203,7 +203,7 @@ class DbConnection
 }
 ```
 
-The `Reducers` field of the `DbConnection` provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `Reducers` field of the `DbConnection` provides access to reducers exposed by the module of the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Interface `IDbContext`
 
