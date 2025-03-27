@@ -337,7 +337,7 @@ The first time a tutorial or series introduces a new type / function / method / 
 
 ### Tutorial code
 
-If the tutorial involves writing code, e.g. for a module or client, the tutorial should include the complete result code within its text. Ideally, it should be possible for a reader to copy and paste all the code blocks in the document into a file, effectively concatentating them together, and wind up with a coherent and runnable program. Sometimes this is not possible, e.g. because C# requires wrapping your whole file in a bunch of scopes. In this case, precede each code block with a sentence that describes where the reader is going to paste it.
+If the tutorial involves writing code, e.g. for a module or client, the tutorial should include the complete result code within its text. Ideally, it should be possible for a reader to copy and paste all the code blocks in the document into a file, effectively concatenating them together, and wind up with a coherent and runnable program. Sometimes this is not possible, e.g. because C# requires wrapping your whole file in a bunch of scopes. In this case, precede each code block with a sentence that describes where the reader is going to paste it.
 
 Include even uninteresting code, like imports! You can rush through these without spending too much time on them, but make sure that every line of code required to make the project work appears in the tutorial.
 
