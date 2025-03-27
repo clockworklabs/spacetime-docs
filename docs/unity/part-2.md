@@ -392,7 +392,7 @@ pub fn connect(ctx: &ReducerContext) -> Result<(), String> {
 }
 ```
 
-The `client_connected` argument to the `spacetimedb::reducer` macro indicates to SpacetimeDB that this is a special reducer. This reducer is only every called by SpacetimeDB itself when a client connects to your module.
+The `client_connected` argument to the `spacetimedb::reducer` macro indicates to SpacetimeDB that this is a special reducer. This reducer is only every called by SpacetimeDB itself when a client connects to your database.
 
 > SpacetimeDB gives you the ability to define custom reducers that automatically trigger when certain events occur.
 >
