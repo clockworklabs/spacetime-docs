@@ -7,7 +7,7 @@ This progressive tutorial is continued from [part 2](/docs/unity/part-2).
 ### Spawning Food
 
 :::server-rust
-Let's start by spawning food into the map. The first thing we need to do is create a new, special reducer called the `init` reducer. SpacetimeDB calls the `init` reducer automatically when first publish your module, and also after any time you run with `publish --delete-data`. It gives you an opportunity to initialize the state of your module before any clients connect.
+Let's start by spawning food into the map. The first thing we need to do is create a new, special reducer called the `init` reducer. SpacetimeDB calls the `init` reducer automatically when first publish your module, and also after any time you run with `publish --delete-data`. It gives you an opportunity to initialize the state of your database before any clients connect.
 
 Add this new reducer above our `connect` reducer.
 
@@ -78,7 +78,7 @@ pub fn spawn_food(ctx: &ReducerContext) -> Result<(), String> {
 ```
 :::
 :::server-csharp
-Let's start by spawning food into the map. The first thing we need to do is create a new, special reducer called the `Init` reducer. SpacetimeDB calls the `Init` reducer automatically when you first publish your module, and also after any time you run with `publish --delete-data`. It gives you an opportunity to initialize the state of your module before any clients connect.
+Let's start by spawning food into the map. The first thing we need to do is create a new, special reducer called the `Init` reducer. SpacetimeDB calls the `Init` reducer automatically when you first publish your module, and also after any time you run with `publish --delete-data`. It gives you an opportunity to initialize the state of your database before any clients connect.
 
 Add this new reducer above our `Connect` reducer.
 
