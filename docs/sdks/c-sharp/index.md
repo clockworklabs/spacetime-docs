@@ -66,12 +66,12 @@ class DbConnection
 }
 ```
 
-Construct a `DbConnection` by calling `DbConnection.Builder()`, chaining configuration methods, and finally calling `.Build()`. At a minimum, you must specify `WithUri` to provide the URI of the SpacetimeDB instance, and `WithModuleName` to specify the module's name or identity.
+Construct a `DbConnection` by calling `DbConnection.Builder()`, chaining configuration methods, and finally calling `.Build()`. At a minimum, you must specify `WithUri` to provide the URI of the SpacetimeDB instance, and `WithModuleName` to specify the database's name or identity.
 
 | Name                                                    | Description                                                                                |
 |---------------------------------------------------------|--------------------------------------------------------------------------------------------|
 | [WithUri method](#method-withuri)                       | Set the URI of the SpacetimeDB instance hosting the remote database.                       |
-| [WithModuleName method](#method-withmodulename)         | Set the name or identity of the remote module.                                             |
+| [WithModuleName method](#method-withmodulename)         | Set the name or identity of the remote database.                                             |
 | [OnConnect callback](#callback-onconnect)               | Register a callback to run when the connection is successfully established.                |
 | [OnConnectError callback](#callback-onconnecterror)     | Register a callback to run if the connection is rejected or the host is unreachable.       |
 | [OnDisconnect callback](#callback-ondisconnect)         | Register a callback to run when the connection ends.                                       |
@@ -98,7 +98,7 @@ class DbConnectionBuilder
 }
 ```
 
-Configure the SpacetimeDB domain name or `Identity` of the remote module which identifies it within the SpacetimeDB instance or cluster.
+Configure the SpacetimeDB domain name or `Identity` of the remote database which identifies it within the SpacetimeDB instance or cluster.
 
 ### Callback `OnConnect`
 

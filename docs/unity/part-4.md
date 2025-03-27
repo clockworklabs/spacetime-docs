@@ -579,15 +579,15 @@ We didn't even have to update the client, because our client's `OnDelete` callba
 Notice that the food automatically respawns as you vaccuum them up. This is because our scheduled reducer is automatically replacing the food 2 times per second, to ensure that there is always 600 food on the map.
 
 ## Connecting to Maincloud
-- Publish to Maincloud `spacetime publish -s maincloud <your module name> --delete-data`
-  - `<your module name>` This name should be unique and cannot contain any special characters other than internal hyphens (`-`).
+- Publish to Maincloud `spacetime publish -s maincloud <your database name> --delete-data`
+  - `<your database name>` This name should be unique and cannot contain any special characters other than internal hyphens (`-`).
 - Update the URL in the Unity project to: `https://maincloud.spacetimedb.com`
-- Update the module name in the Unity project to `<your module name>`.
+- Update the database name in the Unity project to `<your database name>`.
 - Clear the PlayerPrefs in Start() within `GameManager.cs`
 - Your `GameManager.cs` should look something like this:
 ```csharp
 const string SERVER_URL = "https://maincloud.spacetimedb.com";
-const string MODULE_NAME = "<your module name>";
+const string DB_NAME = "<your database name>";
 
 ...
 
@@ -600,7 +600,7 @@ private void Start()
 }
 ```
 
-To delete your Maincloud module, you can run: `spacetime delete -s maincloud <your module name>`
+To delete your Maincloud database, you can run: `spacetime delete -s maincloud <your database name>`
 
 # Conclusion
 

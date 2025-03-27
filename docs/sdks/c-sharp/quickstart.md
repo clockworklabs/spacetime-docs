@@ -121,7 +121,7 @@ void Main()
 
 ## Connect to database
 
-Before we connect, we'll store the SpacetimeDB host name and our module name in constants `HOST` and `DB_NAME`.
+Before we connect, we'll store the SpacetimeDB host name and our database name in constants `HOST` and `DB_NAME`.
 
 A connection to a SpacetimeDB database is represented by a `DbConnection`. We configure `DbConnection`s using the builder pattern, by calling `DbConnection.Builder()`, chaining method calls to set various connection parameters and register callbacks, then we cap it off with a call to `.Build()` to begin the connection.
 
@@ -140,7 +140,7 @@ To `Program.cs`, add:
 /// The URI of the SpacetimeDB instance hosting our chat module.
 const string HOST = "http://localhost:3000";
 
-/// The module name we chose when we published our module.
+/// The database name we chose when we published our module.
 const string DBNAME = "quickstart-chat";
 
 /// Load credentials from a file and connect to the database.
