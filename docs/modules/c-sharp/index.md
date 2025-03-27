@@ -1002,7 +1002,7 @@ namespace SpacetimeDB
 
 Methods for writing to a private debug log. Log messages will include file and line numbers.
 
-Log outputs of a running module can be inspected using the `spacetime logs` command:
+Log outputs of a running database can be inspected using the `spacetime logs` command:
 
 ```text
 spacetime logs <DATABASE_IDENTITY>

@@ -87,7 +87,7 @@ class DbConnectionBuilder<DbConnection>
 }
 ```
 
-Configure the URI of the SpacetimeDB instance or cluster which hosts the remote module.
+Configure the URI of the SpacetimeDB instance or cluster which hosts the remote database attached to the module.
 
 ### Method `WithModuleName`
 

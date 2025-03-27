@@ -127,7 +127,7 @@ A connection to a SpacetimeDB database is represented by a `DbConnection`. We co
 
 In our case, we'll supply the following options:
 
-1. A `WithUri` call, to specify the URI of the SpacetimeDB host where our module is running.
+1. A `WithUri` call, to specify the URI of the SpacetimeDB host where our database is running.
 2. A `WithModuleName` call, to specify the name or `Identity` of our database. Make sure to pass the same name here as you supplied to `spacetime publish`.
 3. A `WithToken` call, to supply a token to authenticate with.
 4. An `OnConnect` callback, to run when the remote database acknowledges and accepts our connection.
@@ -137,7 +137,7 @@ In our case, we'll supply the following options:
 To `Program.cs`, add:
 
 ```csharp
-/// The URI of the SpacetimeDB instance hosting our chat module.
+/// The URI of the SpacetimeDB instance hosting our database containing the chat module.
 const string HOST = "http://localhost:3000";
 
 /// The database name we chose when we published our module.
