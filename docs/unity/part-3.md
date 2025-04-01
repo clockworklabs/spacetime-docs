@@ -63,7 +63,7 @@ pub fn spawn_food(ctx: &ReducerContext) -> Result<(), String> {
         let y = rng.gen_range(food_radius..world_size as f32 - food_radius);
         let entity = ctx.db.entity().try_insert(Entity {
             entity_id: 0,
-            position: DbVector2 { x, y },
+            position: DBVector2 { x, y },
             mass: food_mass,
         })?;
         ctx.db.food().try_insert(Food {
