@@ -494,7 +494,7 @@ Replace the implementation of the `GameManager` class with the following.
 public class GameManager : MonoBehaviour
 {
     const string SERVER_URL = "http://127.0.0.1:3000";
-    const string DB_NAME = "blackholio";
+    const string MODULE_NAME = "blackholio";
 
     public static event Action OnConnected;
     public static event Action OnSubscriptionApplied;
@@ -518,7 +518,7 @@ public class GameManager : MonoBehaviour
             .OnConnectError(HandleConnectError)
             .OnDisconnect(HandleDisconnect)
             .WithUri(SERVER_URL)
-            .WithModuleName(DB_NAME);
+            .WithModuleName(MODULE_NAME);
 
         // If the user has a SpacetimeDB auth token stored in the Unity PlayerPrefs,
         // we can use it to authenticate the connection.
@@ -580,7 +580,7 @@ public class GameManager : MonoBehaviour
 }
 ```
 
-Here we configure the connection to the database, by passing it some callbacks in addition to providing the `SERVER_URI` and `DB_NAME` to the connection. When the client connects, the SpacetimeDB SDK will call the `HandleConnect` method, allowing us to start up the game.
+Here we configure the connection to the database, by passing it some callbacks in addition to providing the `SERVER_URI` and `MODULE_NAME` to the connection. When the client connects, the SpacetimeDB SDK will call the `HandleConnect` method, allowing us to start up the game.
 
 In our `HandleConnect` callback we building a subscription and are calling `Subscribe` and subscribing to all data in the database. This will cause SpacetimeDB to synchronize the state of all your tables with your Unity client's SpacetimeDB SDK's "client cache". You can also subscribe to specific tables using SQL syntax, e.g. `SELECT * FROM my_table`. Our [SQL documentation](/docs/sql) enumerates the operations that are accepted in our SQL syntax.
 
