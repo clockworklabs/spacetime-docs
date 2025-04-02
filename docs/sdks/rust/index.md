@@ -220,7 +220,7 @@ struct DbConnection {
 }
 ```
 
-The `reducers` field of the `DbConnection` provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the `DbConnection` provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Trait `DbContext`
 
@@ -528,7 +528,7 @@ struct EventContext {
 }
 ```
 
-The `reducers` field of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ### Enum `Event`
 
@@ -710,7 +710,7 @@ struct ReducerEventContext {
 }
 ```
 
-The `reducers` field of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Type `SubscriptionEventContext`
 
@@ -741,7 +741,7 @@ struct SubscriptionEventContext {
 }
 ```
 
-The `reducers` field of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Type `ErrorContext`
 
@@ -783,7 +783,7 @@ struct ErrorContext {
 }
 ```
 
-The `reducers` field of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Access the client cache
 

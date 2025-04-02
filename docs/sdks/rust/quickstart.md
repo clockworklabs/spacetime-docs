@@ -136,7 +136,7 @@ In our case, we'll supply the following options:
 To `client/src/main.rs`, add:
 
 ```rust
-/// The URI of the SpacetimeDB instance hosting our database containing chat module.
+/// The URI of the SpacetimeDB instance hosting our chat database and module.
 const HOST: &str = "http://localhost:3000";
 
 /// The database name we chose when we published our module.

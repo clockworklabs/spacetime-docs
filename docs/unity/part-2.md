@@ -512,7 +512,7 @@ public class GameManager : MonoBehaviour
         Application.targetFrameRate = 60;
 
         // In order to build a connection to SpacetimeDB we need to register
-        // our callbacks and specify a SpacetimeDB server URI and database name.
+        // our callbacks and specify a SpacetimeDB server URI and module name.
         var builder = DbConnection.Builder()
             .OnConnect(HandleConnect)
             .OnConnectError(HandleConnectError)

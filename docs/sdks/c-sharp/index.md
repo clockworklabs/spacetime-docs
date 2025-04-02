@@ -87,7 +87,7 @@ class DbConnectionBuilder<DbConnection>
 }
 ```
 
-Configure the URI of the SpacetimeDB instance or cluster which hosts the remote database attached to the module.
+Configure the URI of the SpacetimeDB instance or cluster which hosts the remote module and database.
 
 ### Method `WithModuleName`
 
@@ -191,7 +191,7 @@ class DbConnection
 }
 ```
 
-The `Db` property of the `DbConnection` provides access to the subscribed view of the remote database module's tables. See [Access the client cache](#access-the-client-cache).
+The `Db` property of the `DbConnection` provides access to the subscribed view of the remote database's tables. See [Access the client cache](#access-the-client-cache).
 
 ### Property `Reducers`
 
@@ -222,7 +222,7 @@ The `IDbContext` interface is implemented by connections and contexts to *every*
 |---------------------------------------------------------------|--------------------------------------------------------------------------|
 | [`IRemoteDbContext` interface](#interface-iremotedbcontext)   | Module-specific `IDbContext`.                                            |
 | [`Db` method](#method-db)                                     | Provides access to the subscribed view of the remote database's tables.  |
-| [`Reducers` method](#method-reducers)                         | Provides access to reducers exposed by the remote database.                |
+| [`Reducers` method](#method-reducers)                         | Provides access to reducers exposed by the remote module.                |
 | [`Disconnect` method](#method-disconnect)                     | End the connection.                                                      |
 | [Subscribe to queries](#subscribe-to-queries)                 | Register SQL queries to receive updates about matching rows.             |
 | [Read connection metadata](#read-connection-metadata)         | Access the connection's `Identity` and `ConnectionId`                    |
@@ -498,7 +498,7 @@ class EventContext {
 }
 ```
 
-The `Reducers` property of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `Reducers` property of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ### Record `Event`
 
@@ -668,7 +668,7 @@ class ReducerEventContext {
 }
 ```
 
-The `Reducers` property of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `Reducers` property of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Type `SubscriptionEventContext`
 
@@ -699,7 +699,7 @@ class SubscriptionEventContext {
 }
 ```
 
-The `Reducers` property of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `Reducers` property of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Type `ErrorContext`
 

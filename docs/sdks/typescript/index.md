@@ -216,7 +216,7 @@ class DbConnection {
 }
 ```
 
-The `reducers` field of the `DbConnection` provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the `DbConnection` provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Interface `DbContext`
 
@@ -257,7 +257,7 @@ interface DbContext {
 }
 ```
 
-The `reducers` field of a `DbContext` provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of a `DbContext` provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ### Method `disconnect`
 
@@ -469,7 +469,7 @@ class EventContext {
 }
 ```
 
-The `reducers` field of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ### Type `Event`
 
@@ -676,7 +676,7 @@ class ReducerEventContext {
 }
 ```
 
-The `reducers` field of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Type `SubscriptionEventContext`
 
@@ -705,7 +705,7 @@ class SubscriptionEventContext {
 }
 ```
 
-The `reducers` field of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Type `ErrorContext`
 
@@ -744,7 +744,7 @@ class ErrorContext {
 }
 ```
 
-The `reducers` field of the context provides access to reducers exposed by the remote database. See [Observe and invoke reducers](#observe-and-invoke-reducers).
+The `reducers` field of the context provides access to reducers exposed by the remote module. See [Observe and invoke reducers](#observe-and-invoke-reducers).
 
 ## Access the client cache
 
