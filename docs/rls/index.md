@@ -30,10 +30,10 @@ RLS rules are expressed in SQL and declared as constants of type `Filter`.
 ```rust
 use spacetimedb::{client_visibility_filter, Filter};
 
-/// A client can only see their user
+/// A client can only see their account
 #[client_visibility_filter]
-const USERS_FILTER: Filter = Filter::Sql(
-    "SELECT * FROM users WHERE identity = :sender"
+const ACCOUNT_FILTER: Filter = Filter::Sql(
+    "SELECT * FROM account WHERE identity = :sender"
 );
 ```
 :::
@@ -48,11 +48,11 @@ using SpacetimeDB;
 public partial class Module
 {
     /// <summary>
-    /// A client can only see their user.
+    /// A client can only see their account.
     /// </summary>
     [SpacetimeDB.ClientVisibilityFilter]
-    public static readonly Filter USERS_FILTER = new Filter.Sql(
-        "SELECT * FROM users WHERE identity = :sender"
+    public static readonly Filter ACCOUNT_FILTER = new Filter.Sql(
+        "SELECT * FROM account WHERE identity = :sender"
     );
 }
 ```
@@ -87,16 +87,16 @@ This means clients will be able to see to any row that matches at least one of t
 ```rust
 use spacetimedb::{client_visibility_filter, Filter};
 
-/// A client can only see their user
+/// A client can only see their account
 #[client_visibility_filter]
-const USERS_FILTER: Filter = Filter::Sql(
-    "SELECT * FROM users WHERE identity = :sender"
+const ACCOUNT_FILTER: Filter = Filter::Sql(
+    "SELECT * FROM account WHERE identity = :sender"
 );
 
-/// An admin can see all users
+/// An admin can see all accounts
 #[client_visibility_filter]
-const USERS_FILTER_FOR_ADMINS: Filter = Filter::Sql(
-    "SELECT u.* FROM users u JOIN admins a WHERE a.identity = :sender"
+const ACCOUNT_FILTER_FOR_ADMINS: Filter = Filter::Sql(
+    "SELECT account.* FROM account JOIN admin WHERE admin.identity = :sender"
 );
 ```
 :::
@@ -109,19 +109,19 @@ using SpacetimeDB;
 public partial class Module
 {
     /// <summary>
-    /// A client can only see their user.
+    /// A client can only see their account.
     /// </summary>
     [SpacetimeDB.ClientVisibilityFilter]
-    public static readonly Filter USERS_FILTER = new Filter.Sql(
-        "SELECT * FROM users WHERE identity = :sender"
+    public static readonly Filter ACCOUNT_FILTER = new Filter.Sql(
+        "SELECT * FROM account WHERE identity = :sender"
     );
 
     /// <summary>
-    /// An admin can see all users.
+    /// An admin can see all accounts.
     /// </summary>
     [SpacetimeDB.ClientVisibilityFilter]
-    public static readonly Filter USERS_FILTER_FOR_ADMINS = new Filter.Sql(
-        "SELECT u.* FROM users u JOIN admins a WHERE a.identity = :sender"
+    public static readonly Filter ACCOUNT_FILTER_FOR_ADMINS = new Filter.Sql(
+        "SELECT account.* FROM account JOIN admin WHERE admin.identity = :sender"
     );
 }
 ```
@@ -138,24 +138,24 @@ This ensures that data is never leaked through indirect access patterns.
 ```rust
 use spacetimedb::{client_visibility_filter, Filter};
 
-/// A client can only see their user
+/// A client can only see their account
 #[client_visibility_filter]
-const USERS_FILTER: Filter = Filter::Sql(
-    "SELECT * FROM users WHERE identity = :sender"
+const ACCOUNT_FILTER: Filter = Filter::Sql(
+    "SELECT * FROM account WHERE identity = :sender"
 );
 
-/// An admin can see all users
+/// An admin can see all accounts
 #[client_visibility_filter]
-const USERS_FILTER_FOR_ADMINS: Filter = Filter::Sql(
-    "SELECT u.* FROM users u JOIN admins a WHERE a.identity = :sender"
+const ACCOUNT_FILTER_FOR_ADMINS: Filter = Filter::Sql(
+    "SELECT account.* FROM account JOIN admin WHERE admin.identity = :sender"
 );
 
-/// Explicitly filtering by user identity in this rule is not necessary,
-/// since the above RLS rules on `users` will be applied automatically.
+/// Explicitly filtering by client identity in this rule is not necessary,
+/// since the above RLS rules on `account` will be applied automatically.
 /// Hence a client can only see their player, but an admin can see all players.
 #[client_visibility_filter]
-const PLAYERS_FILTER: Filter = Filter::Sql(
-    "SELECT p.* FROM users u JOIN players p ON u.id = p.id"
+const PLAYER_FILTER: Filter = Filter::Sql(
+    "SELECT p.* FROM account a JOIN player p ON a.id = p.id"
 );
 ```
 :::
@@ -166,29 +166,29 @@ using SpacetimeDB;
 public partial class Module
 {
     /// <summary>
-    /// A client can only see their user.
+    /// A client can only see their account.
     /// </summary>
     [SpacetimeDB.ClientVisibilityFilter]
-    public static readonly Filter USERS_FILTER = new Filter.Sql(
-        "SELECT * FROM users WHERE identity = :sender"
+    public static readonly Filter ACCOUNT_FILTER = new Filter.Sql(
+        "SELECT * FROM account WHERE identity = :sender"
     );
 
     /// <summary>
-    /// An admin can see all users.
+    /// An admin can see all accounts.
     /// </summary>
     [SpacetimeDB.ClientVisibilityFilter]
-    public static readonly Filter USERS_FILTER_FOR_ADMINS = new Filter.Sql(
-        "SELECT u.* FROM users u JOIN admins a WHERE a.identity = :sender"
+    public static readonly Filter ACCOUNT_FILTER_FOR_ADMINS = new Filter.Sql(
+        "SELECT account.* FROM account JOIN admin WHERE admin.identity = :sender"
     );
 
     /// <summary>
-    /// Explicitly filtering by user identity in this rule is not necessary,
-    /// since the above RLS rules on `users` will be applied automatically.
+    /// Explicitly filtering by client identity in this rule is not necessary,
+    /// since the above RLS rules on `account` will be applied automatically.
     /// Hence a client can only see their player, but an admin can see all players.
     /// </summary>
     [SpacetimeDB.ClientVisibilityFilter]
-    public static readonly Filter PLAYERS_FILTER = new Filter.Sql(
-        "SELECT p.* FROM users u JOIN players p ON u.id = p.id"
+    public static readonly Filter PLAYER_FILTER = new Filter.Sql(
+        "SELECT p.* FROM account a JOIN player p ON a.id = p.id"
     );
 }
 ```
@@ -205,12 +205,12 @@ use spacetimedb::{client_visibility_filter, Filter};
 
 /// A client can only see players on their same level
 #[client_visibility_filter]
-const PLAYERS_FILTER: Filter = Filter::Sql("
+const PLAYER_FILTER: Filter = Filter::Sql("
     SELECT q.*
-    FROM users u
-    JOIN players p ON u.id = p.id
-    JOIN players q on p.level = q.level
-    WHERE u.identity = :sender
+    FROM account a
+    JOIN player p ON u.id = p.id
+    JOIN player q on p.level = q.level
+    WHERE a.identity = :sender
 ");
 ```
 :::
@@ -224,12 +224,12 @@ public partial class Module
     /// A client can only see players on their same level.
     /// </summary>
     [SpacetimeDB.ClientVisibilityFilter]
-    public static readonly Filter PLAYERS_FILTER = new Filter.Sql(@"
+    public static readonly Filter PLAYER_FILTER = new Filter.Sql(@"
         SELECT q.*
-        FROM users u
-        JOIN players p ON u.id = p.id
-        JOIN players q on p.level = q.level
-        WHERE u.identity = :sender
+        FROM account a
+        JOIN player p ON u.id = p.id
+        JOIN player q on p.level = q.level
+        WHERE a.identity = :sender
     ");
 }
 ```
@@ -243,16 +243,16 @@ This module will fail to publish because each rule depends on the other one.
 ```rust
 use spacetimedb::{client_visibility_filter, Filter};
 
-/// A user must have a corresponding player
+/// An account must have a corresponding player
 #[client_visibility_filter]
-const USERS_FILTER: Filter = Filter::Sql(
-    "SELECT u.* FROM users u JOIN players p ON u.id = p.id WHERE u.identity = :sender"
+const ACCOUNT_FILTER: Filter = Filter::Sql(
+    "SELECT a.* FROM account a JOIN player p ON a.id = p.id WHERE a.identity = :sender"
 );
 
-/// A player must have a corresponding user
+/// A player must have a corresponding account
 #[client_visibility_filter]
-const PLAYERS_FILTER: Filter = Filter::Sql(
-    "SELECT p.* FROM users u JOIN players p ON u.id = p.id WHERE u.identity = :sender"
+const PLAYER_FILTER: Filter = Filter::Sql(
+    "SELECT p.* FROM account a JOIN player p ON a.id = p.id WHERE a.identity = :sender"
 );
 ```
 :::
@@ -263,19 +263,19 @@ using SpacetimeDB;
 public partial class Module
 {
     /// <summary>
-    /// A user must have a corresponding player.
+    /// An account must have a corresponding player.
     /// </summary>
     [SpacetimeDB.ClientVisibilityFilter]
-    public static readonly Filter USERS_FILTER = new Filter.Sql(
-        "SELECT u.* FROM users u JOIN players p ON u.id = p.id WHERE u.identity = :sender"
+    public static readonly Filter ACCOUNT_FILTER = new Filter.Sql(
+        "SELECT a.* FROM account a JOIN player p ON a.id = p.id WHERE a.identity = :sender"
     );
 
     /// <summary>
-    /// A player must have a corresponding user.
+    /// A player must have a corresponding account.
     /// </summary>
     [SpacetimeDB.ClientVisibilityFilter]
-    public static readonly Filter USERS_FILTER = new Filter.Sql(
-        "SELECT p.* FROM users u JOIN players p ON u.id = p.id WHERE u.identity = :sender"
+    public static readonly Filter ACCOUNT_FILTER = new Filter.Sql(
+        "SELECT p.* FROM account a JOIN player p ON a.id = p.id WHERE a.identity = :sender"
     );
 }
 ```
