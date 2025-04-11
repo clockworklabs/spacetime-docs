@@ -7,21 +7,20 @@ These access rules are expressed in SQL and evaluated automatically for queries 
 
 RLS is currently **experimental** and must be explicitly enabled in your module.
 
-### Rust
-
-To enable RLS in Rust, activate the `unstable` feature in your project's `Cargo.toml`:
+:::server-rust
+To enable RLS, activate the `unstable` feature in your project's `Cargo.toml`:
 
 ```toml
 spacetimedb = { version = "...", features = ["unstable"] }
 ```
+:::
+:::server-csharp
+To enable RLS, include the following preprocessor directive at the top of your module files:
 
-### C#
-
-To enable RLS in C#, include the following preprocessor directive at the top of your module files:
-
-```csharp
+```cs
 #pragma warning disable STDB_UNSTABLE
 ```
+:::
 
 ## How It Works
 
