@@ -25,59 +25,79 @@ To enable RLS in C#, include the following preprocessor directive at the top of 
 
 ## How It Works
 
-RLS rules are expressed in SQL and declared as constants of type `Filter` in Rust or public static readonly fields of type `Filter` in C#.
+:::server-rust
+RLS rules are expressed in SQL and declared as constants of type `Filter`.
 
-They are similar to subscriptions in that logically they act as filters on a particular table.
-Just like subscriptions, arbitrary column projections are **not** allowed.
-Similarly, joins **are** allowed, but each rule must return rows from one and only one table.
+```rust
+use spacetimedb::{client_visibility_filter, Filter};
 
-RLS rules can reference other tables with RLS rules, and they will be applied recursively.
-For example, if an RLS rule on the `players` table joins to the `users` table,
-and the `users` table has its own RLS rule, both rules will be enforced.
-This ensures that data is never leaked through indirect access patterns.
+/// A client can only see their user
+#[client_visibility_filter]
+const USERS_FILTER: Filter = Filter::Sql(
+    "SELECT * FROM users WHERE identity = :sender"
+);
+```
+:::
+:::server-csharp
+RLS rules are expressed in SQL and declared as public static readonly fields of type `Filter`.
 
-RLS rules cannot be self-referential however, as this would result in infinite recursion.
-The notable exception is self-joins, since the rule being declared is not applied to the self-join.
+```cs
+using SpacetimeDB;
+
+#pragma warning disable STDB_UNSTABLE
+
+public partial class Module
+{
+    /// <summary>
+    /// A client can only see their user.
+    /// </summary>
+    [SpacetimeDB.ClientVisibilityFilter]
+    public static readonly Filter USERS_FILTER = new Filter.Sql(
+        "SELECT * FROM users WHERE identity = :sender"
+    );
+}
+```
+:::
+
+A module will fail to publish if any of its RLS rules are invalid or malformed.
+
+### `:sender`
 
 You can use the special `:sender` parameter in your rules for user specific access control.
 This parameter is automatically bound to the requesting client's [Identity].
 
-Note that module owners have full access to all public and private tables regardless of RLS.
-
-Multiple rules may be declared for the same table and will be evaluated as a logical `OR`.
-This means clients will be able to see to any row that matches at least one of the rules.
-
-Finally, RLS rules are validated when you publish your module.
-If any rule is invalid or malformed, your module will fail to publish.
+Note that module owners have unrestricted access to all tables regardless of RLS.
 
 
 [Identity]: /docs/index.md#identity
 
-### Examples
+### Semantic Constraints
+
+RLS rules are similar to subscriptions in that logically they act as filters on a particular table.
+Also like subscriptions, arbitrary column projections are **not** allowed.
+Joins **are** allowed, but each rule must return rows from one and only one table.
+
+### Multiple Rules Per Table
+
+Multiple rules may be declared for the same table and will be evaluated as a logical `OR`.
+This means clients will be able to see to any row that matches at least one of the rules.
+
+#### Example
 
 :::server-rust
 ```rust
 use spacetimedb::{client_visibility_filter, Filter};
 
-/// A client only has access to their user's row in the `users` table.
+/// A client can only see their user
 #[client_visibility_filter]
 const USERS_FILTER: Filter = Filter::Sql(
     "SELECT * FROM users WHERE identity = :sender"
 );
 
-/// An admin has full access to the `users` table.
+/// An admin can see all users
 #[client_visibility_filter]
 const USERS_FILTER_FOR_ADMINS: Filter = Filter::Sql(
     "SELECT u.* FROM users u JOIN admins a WHERE a.identity = :sender"
-);
-
-/// A client only has access to their player's row in the `players` table.
-/// Filtering by user identity is not necessary.
-/// The above RLS rule on `users` will be applied automatically.
-/// Hence this rule gives admins full access to the `players` table as well.
-#[client_visibility_filter]
-const PLAYERS_FILTER: Filter = Filter::Sql(
-    "SELECT p.* FROM users u JOIN players p ON u.id = p.id"
 );
 ```
 :::
@@ -90,7 +110,7 @@ using SpacetimeDB;
 public partial class Module
 {
     /// <summary>
-    /// A client only has access to their user's row in the `users` table.
+    /// A client can only see their user.
     /// </summary>
     [SpacetimeDB.ClientVisibilityFilter]
     public static readonly Filter USERS_FILTER = new Filter.Sql(
@@ -98,7 +118,64 @@ public partial class Module
     );
 
     /// <summary>
-    /// An admin has full access to the `users` table.
+    /// An admin can see all users.
+    /// </summary>
+    [SpacetimeDB.ClientVisibilityFilter]
+    public static readonly Filter USERS_FILTER_FOR_ADMINS = new Filter.Sql(
+        "SELECT u.* FROM users u JOIN admins a WHERE a.identity = :sender"
+    );
+}
+```
+:::
+
+### Recursive Application
+
+RLS rules can reference other tables with RLS rules, and they will be applied recursively.
+This ensures that data is never leaked through indirect access patterns.
+
+#### Example
+
+:::server-rust
+```rust
+use spacetimedb::{client_visibility_filter, Filter};
+
+/// A client can only see their user
+#[client_visibility_filter]
+const USERS_FILTER: Filter = Filter::Sql(
+    "SELECT * FROM users WHERE identity = :sender"
+);
+
+/// An admin can see all users
+#[client_visibility_filter]
+const USERS_FILTER_FOR_ADMINS: Filter = Filter::Sql(
+    "SELECT u.* FROM users u JOIN admins a WHERE a.identity = :sender"
+);
+
+/// Explicitly filtering by user identity in this rule is not necessary,
+/// since the above RLS rules on `users` will be applied automatically.
+/// Hence a client can only see their player, but an admin can see all players.
+#[client_visibility_filter]
+const PLAYERS_FILTER: Filter = Filter::Sql(
+    "SELECT p.* FROM users u JOIN players p ON u.id = p.id"
+);
+```
+:::
+:::server-csharp
+```cs
+using SpacetimeDB;
+
+public partial class Module
+{
+    /// <summary>
+    /// A client can only see their user.
+    /// </summary>
+    [SpacetimeDB.ClientVisibilityFilter]
+    public static readonly Filter USERS_FILTER = new Filter.Sql(
+        "SELECT * FROM users WHERE identity = :sender"
+    );
+
+    /// <summary>
+    /// An admin can see all users.
     /// </summary>
     [SpacetimeDB.ClientVisibilityFilter]
     public static readonly Filter USERS_FILTER_FOR_ADMINS = new Filter.Sql(
@@ -106,15 +183,55 @@ public partial class Module
     );
 
     /// <summary>
-    /// A client only has access to their player's row in the `players` table.
-    /// Filtering by user identity is not necessary.
-    /// The above RLS rule on `users` will be applied automatically.
-    /// Hence this rule gives admins full access to the `players` table as well.
+    /// Explicitly filtering by user identity in this rule is not necessary,
+    /// since the above RLS rules on `users` will be applied automatically.
+    /// Hence a client can only see their player, but an admin can see all players.
     /// </summary>
     [SpacetimeDB.ClientVisibilityFilter]
     public static readonly Filter PLAYERS_FILTER = new Filter.Sql(
         "SELECT p.* FROM users u JOIN players p ON u.id = p.id"
     );
+}
+```
+:::
+
+And while self-joins are allowed, in general RLS rules cannot be self-referential,
+as this would result in infinite recursion.
+
+#### Example
+
+:::server-rust
+```rust
+use spacetimedb::{client_visibility_filter, Filter};
+
+/// A client can only see players on their same level
+#[client_visibility_filter]
+const PLAYERS_FILTER: Filter = Filter::Sql("
+    SELECT q.*
+    FROM users u
+    JOIN players p ON u.id = p.id
+    JOIN players q on p.level = q.level
+    WHERE u.identity = :sender
+");
+```
+:::
+:::server-csharp
+```cs
+using SpacetimeDB;
+
+public partial class Module
+{
+    /// <summary>
+    /// A client can only see players on their same level.
+    /// </summary>
+    [SpacetimeDB.ClientVisibilityFilter]
+    public static readonly Filter PLAYERS_FILTER = new Filter.Sql(@"
+        SELECT q.*
+        FROM users u
+        JOIN players p ON u.id = p.id
+        JOIN players q on p.level = q.level
+        WHERE u.identity = :sender
+    ");
 }
 ```
 :::
@@ -135,7 +252,7 @@ However a client will not be able to subscribe to the table for which that rule 
 ## Best Practices
 
 1. Use `:sender` for client specific filtering.
-2. Follow the [SQL best practices] for optimizing your rules.
+2. Follow the [SQL best practices] for optimizing your RLS rules.
 
 
 [SQL best practices]: /docs/sql/index.md#best-practices-for-performance-and-scalability
