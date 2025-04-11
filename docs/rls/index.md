@@ -197,7 +197,7 @@ public partial class Module
 And while self-joins are allowed, in general RLS rules cannot be self-referential,
 as this would result in infinite recursion.
 
-#### Example
+#### Example: Self-Join
 
 :::server-rust
 ```rust
@@ -231,6 +231,52 @@ public partial class Module
         JOIN players q on p.level = q.level
         WHERE u.identity = :sender
     ");
+}
+```
+:::
+
+#### Example: Recursive Rules
+
+This module will fail to publish because each rule depends on the other one.
+
+:::server-rust
+```rust
+use spacetimedb::{client_visibility_filter, Filter};
+
+/// A user must have a corresponding player
+#[client_visibility_filter]
+const USERS_FILTER: Filter = Filter::Sql(
+    "SELECT u.* FROM users u JOIN players p ON u.id = p.id WHERE u.identity = :sender"
+);
+
+/// A player must have a corresponding user
+#[client_visibility_filter]
+const PLAYERS_FILTER: Filter = Filter::Sql(
+    "SELECT p.* FROM users u JOIN players p ON u.id = p.id WHERE u.identity = :sender"
+);
+```
+:::
+:::server-csharp
+```cs
+using SpacetimeDB;
+
+public partial class Module
+{
+    /// <summary>
+    /// A user must have a corresponding player.
+    /// </summary>
+    [SpacetimeDB.ClientVisibilityFilter]
+    public static readonly Filter USERS_FILTER = new Filter.Sql(
+        "SELECT u.* FROM users u JOIN players p ON u.id = p.id WHERE u.identity = :sender"
+    );
+
+    /// <summary>
+    /// A player must have a corresponding user.
+    /// </summary>
+    [SpacetimeDB.ClientVisibilityFilter]
+    public static readonly Filter USERS_FILTER = new Filter.Sql(
+        "SELECT p.* FROM users u JOIN players p ON u.id = p.id WHERE u.identity = :sender"
+    );
 }
 ```
 :::
