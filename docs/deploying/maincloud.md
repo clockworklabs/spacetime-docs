@@ -12,7 +12,7 @@ Maincloud is a managed cloud service that provides developers an easy way to dep
 spacetime publish -s maincloud my-cool-module
 ```
 
-`maincloud` is the nickname for the hostname `maincloud.spacetimedb.com`, which is pre-configured in the SpacetimeDB CLI. See [`spacetime server`↴](/docs/cli-reference#spacetime-server) for more information.
+`maincloud` is the nickname for the hostname `maincloud.spacetimedb.com`, which is pre-configured in the SpacetimeDB CLI. See [`spacetime server`↴](/docs/cli-reference#spacetime-server) for more information. Use `wss://maincloud.spacetimedb.com` as URI to connect to maincloud from clients.
 
 ## Connecting your Identity to the Web Dashboard
 
