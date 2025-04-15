@@ -30,4 +30,6 @@ spacetime login
 With SpacetimeDB Maincloud, you benefit from automatic scaling, robust security, and the convenience of not having to manage the hosting environment.
 
 # Connect from Client SDKs
-
+## Rust
+## C#
+## TypeScript
