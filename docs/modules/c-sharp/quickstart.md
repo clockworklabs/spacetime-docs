@@ -298,13 +298,13 @@ info: Hello, World!
 SpacetimeDB supports a subset of the SQL syntax so that you can easily query the data of your database. We can run a query using the `sql` command.
 
 ```bash
-spacetime sql quickstart-chat "SELECT * FROM Message"
+spacetime sql quickstart-chat "SELECT * FROM message"
 ```
 
 ```bash
- text
----------
- "Hello, World!"
+ sender                                                             | sent                             | text
+--------------------------------------------------------------------+----------------------------------+-----------------
+ 0x93dda09db9a56d8fa6c024d843e805d8262191db3b4ba84c5efcd1ad451fed4e | 2025-04-08T15:47:46.935402+00:00 | "Hello, world!"
 ```
 
 ## What's next?

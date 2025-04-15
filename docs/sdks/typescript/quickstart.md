@@ -28,7 +28,7 @@ pnpm install
 We also need to install the `spacetime-client-sdk` package:
 
 ```bash
-pnpm install @clockworklabs/spacetimedb-sdk@1.0.2
+pnpm install @clockworklabs/spacetimedb-sdk
 ```
 
 > If you are using another package manager like `yarn` or `npm`, the same steps should work with the appropriate commands for those tools.
@@ -387,7 +387,7 @@ module_bindings
 With `spacetime generate` we have generated TypeScript types derived from the types you specified in your module, which we can conveniently use in our client. We've placed these in the `module_bindings` folder. The main entry to the SpacetimeDB API is the `DbConnection`, a type which manages a connection to a remote database. Let's import it and a few other types into our `client/src/App.tsx`.
 
 ```tsx
-import { DbConnection, EventContext, Message, User } from './module_bindings';
+import { DbConnection, ErrorContext, EventContext, Message, User } from './module_bindings';
 import { Identity } from '@clockworklabs/spacetimedb-sdk';
 ```
 
@@ -442,7 +442,7 @@ Add the following to your `App` function, just below `const [newMessage, setNewM
       setConnected(false);
     };
 
-    const onConnectError = (_conn: DbConnection, err: Error) => {
+    const onConnectError = (_ctx: ErrorContext, err: Error) => {
       console.log('Error connecting to SpacetimeDB:', err);
     };
 
@@ -546,7 +546,7 @@ These custom React hooks update the React state anytime a row in our tables chan
 
 > In principle, it should be possible to automatically generate these hooks based on your module's schema, or use [`useSyncExternalStore`](https://react.dev/reference/react/useSyncExternalStore). For simplicity, rather than creating them mechanically, we're just going to do it manually.
 
-Next add let's add these hooks to our `App` component just below our connection setup:
+Let's add these hooks to our `App` component just below our connection setup:
 
 ```tsx
   const messages = useMessages(conn);
