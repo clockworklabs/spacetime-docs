@@ -30,41 +30,22 @@ spacetime login
 With SpacetimeDB Maincloud, you benefit from automatic scaling, robust security, and the convenience of not having to manage the hosting environment.
 
 # Connect from Client SDKs
-To connect to your deployed module in your client code, build a `DbConnection` similar to this:
+To connect to your deployed module in your client code, use the host url of `https://maincloud.spacetimedb.com`:
 
 ## Rust
 ```rust
 DbConnection::builder()
     .with_uri("https://maincloud.spacetimedb.com")
-    .with_module_name(DB_NAME)
-    .with_token(creds_store().load().expect("Error loading credentials"))
-    .on_connect(on_connected)
-    .on_connect_error(on_connect_error)
-    .on_disconnect(on_disconnected)
-    .build()
-    .expect("Failed to connect")
 ```
 
 ## C#
 ```csharp
 DbConnection.Builder()
     .WithUri("https://maincloud.spacetimedb.com")
-    .WithModuleName(DBNAME)
-    .WithToken(AuthToken.Token)
-    .OnConnect(OnConnected)
-    .OnConnectError(OnConnectError)
-    .OnDisconnect(OnDisconnected)
-    .Build()
 ```
 
 ## TypeScript
 ```ts
   DbConnection.builder()
     .withUri('https://maincloud.spacetimedb.com')
-    .withModuleName(dbName)
-    .withToken(localStorage.getItem('auth_token') || '')
-    .onConnect(onConnect)
-    .onDisconnect(onDisconnect)
-    .onConnectError(onConnectError)
-    .build()
 ```
