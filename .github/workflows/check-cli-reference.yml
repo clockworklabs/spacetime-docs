@@ -6,6 +6,7 @@ on:
         description: 'SpacetimeDB ref'
         required: false
         default: ''
+permissions: read-all
 
 name: Check CLI docs
 
