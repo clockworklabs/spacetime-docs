@@ -21,7 +21,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: clockworklabs/SpacetimeDB
-          path: SpacetimeDB
           ref: ${{ env.GIT_REF }}
       - uses: dsherret/rust-toolchain-file@v1
       - name: Checkout docs
@@ -30,7 +29,7 @@ jobs:
           path: spacetime-docs
       - name: Check for docs change
         run: |
-          ( cd SpacetimeDB && cargo run --features markdown-docs -p spacetimedb-cli > ../spacetime-docs/docs/cli-reference.md )
+          cargo run --features markdown-docs -p spacetimedb-cli > ../spacetime-docs/docs/cli-reference.md
           cd spacetime-docs
           # This is needed because our website doesn't render markdown quite properly.
           # See the README in spacetime-docs for more details.
