@@ -96,7 +96,7 @@ const ACCOUNT_FILTER: Filter = Filter::Sql(
 /// An admin can see all accounts
 #[client_visibility_filter]
 const ACCOUNT_FILTER_FOR_ADMINS: Filter = Filter::Sql(
-    "SELECT account.* FROM account JOIN admin WHERE admin.identity = :sender"
+    "SELECT account.* FROM account JOIN admin ON account.identity = admin.identity WHERE admin.identity = :sender"
 );
 ```
 :::
@@ -121,7 +121,7 @@ public partial class Module
     /// </summary>
     [SpacetimeDB.ClientVisibilityFilter]
     public static readonly Filter ACCOUNT_FILTER_FOR_ADMINS = new Filter.Sql(
-        "SELECT account.* FROM account JOIN admin WHERE admin.identity = :sender"
+        "SELECT account.* FROM account JOIN admin ON account.identity = admin.identity WHERE admin.identity = :sender"
     );
 }
 ```
@@ -147,7 +147,7 @@ const ACCOUNT_FILTER: Filter = Filter::Sql(
 /// An admin can see all accounts
 #[client_visibility_filter]
 const ACCOUNT_FILTER_FOR_ADMINS: Filter = Filter::Sql(
-    "SELECT account.* FROM account JOIN admin WHERE admin.identity = :sender"
+    "SELECT account.* FROM account JOIN admin ON account.identity = admin.identity WHERE admin.identity = :sender"
 );
 
 /// Explicitly filtering by client identity in this rule is not necessary,
@@ -178,7 +178,7 @@ public partial class Module
     /// </summary>
     [SpacetimeDB.ClientVisibilityFilter]
     public static readonly Filter ACCOUNT_FILTER_FOR_ADMINS = new Filter.Sql(
-        "SELECT account.* FROM account JOIN admin WHERE admin.identity = :sender"
+        "SELECT account.* FROM account JOIN admin ON account.identity = admin.identity WHERE admin.identity = :sender"
     );
 
     /// <summary>
@@ -208,7 +208,7 @@ use spacetimedb::{client_visibility_filter, Filter};
 const PLAYER_FILTER: Filter = Filter::Sql("
     SELECT q.*
     FROM account a
-    JOIN player p ON u.id = p.id
+    JOIN player p ON a.id = p.id
     JOIN player q on p.level = q.level
     WHERE a.identity = :sender
 ");
@@ -227,7 +227,7 @@ public partial class Module
     public static readonly Filter PLAYER_FILTER = new Filter.Sql(@"
         SELECT q.*
         FROM account a
-        JOIN player p ON u.id = p.id
+        JOIN player p ON a.id = p.id
         JOIN player q on p.level = q.level
         WHERE a.identity = :sender
     ");
