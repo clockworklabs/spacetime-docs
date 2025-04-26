@@ -12,7 +12,7 @@ Our game, called [Blackhol.io](https://github.com/ClockworkLabs/Blackholio), wil
 
 This tutorial assumes that you have a basic understanding of the Unity Editor, using a command line terminal and programming. We'll give you some CLI commands to execute. If you are using Windows, we recommend using Git Bash or PowerShell. For Mac, we recommend Terminal.
 
-We recommend using Unity `2022.3.32f1` or later, but the SDK's minimum supported Unity version is `2021.2` as the SDK requires C# 9. This tutorial has been tested with the following Unity versions.
+We recommend using Unity `2022.3.32f1` or later. Earlier versions of Unity that utilize C# 9 (`2021.2` onward) may work, however are untested and thus may not be fully functional. This tutorial has been tested with the following Unity versions:
 
 - `2022.3.32f1 LTS`
 - `6000.0.33f1`
