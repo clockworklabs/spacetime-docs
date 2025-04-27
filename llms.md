@@ -2171,8 +2171,6 @@ private handleSendMessageResult(ctx: ReducerEventContext, messageText: string) {
     switch(ctx.event.status.tag) {
     case "Committed":
         console.log(`Our message "${messageText}" sent successfully.`);
-        // ctx.event.status.value is type DatabaseUpdate
-        // which has .tables which is an array of TableUpdates
         break;
     case "Failed":
         console.error(`Failed to send "${messageText}": ${ctx.event.status.value}`);
