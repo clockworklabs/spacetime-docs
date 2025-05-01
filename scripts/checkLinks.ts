@@ -143,7 +143,10 @@ function checkLinks(): void {
       }
 
       // Split the resolved link into base and fragment
-      const [baseLink, fragmentRaw] = resolvedLink.split('#');
+      let [baseLink, fragmentRaw] = resolvedLink.split('#');
+      if (baseLink.endsWith('/')) {
+        baseLink = baseLink.slice(0, -1);
+      }
       const fragment: string | null = fragmentRaw || null;
 
       if (fragment) {
