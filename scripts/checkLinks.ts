@@ -118,11 +118,14 @@ function checkLinks(): void {
         return; // Skip external links
       }
 
-      const siteLinks = ['/', '/install', '/images', '/profile'];
+      const siteLinks = ['/install', '/images', '/profile'];
       for (const siteLink of siteLinks) {
-        if (link.startsWith(siteLink + '/') || link.startsWith(siteLink + '#') || link === siteLink) {
+        if (link.startsWith(siteLink)) {
           return; // Skip site links
         }
+      }
+      if (link.startsWith('/#') || link == '/') {
+          return; // Skip site links
       }
 
       // Resolve the link
