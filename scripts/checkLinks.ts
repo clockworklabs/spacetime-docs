@@ -118,14 +118,8 @@ function checkLinks(): void {
         return; // Skip external links
       }
 
-      const siteLinks = ['/install', '/images', '/profile'];
-      for (const siteLink of siteLinks) {
-        if (link.startsWith(siteLink)) {
-          return; // Skip site links
-        }
-      }
-      if (link.startsWith('/#') || link == '/') {
-          return; // Skip site links
+      if (!link.startsWith('/docs')) {
+        return; // Skip site links
       }
 
       // Resolve the link
