@@ -23,8 +23,29 @@ spacetime login
 ```
 
 1. Open the SpacetimeDB website and log in using your GitHub login.
-1. You should now be able to see your published modules [by navigating to your profile on the website](/profile).
+1. You should now be able to see your published modules https://spacetimedb.com/profile, or you can navigate to your database directly at https://spacetimedb.com/my-cool-module.
 
 ---
 
 With SpacetimeDB Maincloud, you benefit from automatic scaling, robust security, and the convenience of not having to manage the hosting environment.
+
+# Connect from Client SDKs
+To connect to your deployed module in your client code, use the host url of `https://maincloud.spacetimedb.com`:
+
+## Rust
+```rust
+DbConnection::builder()
+    .with_uri("https://maincloud.spacetimedb.com")
+```
+
+## C#
+```csharp
+DbConnection.Builder()
+    .WithUri("https://maincloud.spacetimedb.com")
+```
+
+## TypeScript
+```ts
+  DbConnection.builder()
+    .withUri('https://maincloud.spacetimedb.com')
+```
