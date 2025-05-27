@@ -443,6 +443,8 @@ Add the following to your `App` function, just below `const [newMessage, setNewM
     setConn(
       DbConnection.builder()
         .withUri('ws://localhost:3000')
+        // For self-hosted instances with SSL certificates, use wss:// protocol
+        // Example: .withUri('wss://your-domain.com')
         .withModuleName('quickstart-chat')
         .withToken(localStorage.getItem('auth_token') || '')
         .onConnect(onConnect)
